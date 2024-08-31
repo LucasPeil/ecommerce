@@ -17,9 +17,9 @@ function App() {
     }
   
   }`;
-  const url = new URL('http://localhost:4000/teste');
+  /*  const url = new URL('http://localhost:4000/teste');
   url.searchParams.append('query', query);
-  url.searchParams.append('variables', JSON.stringify({ id: id }));
+  url.searchParams.append('variables', JSON.stringify({ id: id })); */
 
   return (
     <>
@@ -38,7 +38,6 @@ function App() {
             const response = await axios.get(
               `/teste?query=${query}&variables=${JSON.stringify({ id: id })}`,
               {
-                method: 'GET',
                 headers: {
                   'Content-Type': 'application/json',
                 },
