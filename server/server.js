@@ -1,81 +1,168 @@
 const express = require('express');
 const { createHandler } = require('graphql-http/lib/use/express');
+const graphql = require('graphql');
 const { buildSchema } = require('graphql');
 const bodyParser = require('body-parser');
 const app = express();
 const path = require('path');
 const dotenv = require('dotenv').config();
+const Produto = require('./models/produtoModel');
 const mongoose = require('mongoose');
-// require('./config/db');
+const connectDB = require('./config/db');
+const { ProductQueryType } = require('./Produto/query');
+const { ProductMutation } = require('./Produto/mutation');
 const PORT = process.env.PORT || 4000;
+
+connectDB();
 // Query para pegar todos os produtos
 
-const productSchema = buildSchema(`
-
+/* const productSchema = buildSchema(`
   type Product{
-    id: ID!
+    id: ID
     image: String
-    descricao: String
-    preco: Float
-    disponibilidade: Boolean
-    qtdDisponibilidade: Int
+    description: String
+    price: Float
+    available: Boolean
+    quantity: Int
+    comments: [String]
   }
+
+  type ProductResult {
+    status: Int!
+    message: String
+    data: Product
+    dataList: [Product]
+}
   
   input ProductInput{
     image: String
-    descricao: String
-    preco: Float
-    disponibilidade: Boolean
-    qtdDisponibilidade: Int
+    description: String
+    price: Float
+    available: Boolean
+    quantity: Int
   }
 
     type Query {
-    getProduct(id: String!): Product
-    getAllProducts(start: Int, end:Int, page:Int, search:String, checkbox: [String] ): [Product]
-    deleteProduct(id: String!): ID
-    createProduct(product: ProductInput): Product
-    updateProduct(id:ID!, product: ProductInput): Product
+    getProduct(id: String!): ProductResult
+    getAllProducts(start: Int, end:Int, page:Int, search:String, checkbox: [String] ): [ProductResult]
     }
-  `);
 
+    type Mutation{
+    deleteProduct(id: String!): ID
+    createProduct(product: ProductInput): ProductResult
+    updateProduct(id:ID!, product: ProductInput): ProductResult}
+  `);
+ */
 class Product {
   constructor(
     id,
-    { image, descricao, preco, disponibilidade, qtdDisponibilidade }
+    { image, description, price, available, quantity, comments }
   ) {
     this.id = id;
     this.image = image;
-    this.descricao = descricao;
-    this.preco = preco;
-    this.disponibilidade = disponibilidade;
-    this.qtdDisponibilidade = qtdDisponibilidade;
-  }
-  getProduct({ id }) {
-    const produto = {
-      id: id,
-      image: 'image-url',
-      descricao: 'Exemplo de Produto',
-      preco: 19.99,
-      disponibilidade: true,
-      qtdDisponibilidade: 10,
-    };
-
-    return produto;
+    this.description = description;
+    this.price = price;
+    this.available = available;
+    this.quantity = quantity;
+    this.comments = comments;
   }
 }
 
-const root = {
+/* const root = {
   getProduct({ id }) {
-    return new Product(id, {
-      image: 'image-url',
-      descricao: 'Exemplo de Produto',
-      preco: 19.99,
-      disponibilidade: true,
-      qtdDisponibilidade: 10,
+    let product = new Product(id, {
+      image: 'imageaaa-url',
+      description: 'Exemplo de Produto',
+      price: 19.99,
+      available: true,
+      quantity: 10,
     });
+    return { status: 200, message: 'Sucesso!', data: product };
   },
-};
 
+  createProduct: async ({ product }, _, context) => {
+    try {
+      let newProduct = new Produto(product);
+      await newProduct.save();
+      return { status: 200, message: 'Sucesso!', data: newProduct };
+    } catch (error) {
+      console.log(error);
+      return { status: 500, message: 'Erro ao criar produto' };
+    }
+  
+  },
+}; */
+/* const root = {
+  getProduct: async ({ id }) => {
+    try {
+      const product = await Produto.findById(id);
+      if (!product) {
+        return { status: 404, message: 'Produto não encontrado' };
+      }
+      return { status: 200, message: 'Sucesso!', data: product };
+    } catch (error) {
+      return { status: 500, message: 'Erro ao buscar produto' };
+    }
+  },
+
+  getAllProducts: async () => {
+    try {
+      const products = await Produto.find();
+      return products.map((product) => ({
+        status: 200,
+        message: 'Sucesso!',
+        data: product,
+      }));
+    } catch (error) {
+      return { status: 500, message: 'Erro ao buscar produtos' };
+    }
+  },
+
+  createProduct: async ({ product }) => {
+    try {
+      const newProduct = new Product(product);
+      await newProduct.save();
+      return {
+        status: 201,
+        message: 'Produto criado com sucesso!',
+        data: newProduct,
+      };
+    } catch (error) {
+      return { status: 500, message: 'Erro ao criar produto' };
+    }
+  },
+
+  updateProduct: async ({ id, product }) => {
+    try {
+      const updatedProduct = await Produto.findByIdAndUpdate(id, product, {
+        new: true,
+      });
+      if (!updatedProduct) {
+        return { status: 404, message: 'Produto não encontrado' };
+      }
+      return {
+        status: 200,
+        message: 'Produto atualizado com sucesso!',
+        data: updatedProduct,
+      };
+    } catch (error) {
+      return { status: 500, message: 'Erro ao atualizar produto' };
+    }
+  },
+
+  deleteProduct: async ({ id }) => {
+    try {
+      await Produto.findByIdAndDelete(id);
+      return id;
+    } catch (error) {
+      return null;
+    }
+  },
+}; */
+const productSchema = new graphql.GraphQLSchema({
+  query: ProductQueryType,
+  mutation: ProductMutation,
+});
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
   bodyParser.urlencoded({
@@ -84,6 +171,12 @@ app.use(
     limit: '50mb',
   })
 );
-app.all('/teste', createHandler({ schema: productSchema, rootValue: root }));
+app.all(
+  '/teste',
+  createHandler({
+    schema: productSchema,
+    context: (req) => ({}),
+  })
+);
 
 app.listen(PORT, () => console.log('Server running on port', PORT));
