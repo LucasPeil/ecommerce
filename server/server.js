@@ -11,11 +11,14 @@ const mongoose = require('mongoose');
 const connectDB = require('./config/db');
 const { ProductQueryType } = require('./Produto/query');
 const { ProductMutation } = require('./Produto/mutation');
+const { UserMutation } = require('./User/mutation');
+
+const { UserQueryType } = require('./User/query');
+const { protect } = require('./middleware/authMiddleware');
 const PORT = process.env.PORT || 4000;
 
 connectDB();
 // Query para pegar todos os produtos
-
 /* const productSchema = buildSchema(`
   type Product{
     id: ID
@@ -67,7 +70,6 @@ class Product {
     this.comments = comments;
   }
 }
-
 /* const root = {
   getProduct({ id }) {
     let product = new Product(id, {
@@ -163,6 +165,10 @@ const productSchema = new graphql.GraphQLSchema({
   query: ProductQueryType,
   mutation: ProductMutation,
 });
+const userSchema = new graphql.GraphQLSchema({
+  query: UserQueryType,
+  mutation: UserMutation,
+});
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
   bodyParser.urlencoded({
@@ -175,7 +181,10 @@ app.all(
   '/teste',
   createHandler({
     schema: productSchema,
-    context: (req) => ({}),
+    context: async (req) => ({
+      user: await protect(req),
+      teste: 'Hello World',
+    }),
   })
 );
 

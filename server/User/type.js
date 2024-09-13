@@ -17,7 +17,7 @@ const UserResultType = new graphql.GraphQLObjectType({
   fields: {
     status: { type: graphql.GraphQLInt },
     message: { type: graphql.GraphQLString },
-    data: { type: ProductType },
+    data: { type: UserType },
   },
 });
 
@@ -27,8 +27,8 @@ const UserInput = new graphql.GraphQLInputObjectType({
     id: { type: graphql.GraphQLString },
     name: { type: graphql.GraphQLString },
     username: { type: graphql.GraphQLString },
-    email: { type: graphql.GraphQLString },
-    password: { type: graphql.GraphQLString },
+    email: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+    password: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
   },
 });
 module.exports = { UserType, UserResultType, UserInput };

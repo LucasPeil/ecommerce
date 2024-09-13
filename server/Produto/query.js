@@ -11,8 +11,9 @@ const ProductQueryType = new graphql.GraphQLObjectType({
       args: {
         id: { type: graphql.GraphQLString },
       },
-      resolve: async (_, { id }) => {
+      resolve: async (_, { id }, context) => {
         try {
+          console.log(context);
           const product = await Produto.findById(id);
           if (!product) {
             return { status: 404, message: 'Produto não encontrado' };

@@ -3,58 +3,83 @@ var graphql = require('graphql');
 const { UserResultType, UserInput } = require('../User/type');
 const User = require('../models/userModel');
 
-//////Modificar daqui para baixo
+const generateToken = (id) => {
+  return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+};
 
-const ProductMutation = new graphql.GraphQLObjectType({
+const UserMutation = new graphql.GraphQLObjectType({
   name: 'Mutation',
   fields: {
-    createProduct: {
-      type: ProductResultType, // Tipo de saída (Output Type) para o retorno
+    createUser: {
+      type: UserResultType, // Tipo de saída (Output Type) para o retorno
       // `args` describes the arguments that the `user` query accepts
-      args: { product: { type: ProductInput } }, // Tipo de entrada (Input Type) para os argumentos
-      resolve: async (_, { product }) => {
+      args: { user: { type: UserInput } }, // Tipo de entrada (Input Type) para os argumentos
+      resolve: async (_, { user }) => {
         try {
-          const newProduct = new Produto(product);
-          await newProduct.save();
+          const newUser = new User(user);
+          await newUser.save();
           return {
             status: 201,
-            message: 'Produto criado com sucesso!',
-            data: newProduct,
+            message: 'Usuário criado com sucesso!',
+            data: newUser,
           };
         } catch (error) {
-          return { status: 500, message: 'Erro ao criar produto' };
+          return { status: 500, message: 'Erro ao criar usuário' };
         }
       },
     },
-    updateProduct: {
-      type: ProductResultType, // Tipo de saída (Output Type) para o retorno
+    login: {
+      type: UserResultType, // Tipo de saída (Output Type) para o retorno
       // `args` describes the arguments that the `user` query accepts
-      args: { product: { type: ProductInput } }, // Tipo de entrada (Input Type) para os argumentos
-      resolve: async (_, { id, product }) => {
+      args: { user: { type: UserInput } }, // Tipo de entrada (Input Type) para os argumentos
+      resolve: async (_, { user }) => {
+        const { email, password } = user;
         try {
-          const updatedProduct = await Produto.findByIdAndUpdate(id, product, {
+          const user = await User.findOne({ email: email }).lean();
+          if (user && (await bcrypt.compare(password, user.password))) {
+            res.status(201).json({
+              _id: user._id,
+              email: user.email,
+              token: generateToken(user._id),
+              resetPassword: user.resetPassword,
+            });
+          } else {
+            throw new Error('Usuário ou senha inválidos');
+          }
+        } catch (error) {
+          return { status: 401, message: 'Usuário ou senha inválidos' };
+        }
+      },
+    },
+    updateUser: {
+      type: UserResultType, // Tipo de saída (Output Type) para o retorno
+      // `args` describes the arguments that the `user` query accepts
+      args: { user: { type: UserInput } }, // Tipo de entrada (Input Type) para os argumentos
+      resolve: async (_, { id, user }) => {
+        try {
+          const updatedUser = await User.findByIdAndUpdate(id, product, {
             new: true,
           });
-          if (!updatedProduct) {
-            return { status: 404, message: 'Produto não encontrado' };
+          if (!updatedUser) {
+            return { status: 404, message: 'Usuário não encontrado' };
           }
           return {
             status: 200,
-            message: 'Produto atualizado com sucesso!',
-            data: updatedProduct,
+            message: 'Usuário atualizado com sucesso!',
+            data: updatedUser,
           };
         } catch (error) {
-          return { status: 500, message: 'Erro ao atualizar produto' };
+          return { status: 500, message: 'Erro ao atualizar usuário' };
         }
       },
     },
-    deleteProduct: {
+    deleteUser: {
       type: graphql.GraphQLString,
       // `args` describes the arguments that the `user` query accepts
       args: { id: { type: graphql.GraphQLString } },
       resolve: async (_, { id }) => {
         try {
-          await Produto.findByIdAndDelete(id);
+          await User.findByIdAndDelete(id);
           return id;
         } catch (error) {
           return null;
@@ -63,4 +88,4 @@ const ProductMutation = new graphql.GraphQLObjectType({
     },
   },
 });
-module.exports = { ProductMutation };
+module.exports = { UserMutation };
