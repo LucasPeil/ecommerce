@@ -12,10 +12,10 @@ const commentschema = mongoose.Schema(
 const productSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
-    image: { type: String },
+    images: { type: String },
     description: { type: String },
     price: { type: Number, required: true },
-    available: { type: Boolean, required: true },
+    available: { type: Boolean, default: true },
     quantity: { type: Number, required: true },
     comments: { type: [commentschema], required: false },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },

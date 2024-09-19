@@ -3,33 +3,15 @@ import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import { Stack } from '@mui/material';
 import DestaqueProductCard from './DestaqueProductCard';
+import { responsiveDestaque } from '../utils/carouselResponsiveness';
 const DestaqueSlider = () => {
-  const responsive = {
-    superLargeDesktop: {
-      // the naming can be any, depends on you.
-      breakpoint: { max: 4000, min: 3000 },
-      items: 4,
-    },
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 4,
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 2,
-    },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 1,
-    },
-  };
   return (
     <Carousel
       swipeable={false}
       focusOnSelect={false}
       draggable={false}
       showDots={false}
-      responsive={responsive}
+      responsive={responsiveDestaque}
       ssr={false} // means to render carousel on server-side.
       infinite={false}
       keyBoardControl={false}
