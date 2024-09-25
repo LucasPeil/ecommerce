@@ -4,7 +4,7 @@ import { Twirl as Hamburger } from 'hamburger-react';
 import LocalGroceryStoreOutlinedIcon from '@mui/icons-material/LocalGroceryStoreOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import CriarProduto from './CriarProduto';
+import CriarProduto from './ProdutoModal/CriarProduto';
 const Header = () => {
   const [isOpen, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
