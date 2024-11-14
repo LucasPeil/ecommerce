@@ -26,17 +26,18 @@ const ProductQueryType = new graphql.GraphQLObjectType({
     },
 
     getAllProducts: {
-      type: new graphql.GraphQLList(ProductResultType),
+      type: ProductResultType /*  new graphql.GraphQLList(ProductResultType) */,
       // `args` describes the arguments that the `user` query accepts
       args: {},
       resolve: async () => {
         try {
           const products = await Produto.find();
-          return products.map((product) => ({
+          return { status: 200, message: 'Sucesso!', dataList: products };
+          /*   return products.map((product) => ({
             status: 200,
             message: 'Sucesso!',
             data: product,
-          }));
+          })); */
         } catch (error) {
           return { status: 500, message: 'Erro ao buscar produtos' };
         }

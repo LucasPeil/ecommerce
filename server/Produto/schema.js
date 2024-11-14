@@ -1,7 +1,7 @@
 const productSchema = buildSchema(`
     type Product{
       id: ID
-      image: String
+      images: String
       description: String
       price: Float
       available: Boolean
@@ -17,7 +17,7 @@ const productSchema = buildSchema(`
   }
     
     input ProductInput{
-      image: String
+      images: String
       description: String
       price: Float
       available: Boolean

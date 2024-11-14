@@ -4,4 +4,4 @@ const ProductInfosForm = () => {
   return <div>ProductInfoForm</div>;
 };
 
-export default ProductInfosForm;
+export default ProductInfosorm;

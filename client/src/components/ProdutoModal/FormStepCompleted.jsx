@@ -11,11 +11,12 @@ const FormStepCompleted = ({ showVariable, Icon }) => {
       sx={{
         height: '5vh',
         transition: '0.5s ease',
-        transitionDelay: showVariable ? 0 : '0.5s',
+        transitionDelay: showVariable ? '0.5s' : 0,
         overflow: 'hidden',
-        opacity: showVariable ? 0 : 1,
+        opacity: showVariable ? 1 : 0,
         backgroundColor: 'white',
         zIndex: 1000,
+        mb: 2,
         borderBottom: '1px solid #999999',
       }}
     >

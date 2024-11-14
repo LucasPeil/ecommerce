@@ -12,7 +12,7 @@ const commentschema = mongoose.Schema(
 const productSchema = mongoose.Schema(
   {
     name: { type: String, required: true },
-    images: { type: String },
+    images: { type: [String] },
     description: { type: String },
     price: { type: Number, required: true },
     available: { type: Boolean, default: true },

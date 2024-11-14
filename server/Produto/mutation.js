@@ -14,6 +14,7 @@ const ProductMutation = new graphql.GraphQLObjectType({
       args: { product: { type: ProductInput } }, // Tipo de entrada (Input Type) para os argumentos
       resolve: async (_, { product }) => {
         try {
+          /*  console.log(product); */
           const newProduct = new Produto(product);
           await newProduct.save();
           return {
@@ -22,6 +23,7 @@ const ProductMutation = new graphql.GraphQLObjectType({
             data: newProduct,
           };
         } catch (error) {
+          console.log(error);
           return { status: 500, message: 'Erro ao criar produto' };
         }
       },

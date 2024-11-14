@@ -2,7 +2,12 @@ import { StrictMode } from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import './index.css';
+import { StyledEngineProvider } from '@mui/material/styles';
+import { Provider } from 'react-redux';
+import { store } from './store';
 import { createTheme } from '@mui/material';
+import { ThemeProvider } from '@emotion/react';
+import { CssBaseline } from '@mui/material';
 const theme = createTheme({
   breakpoints: {
     values: {
@@ -33,13 +38,17 @@ const theme = createTheme({
     background: {
       default: '#f2f2f2',
     },
-    black: {
-      default: '#000000',
-    },
   },
 });
 createRoot(document.getElementById('root')).render(
   <StrictMode>
-    <App />
+    <Provider store={store}>
+      <StyledEngineProvider injectFirst>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      </StyledEngineProvider>
+    </Provider>
   </StrictMode>
 );

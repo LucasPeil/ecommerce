@@ -19,7 +19,7 @@ const Header = () => {
         position: 'fixed',
         top: 0,
         left: 0,
-        zIndex: 200000000,
+        zIndex: 200,
         px: 3,
         boxSizing: 'border-box',
       }}

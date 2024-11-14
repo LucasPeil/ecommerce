@@ -22,7 +22,7 @@ connectDB();
 /* const productSchema = buildSchema(`
   type Product{
     id: ID
-    image: String
+    images: String
     description: String
     price: Float
     available: Boolean
@@ -38,7 +38,7 @@ connectDB();
 }
   
   input ProductInput{
-    image: String
+    images: String
     description: String
     price: Float
     available: Boolean
@@ -59,10 +59,10 @@ connectDB();
 class Product {
   constructor(
     id,
-    { image, description, price, available, quantity, comments }
+    { images, description, price, available, quantity, comments }
   ) {
     this.id = id;
-    this.image = image;
+    this.images = images;
     this.description = description;
     this.price = price;
     this.available = available;
@@ -73,7 +73,7 @@ class Product {
 /* const root = {
   getProduct({ id }) {
     let product = new Product(id, {
-      image: 'imageaaa-url',
+      images: 'imageaaa-url',
       description: 'Exemplo de Produto',
       price: 19.99,
       available: true,
@@ -178,11 +178,11 @@ app.use(
   })
 );
 app.all(
-  '/teste',
+  '/api/products',
   createHandler({
     schema: productSchema,
     context: async (req) => ({
-      user: await protect(req),
+      /*   user: await protect(req), */
       teste: 'Hello World',
     }),
   })

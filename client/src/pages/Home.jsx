@@ -94,7 +94,6 @@ const Home = () => {
               variant="contained"
               sx={{
                 color: 'black',
-
                 backgroundColor: 'white',
                 fontWeight: 'bold',
                 fontSize: '1.2rem',
