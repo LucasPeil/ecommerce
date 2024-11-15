@@ -47,6 +47,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
   /*   const dispatch = useDispatch(); */
   const handleFile = (e) => {
     for (let photo of e.target.files) {
+      setFiles([...files, photo]);
       const reader = new FileReader();
       reader.readAsDataURL(photo);
       reader.onload = () => {
@@ -92,6 +93,8 @@ const CriarProduto = ({ open, handleClose, data }) => {
     validationSchema: ValidationSchema,
     onSubmit: (values) => {
       /*   console.log(values); */
+      values.images = files;
+      console.log(values);
       dispatch(createProduct(values));
       /*  closeDialog();
       formik.resetForm(); */

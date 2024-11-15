@@ -5,6 +5,8 @@ const {
   ProductInput,
 } = require('../Produto/type');
 const Produto = require('../models/produtoModel');
+const { uploadImages } = require('./fileUpload');
+
 const ProductMutation = new graphql.GraphQLObjectType({
   name: 'Mutation',
   fields: {
@@ -14,9 +16,28 @@ const ProductMutation = new graphql.GraphQLObjectType({
       args: { product: { type: ProductInput } }, // Tipo de entrada (Input Type) para os argumentos
       resolve: async (_, { product }) => {
         try {
-          /*  console.log(product); */
+          console.log(product);
           const newProduct = new Produto(product);
           await newProduct.save();
+          /*  if (req.files) {
+            let urls = [];
+            for (const key of Object.keys(req.files)) {
+              try {
+                const url = await uploadImages(
+                  req.files[key].tempFilePath,
+                  {},
+                  'teste_' + tempFilePath
+                );
+                urls.push(url);
+              } catch (error) {
+                console.log(error);
+                res.status(400);
+                throw new Error('Erro ao salvar imagens.');
+              }
+            }
+            
+          } */
+
           return {
             status: 201,
             message: 'Produto criado com sucesso!',
