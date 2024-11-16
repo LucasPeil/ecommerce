@@ -48,11 +48,11 @@ const getProduct = async (id, token) => {
       }`;
   const config = {
     headers: {
-      Authorization: `Bearer: ${token}`,
+      Authorization: `Bearer ${token}`,
     },
   };
 
-  const response = await axios.get(
+  const response = await axios.post(
     `/teste?query=${query}&variables=${JSON.stringify({ id: id })}`,
     config
   );
@@ -61,29 +61,44 @@ const getProduct = async (id, token) => {
 };
 
 const getAllProducts = async (options, token) => {
-  const query = `query getAllProducts() {
-          getAllProducts() {
-          status
-          message
-          dataList{
+  const query = `query getAllProducts($first: Int, $after: String) {
+          getAllProducts(first: $first, after: $after) {
+                edges {
+          node {
             id
-            condition 
             images
             description
             price
             available
             quantity
           }
+          cursor
+        }
+            pageInfo {
+              hasNextPage,
+              hasPreviousPage,
+              startCursor,
+              endCursor,
+            },
           }
-        
         }`;
+
   const config = {
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer: ${token}`,
     },
   };
 
-  const response = await axios.get(`/teste?query=${query}`, config);
+  const response = await axios.post(
+    API_URL,
+    {
+      query,
+      variables: options,
+    },
+    config
+  );
+  console.log(response.data);
 
   return response.data;
 };
@@ -107,6 +122,7 @@ const createProduct = async (data, token) => {
       } `;
 
   const urls = await uploadImages(data.images);
+
   const product = { ...data, ...{ images: urls } };
 
   const dataToSend = JSON.stringify({

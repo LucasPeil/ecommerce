@@ -92,7 +92,6 @@ const CriarProduto = ({ open, handleClose, data }) => {
     },
     validationSchema: ValidationSchema,
     onSubmit: (values) => {
-      /*   console.log(values); */
       values.images = files;
       console.log(values);
       dispatch(createProduct(values));

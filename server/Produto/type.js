@@ -38,4 +38,38 @@ const ProductInput = new graphql.GraphQLInputObjectType({
     quantity: { type: new graphql.GraphQLNonNull(graphql.GraphQLInt) },
   },
 });
-module.exports = { ProductType, ProductResultType, ProductInput };
+
+const ProductConnectionType = new graphql.GraphQLObjectType({
+  name: 'ProductConnection',
+  fields: {
+    edges: {
+      type: new graphql.GraphQLList(
+        new graphql.GraphQLObjectType({
+          name: 'ProductEdge',
+          fields: {
+            node: { type: ProductType },
+            cursor: { type: graphql.GraphQLString },
+          },
+        })
+      ),
+    },
+    pageInfo: {
+      type: new graphql.GraphQLObjectType({
+        name: 'PageInfo',
+        fields: {
+          hasNextPage: { type: graphql.GraphQLBoolean },
+          hasPreviousPage: { type: graphql.GraphQLBoolean },
+          startCursor: { type: graphql.GraphQLString },
+          endCursor: { type: graphql.GraphQLString },
+        },
+      }),
+    },
+  },
+});
+
+module.exports = {
+  ProductType,
+  ProductResultType,
+  ProductInput,
+  ProductConnectionType,
+};

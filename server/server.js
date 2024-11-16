@@ -61,6 +61,7 @@ app.post('/api/uploadFile', async (req, res) => {
       throw new Error('Erro ao salvar imagens.');
     }
   }
+  console.log(urls);
   if (urls.length > 0) {
     res.status(200).json(urls);
   } else {

@@ -9,12 +9,29 @@ const productSchema = buildSchema(`
       comments: [String]
     }
   
-    type ProductResult {
-      status: Int!
-      message: String
-      data: Product
-      dataList: [Product]
-  }
+    type ProductEdge {
+        node: Product!      
+        cursor: String!      
+    }
+
+    type PageInfo {
+        hasNextPage: Boolean!   
+        hasPreviousPage: Boolean! 
+        startCursor: String      
+        endCursor: String        
+    }
+
+       type ProductConnection {
+        edges: [ProductEdge!]!   
+        pageInfo: PageInfo!      
+    }
+
+       type Query {
+      getProduct(id: String!): ProductResult
+      getAllProducts(first: Int, after: String, search: String, checkbox: [String]): ProductConnection
+      }
+
+  
     
     input ProductInput{
       images: String
@@ -24,10 +41,13 @@ const productSchema = buildSchema(`
       quantity: Int
     }
   
-      type Query {
-      getProduct(id: String!): ProductResult
-      getAllProducts(start: Int, end:Int, page:Int, search:String, checkbox: [String] ): [ProductResult]
-      }
+       type ProductResult {
+      status: Int!
+      message: String
+      data: Product
+      dataList: [Product]
+  }
+    
   
       type Mutation{
       deleteProduct(id: String!): ID
