@@ -7,7 +7,7 @@ const app = express();
 const path = require('path');
 const dotenv = require('dotenv').config();
 const Produto = require('./models/produtoModel');
-const mongoose = require('mongoose');
+
 const connectDB = require('./config/db');
 const { ProductQueryType } = require('./Produto/query');
 const { ProductMutation } = require('./Produto/mutation');
@@ -17,7 +17,7 @@ const { UserQueryType } = require('./User/query');
 const { protect } = require('./middleware/authMiddleware');
 const { uploadImages } = require('./Produto/fileUpload');
 const PORT = process.env.PORT || 4000;
-
+const { v4: uuidv4 } = require('uuid');
 connectDB();
 // Query para pegar todos os produtos
 /* app.use(graphqlUploadExpress()); */
@@ -52,8 +52,10 @@ app.post('/api/uploadFile', async (req, res) => {
 
   for (const key of Object.keys(req.files)) {
     try {
-      const url = await uploadImages(req.files[key].tempFilePath, {}, '');
-      console.log(url);
+      /*  let url = '';
+      console.log(req.files[key].tempFilePath);  */
+      const url = await uploadImages(req.files[key].tempFilePath, {}, uuidv4());
+
       urls.push(url);
     } catch (error) {
       console.log(error);
@@ -61,7 +63,7 @@ app.post('/api/uploadFile', async (req, res) => {
       throw new Error('Erro ao salvar imagens.');
     }
   }
-  console.log(urls);
+
   if (urls.length > 0) {
     res.status(200).json(urls);
   } else {
@@ -74,10 +76,15 @@ app.all(
   createHandler({
     schema: productSchema,
     context: async (req) => ({
-      /*   user: await protect(req), */
-      teste: 'Hello World',
       filesObj: req?.files,
     }),
+  })
+);
+app.all(
+  '/api/users',
+  createHandler({
+    schema: userSchema,
+    context: async (req) => ({}),
   })
 );
 

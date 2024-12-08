@@ -31,7 +31,7 @@ const ProductQueryType = new graphql.GraphQLObjectType({
     },
 
     getAllProducts: {
-      type: ProductConnectionType /*  new graphql.GraphQLList(ProductResultType) */,
+      type: ProductConnectionType,
       // `args` describes the arguments that the `user` query accepts
       args: {
         first: { type: graphql.GraphQLInt },

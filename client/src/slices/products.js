@@ -94,6 +94,18 @@ export const productsSlice = createSlice({
   name: 'productsSlice',
   initialState,
   reducers: {
+    /* 
+    addProductsToCart: (state, action) => {
+      state.cartProducts.push(action.payload);
+    },
+    removeProductsFromCart: (state, action) => {
+      let tempCartProductsArr = state.cartProducts;
+      const idx = tempCartProductsArr.findIndex(
+        (item) => item == action.payload
+      );
+      tempCartProductsArr.splice(idx, 1);
+      state.cartProducts = [...tempCartProductsArr];
+    }, */
     resetProducts: (state) => {
       state.isLoading = false;
       state.isSuccess = false;
@@ -151,7 +163,7 @@ export const productsSlice = createSlice({
         state.getAllProducts.isLoading = false;
         state.getAllProducts.isSuccess = true;
         state.getAllProducts.isError = false;
-        state.products = action.payload;
+        state.products = action.payload.data.getAllProducts;
       })
       .addCase(getAllProducts.rejected, (state, action) => {
         state.getAllProducts.isLoading = false;
@@ -167,7 +179,7 @@ export const productsSlice = createSlice({
         state.getProduct.isLoading = false;
         state.getProduct.isSuccess = true;
         state.getProduct.isError = false;
-        state.singleProduct = action.payload;
+        state.singleProduct = action.payload?.data?.getProduct?.data;
       })
       .addCase(getProduct.rejected, (state, action) => {
         state.getProduct.isLoading = false;

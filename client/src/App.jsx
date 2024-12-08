@@ -4,47 +4,19 @@ import './App.css';
 import axios from 'axios';
 import Home from './pages/Home';
 import Header from './components/Header';
-function App() {
-  const [count, setCount] = useState(0);
-  const id = '300';
-  const query = `query getProduct($id: String!) {
-    getProduct(id: $id) {
-    status
-    message
-    data {
-    id
-      image
-      description
-      price
-      available
-      quantity
-    }  
-    }
-  
-  }`;
-  const mutation = `mutation createProduct($product: ProductInput) {
-    createProduct(product: $product) {
-     status
-    message
-    data {
-    id
-      image
-      description
-      price
-      available
-      quantity
-    }  
-    }
- 
-  } `;
-  /*  const url = new URL('http://localhost:4000/teste');
-  url.searchParams.append('query', query);
-  url.searchParams.append('variables', JSON.stringify({ id: id })); */
+import { Route, Routes } from 'react-router-dom';
+import Product from './pages/Product';
 
+function App() {
   return (
     <>
       <Header />
-      <Home />
+
+      <Routes>
+        <Route exact path="/" element={<Home />} />
+
+        <Route exact path="/produto/:id" element={<Product />} />
+      </Routes>
     </>
   );
 }

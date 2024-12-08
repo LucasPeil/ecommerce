@@ -48,12 +48,17 @@ const getProduct = async (id, token) => {
       }`;
   const config = {
     headers: {
+      'Content-Type': 'application/json',
       Authorization: `Bearer ${token}`,
     },
   };
 
   const response = await axios.post(
-    `/teste?query=${query}&variables=${JSON.stringify({ id: id })}`,
+    API_URL,
+    {
+      query: query,
+      variables: { id: id },
+    },
     config
   );
 
@@ -66,6 +71,7 @@ const getAllProducts = async (options, token) => {
                 edges {
           node {
             id
+            name
             images
             description
             price

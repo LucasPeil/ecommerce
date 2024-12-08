@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
-import productsReducer from './slices/product';
+import productsReducer from './slices/products';
+import authReducer from './slices/user';
 import axios from 'axios';
 
 export const store = configureStore({
   reducer: {
     products: productsReducer,
+    auth: authReducer,
   },
   /*   devTools: process.env.NODE_ENV === "development",
    */

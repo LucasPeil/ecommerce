@@ -31,7 +31,7 @@ import NextStep from './NextStep';
 import NoPhoto from './NoPhoto';
 import ReviewProductInfos from './ReviewProductInfos';
 import { useDispatch } from 'react-redux';
-import { createProduct } from '../../slices/product';
+import { createProduct } from '../../slices/products';
 /* import { useDispatch } from 'react-redux'; */
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Zoom ref={ref} {...props} />;
@@ -180,7 +180,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
               >
                 <Box
                   sx={{
-                    height: showCarousel ? '35vh' : '0vh',
+                    height: showCarousel ? '46vh' : '0vh',
                     opacity: showCarousel ? 1 : 0,
                     transition: '0.5s ease',
                     overflow: 'hidden',
@@ -214,7 +214,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
                           const arrCopy = [...photosToDisplay];
                           arrCopy.splice(idx, 1);
                           setPhotosToDisplay(arrCopy);
-                          if (photosToDisplay.length >= 1) {
+                          if (photosToDisplay?.length >= 1) {
                             carouselRef.current.previous();
                           }
                         }}

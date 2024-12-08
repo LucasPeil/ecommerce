@@ -1,13 +1,19 @@
-import { Button, Stack, Typography, Box } from '@mui/material';
+import { Button, Stack, Typography, Box, Badge } from '@mui/material';
 import React, { useState } from 'react';
 import { Twirl as Hamburger } from 'hamburger-react';
 import LocalGroceryStoreOutlinedIcon from '@mui/icons-material/LocalGroceryStoreOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import CriarProduto from './ProdutoModal/CriarProduto';
+import { useTheme } from '@mui/material/styles';
+import { useSelector } from 'react-redux';
+import { Link, NavLink } from 'react-router-dom';
+
 const Header = () => {
   const [isOpen, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+
+  const theme = useTheme();
   return (
     <Stack
       direction={'row'}
@@ -22,6 +28,7 @@ const Header = () => {
         zIndex: 200,
         px: 3,
         boxSizing: 'border-box',
+        maxHeight: '100px',
       }}
     >
       <CriarProduto
@@ -30,7 +37,9 @@ const Header = () => {
       />
       <Hamburger toggled={isOpen} toggle={setOpen} />
       <h1 className="title" sx={{}}>
-        FORNITURE
+        <Link style={{ underline: 'none', color: '#000000' }} to="/">
+          FORNITURE
+        </Link>
       </h1>
       <Box sx={{ display: 'flex', alignItems: 'center', gap: 2 }}>
         <Button onClick={() => setOpenDialog(true)}>
@@ -38,14 +47,19 @@ const Header = () => {
             Criar Produto
           </Typography>
         </Button>
-        <Button>
+
+        <NavLink to={'/login'}>
           <Typography color="black" variant="button">
             Entrar
           </Typography>
-        </Button>
+        </NavLink>
+
         <Button sx={{ color: 'black', px: 0 }}>
-          <LocalGroceryStoreOutlinedIcon sx={{ fontSize: '1.8rem' }} />
+          <Badge badgeContent={4} color={'darkColor'}>
+            <LocalGroceryStoreOutlinedIcon sx={{ fontSize: '1.8rem' }} />
+          </Badge>
         </Button>
+
         <Button sx={{ color: 'black', px: 0 }}>
           <SearchOutlinedIcon sx={{ fontSize: '1.8rem' }} />
         </Button>

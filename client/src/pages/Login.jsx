@@ -20,25 +20,25 @@ import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { login, reset } from '../features/auth/authSlice';
+// import { login, reset } from '../features/auth/authSlice';
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginValue, setLoginValue] = useState('');
   const [passwordValue, setPasswordValue] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user, isSuccess, message, isError } = useSelector(
+  /*   const { user, isSuccess, message, isError } = useSelector(
     (state) => state.auth
-  );
+  ); */
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (isSuccess) {
       navigate('/visao-geral');
     }
     setTimeout(() => {
       dispatch(reset());
     }, 3000);
-  }, [user, isSuccess, isError]);
+  }, [user, isSuccess, isError]); */
   return (
     <Box
       component={motion.div}
@@ -69,11 +69,11 @@ const Login = () => {
           textAlign="center"
           sx={{
             '&::before, &::after': {
-              borderColor: '#C10FE9',
+              borderColor: '#000000',
             },
           }}
         >
-          Dashboard
+          FORNITURE
         </Divider>
         {/* type={showPassword ? "text" : "password"} */}
         <form>
@@ -114,7 +114,7 @@ const Login = () => {
             />
           </FormControl>
           <Typography variant="subtitle2" color={'error'} textAlign={'center'}>
-            {message}
+            {/* {message} */}
           </Typography>
         </form>
         <Stack
@@ -129,7 +129,7 @@ const Login = () => {
             }
             variant="contained"
             sx={{
-              backgroundColor: '#C10FE9',
+              backgroundColor: '#000000',
               mt: 2,
               width: '10rem',
               fontWeight: 'bold',

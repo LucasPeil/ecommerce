@@ -9,6 +9,9 @@ const CustomDot = ({ onClick, ...rest }) => {
     active,
     photosToDisplay,
     showCarousel,
+    showCloseButton = true,
+    closeFunction,
+
     carouselState: { currentSlide, deviceType },
   } = rest;
 
@@ -17,7 +20,8 @@ const CustomDot = ({ onClick, ...rest }) => {
       imagem={photo}
       minHeight={'5rem'}
       minWidth={'5rem'}
-      closeFunction={() => {}}
+      closeFunction={closeFunction}
+      showCloseButton={showCloseButton}
     />
   ));
 
@@ -26,7 +30,7 @@ const CustomDot = ({ onClick, ...rest }) => {
   return (
     <Button
       sx={{
-        border: active ? '1px solid black' : 'none',
+        border: 'none',
         display: showCarousel ? 'block' : 'none',
       }}
       onClick={() => onClick()}

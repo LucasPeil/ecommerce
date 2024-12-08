@@ -18,7 +18,7 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { cadastrar, reset } from '../features/auth/authSlice';
+import { createUser, reset } from '../slices/user';
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -33,7 +33,7 @@ const Register = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      navigate('/visao-geral');
+      navigate('/');
     }
     dispatch(reset());
   }, [user]);
@@ -175,7 +175,7 @@ const Register = () => {
               }
               onClick={() => {
                 dispatch(
-                  cadastrar({
+                  createUser({
                     password: passwordValue,
                     email: emailValue,
                     username: usernameValue,

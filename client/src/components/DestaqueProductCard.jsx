@@ -2,9 +2,19 @@ import React from 'react';
 import { Box, Stack, Typography } from '@mui/material';
 import quadro1 from '../assets/quadro-1.jpg';
 import { ButtonBase } from '@mui/material';
-const DestaqueProductCard = () => {
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+const DestaqueProductCard = ({ product }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
   return (
-    <ButtonBase className="buttonBase" onClick={() => {}}>
+    <ButtonBase
+      disableRipple
+      className="buttonBase"
+      onClick={() => {
+        navigate(`/produto/${product.id}`);
+      }}
+    >
       <Box
         sx={{
           minWidth: '75%',
@@ -19,7 +29,7 @@ const DestaqueProductCard = () => {
         <Box sx={{ overflow: 'hidden' }}>
           <Box
             sx={{
-              backgroundImage: `url(${quadro1})`,
+              backgroundImage: `url(${product?.images[0]})`,
               backgroundSize: 'cover',
               backgroundPosition: 'center',
               backgroundOrigin: 'border-box',
@@ -35,7 +45,7 @@ const DestaqueProductCard = () => {
         </Box>
         <Stack sx={{ mt: 1, p: 1, borderBottom: '1px solid #CDCDCD' }}>
           <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-            Produto 1
+            {product.name}
           </Typography>
           <Typography
             variant="caption"
@@ -43,7 +53,7 @@ const DestaqueProductCard = () => {
             gutterBottom
             sx={{}}
           >
-            R$ 199,00
+            {`R$ ${product.price}`}
           </Typography>
         </Stack>
       </Box>

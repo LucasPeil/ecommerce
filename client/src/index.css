@@ -9,19 +9,22 @@ html, body{
   font-style: normal;
 }
 
-.slideButton{
- 
+
+.slideButton, .product-title{
     font-family: "Playfair Display", serif;
     font-optical-sizing: auto;
     font-style: normal;
   
 }
-.active{
+.react-multi-carousel-dot-list {
+  position: relative !important;
+  margin-top: 1rem;
 }
 *::-webkit-scrollbar {
   width: 0.6rem;
   height: 8px;
 }
+
 
 * {
   scrollbar-width: thin;
@@ -37,6 +40,17 @@ html, body{
   background: #b0b0b0;
   border-radius: 5px;
 }
+
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type=number] {
+  -moz-appearance: textfield;
+}
 .buttonBase{
   all: unset;
   min-width: 100%;
@@ -44,3 +58,5 @@ html, body{
   justify-content: center;
   padding: 10,
 }
+
+

@@ -13,15 +13,15 @@ const uploadImages = async function (path, options, public_id) {
   // Upload an image
   const uploadResult = await cloudinary.uploader
     .upload(path, {
-      public_id: 'produtos',
+      public_id: public_id,
       folder: 'ecommerce',
     })
     .catch((error) => {
       console.log(error);
     });
-
+  /*   console.log(uploadResult); */
   // Optimize delivery by resizing and applying auto-format and auto-quality
-  const optimizeUrl = cloudinary.url('ecommerce/produtos', {
+  const optimizeUrl = cloudinary.url(`ecommerce/${public_id}`, {
     fetch_format: 'auto',
     quality: 'auto',
   });

@@ -5,35 +5,40 @@ import { Stack } from '@mui/material';
 import DestaqueProductCard from './DestaqueProductCard';
 import { responsiveDestaque } from '../utils/carouselResponsiveness';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllProducts } from '../slices/product';
+import { getAllProducts } from '../slices/products';
 const DestaqueSlider = () => {
   const dispatch = useDispatch();
+  const { products, getAllProducts: getAllProductsState } = useSelector(
+    (state) => state.products
+  );
 
   useEffect(() => {
-    dispatch(getAllProducts({ first: 2, after: '', search: '', checkbox: [] }));
+    dispatch(getAllProducts({ first: 3, after: '', search: '', checkbox: [] }));
   }, []);
 
   return (
-    <Carousel
-      swipeable={false}
-      focusOnSelect={false}
-      draggable={false}
-      showDots={false}
-      responsive={responsiveDestaque}
-      ssr={false} // means to render carousel on server-side.
-      infinite={false}
-      keyBoardControl={false}
-      customTransition="all 0.5s ease-in-out"
-      transitionDuration={500}
-      removeArrowOnDeviceType={['mobile']}
-      containerClass="carousel-container"
-      dotListClass="custom-dot-list-style"
-      itemClass="carousel-item-padding-40-px"
-    >
-      {[...Array(6)].map((_, idx) => (
-        <DestaqueProductCard />
-      ))}
-    </Carousel>
+    !getAllProductsState.isLoading && (
+      <Carousel
+        swipeable={false}
+        focusOnSelect={false}
+        draggable={false}
+        showDots={false}
+        responsive={responsiveDestaque}
+        ssr={false} // means to render carousel on server-side.
+        infinite={false}
+        keyBoardControl={false}
+        customTransition="all 0.5s ease-in-out"
+        transitionDuration={500}
+        removeArrowOnDeviceType={['mobile']}
+        containerClass="carousel-container"
+        dotListClass="custom-dot-list-style"
+        itemClass="carousel-item-padding-40-px"
+      >
+        {products?.edges?.map((item) => (
+          <DestaqueProductCard product={item.node} />
+        ))}
+      </Carousel>
+    )
   );
 };
 

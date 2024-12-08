@@ -6,7 +6,10 @@ const User = require('../models/userModel');
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
 };
-
+const createNewPassword = async (password) => {
+  const salt = await bcrypt.genSalt(10);
+  return bcrypt.hash(password, salt);
+};
 const UserMutation = new graphql.GraphQLObjectType({
   name: 'Mutation',
   fields: {
@@ -16,8 +19,11 @@ const UserMutation = new graphql.GraphQLObjectType({
       args: { user: { type: UserInput } }, // Tipo de entrada (Input Type) para os argumentos
       resolve: async (_, { user }) => {
         try {
-          const newUser = new User(user);
-          await newUser.save();
+          const newUser = await User.create({
+            ...user,
+            ...{ password: await createNewPassword(user.password) },
+          });
+
           return {
             status: 201,
             message: 'Usuário criado com sucesso!',
@@ -83,6 +89,27 @@ const UserMutation = new graphql.GraphQLObjectType({
           return id;
         } catch (error) {
           return null;
+        }
+      },
+    },
+    updateUserCart: {
+      type: UserResultType, // Tipo de saída (Output Type) para o retorno
+      // `args` describes the arguments that the `user` query accepts
+      args: { user: { type: UserInput } }, // Tipo de entrada (Input Type) para os argumentos
+      resolve: async (_, { id, productId }) => {
+        try {
+          const user = await User.findById(id);
+
+          if (!updatedUser) {
+            return { status: 404, message: 'Usuário não encontrado' };
+          }
+          return {
+            status: 200,
+            message: 'Usuário atualizado com sucesso!',
+            data: updatedUser,
+          };
+        } catch (error) {
+          return { status: 500, message: 'Erro ao atualizar usuário' };
         }
       },
     },
