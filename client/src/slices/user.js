@@ -76,7 +76,6 @@ export const resetPassword = createAsyncThunk(
 export const createUser = createAsyncThunk(
   'createUser/post',
   async (data, thunkAPI) => {
-    console.log(data);
     try {
       return await authServices.createUser(data);
     } catch (error) {
@@ -180,6 +179,7 @@ export const authSlice = createSlice({
         state.isLoading = false;
         state.isSuccess = false;
         state.isError = true;
+
         state.message = action.payload;
       })
       .addCase(resetPassword.pending, (state) => {

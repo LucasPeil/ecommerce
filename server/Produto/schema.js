@@ -28,7 +28,7 @@ const productSchema = buildSchema(`
 
        type Query {
       getProduct(id: String!): ProductResult
-      getAllProducts(first: Int, after: String, search: String, checkbox: [String]): ProductConnection
+      getAllProducts(first: Int, after: String): ProductConnection
       }
 
   
@@ -39,6 +39,7 @@ const productSchema = buildSchema(`
       price: Float
       available: Boolean
       quantity: Int
+      category: String
     }
   
        type ProductResult {

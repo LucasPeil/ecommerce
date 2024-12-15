@@ -46,7 +46,7 @@ const Product = () => {
         height: 'calc(100vh - 100px)',
       }}
     >
-      <Grid container spacing={6} sx={{ height: '100%' }} direction>
+      <Grid container spacing={6} sx={{ height: '100%' }}>
         <Grid size={6} alignContent={'center'} sx={{}}>
           {!getProductState.isLoading && (
             <Carousel
@@ -72,11 +72,13 @@ const Product = () => {
               }
             >
               {singleProduct?.images?.map((photo, idx) => (
-                <SliderImagem
-                  imagem={photo}
-                  minHeight={'35rem'}
-                  minWidth={'100%'}
-                />
+                <Box key={idx}>
+                  <SliderImagem
+                    imagem={photo}
+                    minHeight={'35rem'}
+                    minWidth={'100%'}
+                  />
+                </Box>
               ))}
             </Carousel>
           )}
@@ -131,12 +133,12 @@ const Product = () => {
                     justifyContent: 'space-between',
                   }}
                 >
-                  <IconButton>
-                    <RemoveIcon
-                      onClick={() =>
-                        qtySelected >= 2 && setQtySelected(qtySelected - 1)
-                      }
-                    />
+                  <IconButton
+                    onClick={() =>
+                      qtySelected >= 2 && setQtySelected(qtySelected - 1)
+                    }
+                  >
+                    <RemoveIcon />
                   </IconButton>
 
                   <InputBase
@@ -152,13 +154,13 @@ const Product = () => {
                       },
                     }}
                   />
-                  <IconButton>
-                    <AddIcon
-                      onClick={() =>
-                        qtySelected < singleProduct?.quantity &&
-                        setQtySelected(qtySelected + 1)
-                      }
-                    />
+                  <IconButton
+                    onClick={() =>
+                      qtySelected < singleProduct?.quantity &&
+                      setQtySelected(qtySelected + 1)
+                    }
+                  >
+                    <AddIcon />
                   </IconButton>
                 </Paper>
                 {!false ? (

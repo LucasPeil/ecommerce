@@ -5,15 +5,48 @@ const API_URL =
     ? import.meta.env.BASE_URL + '/api/users/'
     : '/api/users/';
 
-const login = async (userData) => {
-  const response = await axios.post(API_URL + 'login', {
-    ...userData,
+const login = async (data) => {
+  const mutation = `mutation createUser($user: UserInput) {
+    login(user: $user) {
+     status
+    message
+    data {
+      id
+      username 
+      email
+      orders{
+        products{
+         name
+         images
+        }
+        total 
+      }
+      cart{
+        name
+        images
+      }
+    }  
+    }
+ 
+  } `;
+  const config = {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  };
+  const dataToSend = JSON.stringify({
+    query: mutation,
+    variables: { user: data },
   });
+  const response = await axios.post(API_URL, dataToSend, config);
 
-  if (response.data) {
-    localStorage.setItem('user', JSON.stringify(response.data));
+  if (response?.data?.data?.login?.data) {
+    localStorage.setItem(
+      'user',
+      JSON.stringify(response?.data?.data?.login?.data)
+    );
   }
-  return response.data;
+  return response?.data?.data?.login;
 };
 
 const resetPassword = async (newPassword, token) => {
@@ -26,9 +59,12 @@ const resetPassword = async (newPassword, token) => {
   const response = await axios.post(API_URL, newPassword, config);
 
   if (response.data) {
-    localStorage.setItem('user', JSON.stringify(response.data));
+    localStorage.setItem(
+      'user',
+      JSON.stringify(response?.data?.data?.createUser?.data)
+    );
   }
-  return response.data;
+  return response?.data?.data?.createUser?.data;
 };
 const createUser = async (data) => {
   const mutation = `mutation createUser($user: UserInput) {
@@ -37,11 +73,19 @@ const createUser = async (data) => {
     message
     data {
       id
-      name
       username 
       email
-      orders
-      cart
+      orders{
+        products{
+         name
+         images
+        }
+        total 
+      }
+      cart{
+        name
+        images
+      }
     }  
     }
  
@@ -55,12 +99,16 @@ const createUser = async (data) => {
       'Content-Type': 'application/json',
     },
   };
-  console.log(dataToSend);
+
   const response = await axios.post(API_URL, dataToSend, config);
   if (response.data) {
-    localStorage.setItem('user', JSON.stringify(response.data));
+    localStorage.setItem(
+      'user',
+      JSON.stringify(response?.data?.data?.createUser?.data)
+    );
   }
-  return response.data;
+
+  return response?.data?.data?.createUser?.data;
 };
 
 const logout = async () => {

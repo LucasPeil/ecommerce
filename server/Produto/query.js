@@ -38,8 +38,8 @@ const ProductQueryType = new graphql.GraphQLObjectType({
         after: { type: graphql.GraphQLString },
       },
       resolve: async (_, { first = 5, after, search, checkbox }, context) => {
+        console.log('testeee');
         try {
-          console.log('testeee');
           // Decodificar o cursor 'after' para obter o ID inicial
           let startId = null;
           if (after) {

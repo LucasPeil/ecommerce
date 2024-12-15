@@ -6,18 +6,26 @@ import DestaqueProductCard from './DestaqueProductCard';
 import { responsiveDestaque } from '../utils/carouselResponsiveness';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllProducts } from '../slices/products';
+import { useGetAllProductsQuery } from '../slices/apiSlice';
 const DestaqueSlider = () => {
   const dispatch = useDispatch();
-  const { products, getAllProducts: getAllProductsState } = useSelector(
+  const { products, getAllProducts: getAllProductsState = [] } = useSelector(
     (state) => state.products
   );
 
-  useEffect(() => {
+  /* useEffect(() => {
     dispatch(getAllProducts({ first: 3, after: '', search: '', checkbox: [] }));
-  }, []);
+  }, []); */
+  const {
+    data = [],
+    isLoading,
+    isSuccess,
+    isError,
+    error,
+  } = useGetAllProductsQuery({ first: 3, after: '' });
 
   return (
-    !getAllProductsState.isLoading && (
+    /*   !getAllProductsState.isLoading && (
       <Carousel
         swipeable={false}
         focusOnSelect={false}
@@ -34,11 +42,14 @@ const DestaqueSlider = () => {
         dotListClass="custom-dot-list-style"
         itemClass="carousel-item-padding-40-px"
       >
-        {products?.edges?.map((item) => (
-          <DestaqueProductCard product={item.node} />
+        {products?.edges?.map((item, idx) => (
+          <div key={idx}>
+            <DestaqueProductCard product={item.node} />
+          </div>
         ))}
       </Carousel>
-    )
+    ) */
+    <></>
   );
 };
 

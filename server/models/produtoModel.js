@@ -18,6 +18,7 @@ const productSchema = mongoose.Schema(
     available: { type: Boolean, default: true },
     quantity: { type: Number, required: true },
     comments: { type: [commentschema], required: false },
+    category: { type: String, required: true },
     userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   },
   { timestamps: true }

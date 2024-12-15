@@ -1,5 +1,6 @@
 var graphql = require('graphql');
-
+const bcrypt = require('bcrypt');
+const jwt = require('jsonwebtoken');
 const { UserResultType, UserInput } = require('../User/type');
 const User = require('../models/userModel');
 
@@ -24,12 +25,22 @@ const UserMutation = new graphql.GraphQLObjectType({
             ...{ password: await createNewPassword(user.password) },
           });
 
+          /*  delete user.password; */
+
           return {
             status: 201,
             message: 'Usuário criado com sucesso!',
-            data: newUser,
+            data: {
+              ...user,
+              ...{
+                token: generateToken(newUser._id.toString()),
+                cart: [],
+                orders: [],
+              },
+            },
           };
         } catch (error) {
+          console.log(error);
           return { status: 500, message: 'Erro ao criar usuário' };
         }
       },
@@ -50,7 +61,8 @@ const UserMutation = new graphql.GraphQLObjectType({
               resetPassword: user.resetPassword,
             });
           } else {
-            throw new Error('Usuário ou senha inválidos');
+            /*  throw new Error('Usuário ou senha inválidos'); */
+            return { status: 401, message: 'Usuário ou senha inválidos' };
           }
         } catch (error) {
           return { status: 401, message: 'Usuário ou senha inválidos' };

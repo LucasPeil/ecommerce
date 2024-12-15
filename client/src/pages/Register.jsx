@@ -27,12 +27,12 @@ const Register = () => {
   const [usernameValue, setUsernameValue] = useState('');
   const [confirmPasswordValue, setConfirmPasswordValue] = useState('');
 
-  const { user, isSuccess } = useSelector((state) => state.auth);
+  const { user, register } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (isSuccess) {
+    if (register.isSuccess) {
       navigate('/');
     }
     dispatch(reset());

@@ -20,6 +20,7 @@ import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
+import { login } from '../slices/user';
 // import { login, reset } from '../features/auth/authSlice';
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -27,18 +28,16 @@ const Login = () => {
   const [passwordValue, setPasswordValue] = useState('');
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  /*   const { user, isSuccess, message, isError } = useSelector(
-    (state) => state.auth
-  ); */
+  const { user } = useSelector((state) => state.auth);
 
-  /*   useEffect(() => {
-    if (isSuccess) {
-      navigate('/visao-geral');
+  useEffect(() => {
+    if (user?.id) {
+      navigate('/');
     }
-    setTimeout(() => {
+    /*    setTimeout(() => {
       dispatch(reset());
-    }, 3000);
-  }, [user, isSuccess, isError]); */
+    }, 3000); */
+  }, [user]);
   return (
     <Box
       component={motion.div}

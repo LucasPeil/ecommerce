@@ -42,7 +42,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
   const [showCarousel, setShowCarousel] = useState(true);
   const [showProductInfo, setShowProductInfo] = useState(false);
   const [showReviewArea, setShowReviewArea] = useState(false);
-  const [productCondition, setProductCondition] = useState('');
+  const [productcategory, setProductcategory] = useState('');
   const dispatch = useDispatch();
   /*   const dispatch = useDispatch(); */
   const handleFile = (e) => {
@@ -68,7 +68,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
     price: Yup.number().required('Preço é obrigatório'),
     quantity: Yup.number().required('Quantidade é obrigatório').min(1),
     available: Yup.boolean().required('Disponibilidade é obrigatório'),
-    condition: Yup.string().required('Condição do produto é obrigatório'),
+    category: Yup.string().required('Categoria do produto é obrigatório'),
   });
   const closeDialog = () => {
     handleClose();
@@ -76,7 +76,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
     setShowProductInfo(false);
     setShowReviewArea(false);
     setShowCarousel(true);
-    setProductCondition('');
+    setProductcategory('');
   };
   const formik = useFormik({
     enableReinitialize: true,
@@ -88,7 +88,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
       price: data?.price || 0.0,
       quantity: data?.quantity || 1,
       available: data?.available || true,
-      condition: data?.condition || '',
+      category: data?.category || '',
     },
     validationSchema: ValidationSchema,
     onSubmit: (values) => {
@@ -308,30 +308,32 @@ const CriarProduto = ({ open, handleClose, data }) => {
                         sx={{ width: { xs: '33%' } }}
                       />
                       <FormControl sx={{ width: { xs: '33%' } }}>
-                        <InputLabel id="condition">
-                          Condição do produto
+                        <InputLabel id="category">
+                          Categoria do produto
                         </InputLabel>
                         <Select
-                          labelId="condition"
-                          id="condition"
+                          labelId="category"
+                          id="category"
                           value={
-                            formik.values.condition
-                              ? formik.values.condition
-                              : productCondition
+                            formik.values.category
+                              ? formik.values.category
+                              : productcategory
                           }
                           label="Condição do produto"
                           onChange={(e) => {
-                            setProductCondition(e.target.value);
-                            formik.setFieldValue('condition', e.target.value);
+                            setProductcategory(e.target.value);
+                            formik.setFieldValue('category', e.target.value);
                           }}
                         >
-                          <MenuItem value={'Novo'}>Novo</MenuItem>
-                          <MenuItem value={'Usado'}>Usado</MenuItem>
+                          <MenuItem value={'Banheiro'}>Banheiro</MenuItem>
+                          <MenuItem value={'Cozinha'}>Cozinha</MenuItem>
+                          <MenuItem value={'Quarto'}>Quarto</MenuItem>
+                          <MenuItem value={'Sala'}>Sala</MenuItem>
                         </Select>
                         <FormHelperText sx={{ color: 'red' }}>
                           {Boolean(
-                            formik.touched.condition && formik.errors.condition
-                          ) && formik.errors.condition}
+                            formik.touched.category && formik.errors.category
+                          ) && formik.errors.category}
                         </FormHelperText>
                       </FormControl>
                     </Stack>

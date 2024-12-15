@@ -59,4 +59,18 @@ input[type=number] {
   padding: 10,
 }
 
+.search-input{
+  background-color: transparent;
+  border: none;
+  border-bottom: 1px solid #999999;
+  color: white;
+  width: 70%;
+  font-size: 1.5rem;
+  padding: 0.5rem;
+}
+.search-input:focus{
+  outline: none;
+ 
+ 
+}
 

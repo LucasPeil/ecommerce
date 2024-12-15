@@ -93,7 +93,6 @@ const Slide = ({ bgImage, bgPosition }) => {
               },
             }
           );
-          console.log(response.data);
         }}
         sx={{
           color: 'black',

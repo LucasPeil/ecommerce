@@ -10,6 +10,7 @@ import { Stack, Box, Button } from '@mui/material';
 import DestaqueSlider from '../components/DestaqueSlider';
 import Footer from '../components/Footer';
 import { responsive } from '../utils/carouselResponsiveness';
+import CategoryTabs from '../components/CategoryTabs';
 const Home = () => {
   return (
     <>
@@ -113,6 +114,7 @@ const Home = () => {
           </Stack>
         </Box>
       </Box>
+      <CategoryTabs />
       <Footer />
     </>
   );

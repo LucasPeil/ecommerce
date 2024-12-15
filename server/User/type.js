@@ -14,8 +14,8 @@ const UserType = new graphql.GraphQLObjectType({
     id: { type: graphql.GraphQLString },
     username: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
     email: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
-    resetPassword: { type: graphql.GraphQLBoolean },
-    password: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
+    // resetPassword: { type: graphql.GraphQLBoolean },
+    /*  password: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) }, */
     orders: { type: new graphql.GraphQLList(OrderType) },
     cart: { type: new graphql.GraphQLList(ProductType) },
   },

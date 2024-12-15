@@ -37,7 +37,7 @@ const getProduct = async (id, token) => {
         id
           name
           images
-           condition 
+           category 
           description
           price
           available
@@ -68,23 +68,23 @@ const getProduct = async (id, token) => {
 const getAllProducts = async (options, token) => {
   const query = `query getAllProducts($first: Int, $after: String) {
           getAllProducts(first: $first, after: $after) {
-                edges {
-          node {
-            id
-            name
-            images
-            description
-            price
-            available
-            quantity
-          }
-          cursor
-        }
+            edges {
+              node {
+                id
+                name
+                images
+                description
+                price
+                available
+                quantity
+              }
+              cursor
+            }
             pageInfo {
-              hasNextPage,
-              hasPreviousPage,
-              startCursor,
-              endCursor,
+                hasNextPage,
+                hasPreviousPage,
+                startCursor,
+                endCursor,
             },
           }
         }`;
@@ -104,7 +104,6 @@ const getAllProducts = async (options, token) => {
     },
     config
   );
-  console.log(response.data);
 
   return response.data;
 };
@@ -117,7 +116,7 @@ const createProduct = async (data, token) => {
         data {
         id
           images
-          condition 
+          category 
           description
           price
           available
@@ -145,7 +144,6 @@ const createProduct = async (data, token) => {
     },
   };
   const response = await axios.post(API_URL, dataToSend, config);
-  console.log(response?.data);
 
   return response?.data;
 };
