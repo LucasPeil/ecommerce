@@ -15,7 +15,6 @@ const CategoryTabs = () => {
         centered
         onChange={handleChange}
         sx={{
-          border: '1px solid red',
           my: 2,
           '& .MuiTabs-indicator': {
             backgroundColor: '#000000',
@@ -31,10 +30,10 @@ const CategoryTabs = () => {
           },
         }}
       >
-        <Tab value="Sala" label="Sala" />
-        <Tab value="Quarto" label="Quarto" />
-        <Tab value="Cozinha" label="Cozinha" />
-        <Tab value="Banheiro" label="Banheiro" />
+        <Tab value="Sala" label="Sala" disableRipple />
+        <Tab value="Quarto" label="Quarto" disableRipple />
+        <Tab value="Cozinha" label="Cozinha" disableRipple />
+        <Tab value="Banheiro" label="Banheiro" disableRipple />
       </Tabs>
     </Box>
   );

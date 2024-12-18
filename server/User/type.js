@@ -11,7 +11,7 @@ const OrderType = new graphql.GraphQLObjectType({
 const UserType = new graphql.GraphQLObjectType({
   name: 'User',
   fields: {
-    id: { type: graphql.GraphQLString },
+    _id: { type: graphql.GraphQLString },
     username: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
     email: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },
     // resetPassword: { type: graphql.GraphQLBoolean },
@@ -33,7 +33,7 @@ const UserResultType = new graphql.GraphQLObjectType({
 const UserInput = new graphql.GraphQLInputObjectType({
   name: 'UserInput',
   fields: {
-    id: { type: graphql.GraphQLString },
+    _id: { type: graphql.GraphQLString },
     name: { type: graphql.GraphQLString },
     username: { type: graphql.GraphQLString },
     email: { type: new graphql.GraphQLNonNull(graphql.GraphQLString) },

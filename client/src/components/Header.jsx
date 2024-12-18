@@ -57,7 +57,6 @@ const Header = () => {
       <h1
         className="title"
         style={{
-          border: '1px solid red',
           width: '100%',
           position: 'absolute',
           textAlign: 'center',
@@ -79,7 +78,7 @@ const Header = () => {
           alignItems: 'center',
           gap: 4,
           px: 2,
-          border: '1px solid red',
+          zIndex: 5,
         }}
       >
         <Button onClick={() => setOpenDialog(true)}>
@@ -87,7 +86,7 @@ const Header = () => {
             Criar Produto
           </Typography>
         </Button>
-        {user?.id ? (
+        {user?._id ? (
           <Button
             onClick={() => {
               dispatch(logout());

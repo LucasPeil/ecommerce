@@ -9,47 +9,43 @@ import { getAllProducts } from '../slices/products';
 import { useGetAllProductsQuery } from '../slices/apiSlice';
 const DestaqueSlider = () => {
   const dispatch = useDispatch();
-  const { products, getAllProducts: getAllProductsState = [] } = useSelector(
-    (state) => state.products
-  );
 
-  /* useEffect(() => {
-    dispatch(getAllProducts({ first: 3, after: '', search: '', checkbox: [] }));
-  }, []); */
   const {
-    data = [],
+    data: products = [],
     isLoading,
     isSuccess,
     isError,
+    isFetching,
     error,
-  } = useGetAllProductsQuery({ first: 3, after: '' });
+  } = useGetAllProductsQuery({ first: 3, after: null, searchText: null });
 
   return (
-    /*   !getAllProductsState.isLoading && (
-      <Carousel
-        swipeable={false}
-        focusOnSelect={false}
-        draggable={false}
-        showDots={false}
-        responsive={responsiveDestaque}
-        ssr={false} // means to render carousel on server-side.
-        infinite={false}
-        keyBoardControl={false}
-        customTransition="all 0.5s ease-in-out"
-        transitionDuration={500}
-        removeArrowOnDeviceType={['mobile']}
-        containerClass="carousel-container"
-        dotListClass="custom-dot-list-style"
-        itemClass="carousel-item-padding-40-px"
-      >
-        {products?.edges?.map((item, idx) => (
-          <div key={idx}>
-            <DestaqueProductCard product={item.node} />
-          </div>
-        ))}
-      </Carousel>
-    ) */
-    <></>
+    <>
+      {!isFetching && (
+        <Carousel
+          swipeable={false}
+          focusOnSelect={false}
+          draggable={false}
+          showDots={false}
+          responsive={responsiveDestaque}
+          ssr={false} // means to render carousel on server-side.
+          infinite={false}
+          keyBoardControl={false}
+          customTransition="all 0.5s ease-in-out"
+          transitionDuration={500}
+          removeArrowOnDeviceType={['mobile']}
+          containerClass="carousel-container"
+          dotListClass="custom-dot-list-style"
+          itemClass="carousel-item-padding-40-px"
+        >
+          {products?.edges?.map((item, idx) => (
+            <div key={idx}>
+              <DestaqueProductCard product={item.node} />
+            </div>
+          ))}
+        </Carousel>
+      )}
+    </>
   );
 };
 

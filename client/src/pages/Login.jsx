@@ -31,7 +31,7 @@ const Login = () => {
   const { user } = useSelector((state) => state.auth);
 
   useEffect(() => {
-    if (user?.id) {
+    if (user?._id) {
       navigate('/');
     }
     /*    setTimeout(() => {
@@ -123,9 +123,9 @@ const Login = () => {
         >
           <Button
             /*  disabled={!loginValue || !passwordValue} */
-            onClick={() =>
-              dispatch(login({ password: passwordValue, email: loginValue }))
-            }
+            onClick={() => {
+              dispatch(login({ password: passwordValue, email: loginValue }));
+            }}
             variant="contained"
             sx={{
               backgroundColor: '#000000',

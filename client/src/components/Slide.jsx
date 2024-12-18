@@ -2,36 +2,6 @@ import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import axios from 'axios';
 const Slide = ({ bgImage, bgPosition }) => {
-  const query = `query getProduct($id: String!) {
-    getProduct(id: $id) {
-    status
-    message
-    data {
-    id
-      image
-      description
-      price
-      available
-      quantity
-    }  
-    }
-  
-  }`;
-  const mutation = `mutation createProduct($product: ProductInput) {
-    createProduct(product: $product) {
-     status
-    message
-    data {
-    id
-      image
-      description
-      price
-      available
-      quantity
-    }  
-    }
- 
-  } `;
   return (
     <Box
       sx={{
@@ -84,18 +54,10 @@ const Slide = ({ bgImage, bgPosition }) => {
 
       <Button
         variant="contained"
-        onClick={async () => {
-          const response = await axios.get(
-            `/teste?query=${query}&variables=${JSON.stringify({ id: '300' })}`,
-            {
-              headers: {
-                'Content-Type': 'application/json',
-              },
-            }
-          );
-        }}
+        onClick={async () => {}}
         sx={{
           color: 'black',
+          border: '1px solid black',
           position: 'absolute',
           bottom: '5rem',
           backgroundColor: 'white',

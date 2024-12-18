@@ -5,19 +5,16 @@ import { gql } from 'graphql-request';
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: graphqlBaseQuery({
-    /*   baseUrl: 'https://graphqlzero.almansi.me/api', */
     baseUrl: 'http://localhost:5173/api',
-
-    /*  /api/products */
   }),
   endpoints: (builder) => ({
     getAllProducts: builder.query({
-      query: ({ first, after }) => {
+      query: ({ first, after, searchText }) => {
         return {
           url: '/products',
           body: gql`
             query {
-              getAllProducts(first: ${first}, after: "${after}") {
+              getAllProducts(first: ${first}, after: ${after}, searchText: ${searchText}) {
                 edges {
                   node {
                     id
@@ -43,26 +40,59 @@ export const apiSlice = createApi({
       },
       transformResponse: (response) => response.getAllProducts,
     }),
-    getPost: builder.query({
-      /*************  ✨ Codeium Command ⭐  *************/
-      /******  63369f05-0d55-403d-b92e-790a3ae45644  *******/
-      query: (id) => ({
+    getProduct: builder.query({
+      query: (id) => {
+        if (id)
+          return {
+            url: '/products',
+            body: gql`
+            query {
+              getProduct(id: "${id}") {
+                status
+                message
+                data {
+                  id
+                  name
+                  images
+                  category
+                  description
+                  price
+                  available
+                  quantity
+                }
+              }
+            }
+          `,
+          };
+      },
+      transformResponse: (response) => response.getProduct.data,
+    }),
+    createProduct: builder.mutation({
+      mutation: (product) => ({
         body: gql`
           query {
-            post(id: ${id}) {
-              id
-              title
-              body
+            createProduct(product: ${product}) {
+              status
+              message
+              data {
+                id
+                images
+                category 
+                description
+                price
+                available
+                quantity
+              }  
             }
           }
-          `,
+        `,
       }),
-      transformResponse: (response) => response.post,
+      transformResponse: (response) => response.createProduct,
     }),
   }),
 });
 
-export const { useGetAllProductsQuery } = apiSlice;
+export const { useGetAllProductsQuery, useGetProductQuery } = apiSlice;
 
 /* body: gql`
             query {

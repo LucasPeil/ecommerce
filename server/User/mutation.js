@@ -49,22 +49,23 @@ const UserMutation = new graphql.GraphQLObjectType({
       type: UserResultType, // Tipo de saída (Output Type) para o retorno
       // `args` describes the arguments that the `user` query accepts
       args: { user: { type: UserInput } }, // Tipo de entrada (Input Type) para os argumentos
-      resolve: async (_, { user }) => {
-        const { email, password } = user;
-        try {
-          const user = await User.findOne({ email: email }).lean();
-          if (user && (await bcrypt.compare(password, user.password))) {
-            res.status(201).json({
+      resolve: async (_, { user: userData }) => {
+        const { email, password } = userData;
+
+        const user = await User.findOne({ email: email }).lean();
+        if (user && (await bcrypt.compare(password, user.password))) {
+          return {
+            status: 200,
+            message: 'Usuário logado',
+            data: {
               _id: user._id,
               email: user.email,
+              username: user.username,
               token: generateToken(user._id),
-              resetPassword: user.resetPassword,
-            });
-          } else {
-            /*  throw new Error('Usuário ou senha inválidos'); */
-            return { status: 401, message: 'Usuário ou senha inválidos' };
-          }
-        } catch (error) {
+            },
+          };
+        } else {
+          /*  throw new Error('Usuário ou senha inválidos'); */
           return { status: 401, message: 'Usuário ou senha inválidos' };
         }
       },

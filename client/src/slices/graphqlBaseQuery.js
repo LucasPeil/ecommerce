@@ -2,11 +2,16 @@ import { request, gql, ClientError } from 'graphql-request';
 
 export const graphqlBaseQuery =
   ({ baseUrl }) =>
-  async ({ url, body }) => {
+  async ({ url, body, variables = null, requestHeaders = {} }) => {
     try {
       const fullUrl = baseUrl + url;
 
-      const result = await request(fullUrl, body);
+      const result = await request({
+        url: fullUrl,
+        document: body,
+        variables,
+        requestHeaders,
+      });
 
       return { data: result };
     } catch (error) {

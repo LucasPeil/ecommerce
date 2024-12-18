@@ -6,19 +6,20 @@ const API_URL =
     : '/api/users/';
 
 const login = async (data) => {
+  console.log(data);
   const mutation = `mutation createUser($user: UserInput) {
     login(user: $user) {
      status
     message
     data {
-      id
-      username 
-      email
-      orders{
-        products{
-         name
-         images
-        }
+      _id
+        username 
+        email
+        orders{
+          products{
+          name
+          images
+          }
         total 
       }
       cart{
@@ -39,14 +40,14 @@ const login = async (data) => {
     variables: { user: data },
   });
   const response = await axios.post(API_URL, dataToSend, config);
-
+  console.log(response);
   if (response?.data?.data?.login?.data) {
     localStorage.setItem(
       'user',
       JSON.stringify(response?.data?.data?.login?.data)
     );
   }
-  return response?.data?.data?.login;
+  return response?.data?.data?.login?.data;
 };
 
 const resetPassword = async (newPassword, token) => {
@@ -72,7 +73,7 @@ const createUser = async (data) => {
      status
     message
     data {
-      id
+      _id
       username 
       email
       orders{
