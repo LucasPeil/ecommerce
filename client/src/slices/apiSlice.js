@@ -13,8 +13,16 @@ export const apiSlice = createApi({
         return {
           url: '/products',
           body: gql`
-            query {
-              getAllProducts(first: ${first}, after: ${after}, searchText: ${searchText}) {
+            query getAllProducts(
+              $first: Int
+              $after: String
+              $searchText: String
+            ) {
+              getAllProducts(
+                first: $first
+                after: $after
+                searchText: $searchText
+              ) {
                 edges {
                   node {
                     id
@@ -36,6 +44,11 @@ export const apiSlice = createApi({
               }
             }
           `,
+          variables: {
+            first,
+            after,
+            searchText, // Pode ser `null`, e o GraphQL lidará corretamente
+          },
         };
       },
       transformResponse: (response) => response.getAllProducts,
@@ -63,6 +76,9 @@ export const apiSlice = createApi({
               }
             }
           `,
+            variables: {
+              id,
+            },
           };
       },
       transformResponse: (response) => response.getProduct.data,

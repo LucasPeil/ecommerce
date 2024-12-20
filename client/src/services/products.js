@@ -140,7 +140,7 @@ const createProduct = async (data, token) => {
     headers: {
       'Content-Type': 'application/json',
       Accept: 'application/json',
-      /*   Authorization: `Bearer: ${token}`, */
+      Authorization: `Bearer: ${token}`,
     },
   };
   const response = await axios.post(API_URL, dataToSend, config);

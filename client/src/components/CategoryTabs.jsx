@@ -1,13 +1,24 @@
 import { useState } from 'react';
-import { Tabs, Tab, Box, useTheme } from '@mui/material';
+import { Tabs, Tab, Box, useTheme, CircularProgress } from '@mui/material';
+import DestaqueSlider from './DestaqueSlider';
+import { useGetAllProductsQuery } from '../slices/apiSlice';
 
 const CategoryTabs = () => {
   const [value, setValue] = useState('Sala');
   const theme = useTheme();
+  const {
+    data: products = [],
+    isLoading,
+    isSuccess,
+    isError,
+    isFetching,
+    error,
+    refetch,
+  } = useGetAllProductsQuery({ first: 3, after: null, searchText: value });
   const handleChange = (event, newValue) => {
     setValue(newValue);
+    refetch();
   };
-
   return (
     <Box sx={{ width: '100%' }}>
       <Tabs
@@ -35,6 +46,21 @@ const CategoryTabs = () => {
         <Tab value="Cozinha" label="Cozinha" disableRipple />
         <Tab value="Banheiro" label="Banheiro" disableRipple />
       </Tabs>
+
+      {!isFetching ? (
+        <DestaqueSlider products={products} />
+      ) : (
+        <Box
+          sx={{
+            minHeight: '410px',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+          }}
+        >
+          <CircularProgress />
+        </Box>
+      )}
     </Box>
   );
 };
