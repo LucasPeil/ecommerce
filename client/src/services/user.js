@@ -6,7 +6,6 @@ const API_URL =
     : '/api/users/';
 
 const login = async (data) => {
-  console.log(data);
   const mutation = `mutation createUser($user: UserInput) {
     login(user: $user) {
      status

@@ -7,12 +7,13 @@ import { useNavigate } from 'react-router-dom';
 const DestaqueProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
   return (
     <ButtonBase
       disableRipple
       className="buttonBase"
       onClick={() => {
-        navigate(`/produto/${product.id}`);
+        navigate(`/produto/${product._id}`);
       }}
     >
       <Box

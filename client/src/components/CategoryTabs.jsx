@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Tabs, Tab, Box, useTheme, CircularProgress } from '@mui/material';
+import { Tabs, Tab, Box, useTheme, Skeleton } from '@mui/material';
 import DestaqueSlider from './DestaqueSlider';
 import { useGetAllProductsQuery } from '../slices/apiSlice';
 
@@ -14,7 +14,7 @@ const CategoryTabs = () => {
     isFetching,
     error,
     refetch,
-  } = useGetAllProductsQuery({ first: 3, after: null, searchText: value });
+  } = useGetAllProductsQuery({ first: 6, after: null, searchText: value });
   const handleChange = (event, newValue) => {
     setValue(newValue);
     refetch();
@@ -47,20 +47,7 @@ const CategoryTabs = () => {
         <Tab value="Banheiro" label="Banheiro" disableRipple />
       </Tabs>
 
-      {!isFetching ? (
-        <DestaqueSlider products={products} />
-      ) : (
-        <Box
-          sx={{
-            minHeight: '410px',
-            display: 'flex',
-            justifyContent: 'center',
-            alignItems: 'center',
-          }}
-        >
-          <CircularProgress />
-        </Box>
-      )}
+      <DestaqueSlider products={products} isFetching={isFetching} />
     </Box>
   );
 };

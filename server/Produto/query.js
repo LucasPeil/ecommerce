@@ -5,6 +5,7 @@ const {
   ProductConnectionType,
 } = require('../Produto/type');
 const Produto = require('../models/produtoModel');
+const { errorTypes } = require('../errorHandler/constants');
 
 const ProductQueryType = new graphql.GraphQLObjectType({
   name: 'Query',
@@ -17,6 +18,7 @@ const ProductQueryType = new graphql.GraphQLObjectType({
       },
 
       resolve: async (_, { id }, context) => {
+        console.log('id: ' + id);
         try {
           console.log(context);
           const product = await Produto.findById(id);
@@ -60,7 +62,7 @@ const ProductQueryType = new graphql.GraphQLObjectType({
           /*  const products = await Produto.find(query)
             .sort({ _id: 1 }) // Ordenar por ID em ordem crescente
             .limit(first + 1); // Buscar um a mais para verificar `hasNextPage` */
-          console.log(query);
+
           const products = await Produto.aggregate([
             { $match: query },
 
@@ -94,7 +96,7 @@ const ProductQueryType = new graphql.GraphQLObjectType({
             },
           };
         } catch (error) {
-          return { status: 500, message: 'Erro ao buscar produtos' };
+          throw new Error(errorTypes.SERVER_ERROR.message);
         }
       },
     },

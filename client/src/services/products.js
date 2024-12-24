@@ -70,7 +70,7 @@ const getAllProducts = async (options, token) => {
           getAllProducts(first: $first, after: $after) {
             edges {
               node {
-                id
+                _id
                 name
                 images
                 description
@@ -114,7 +114,7 @@ const createProduct = async (data, token) => {
          status
         message
         data {
-        id
+          _id
           images
           category 
           description

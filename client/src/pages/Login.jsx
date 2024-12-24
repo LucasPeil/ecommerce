@@ -20,24 +20,24 @@ import RocketLaunchOutlinedIcon from '@mui/icons-material/RocketLaunchOutlined';
 import PersonIcon from '@mui/icons-material/Person';
 import Visibility from '@mui/icons-material/Visibility';
 import VisibilityOff from '@mui/icons-material/VisibilityOff';
-import { login } from '../slices/user';
+import { useLoginMutation } from '../slices/apiSlice';
+import { getUser } from '../slices/apiSlice';
 // import { login, reset } from '../features/auth/authSlice';
+
 const Login = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [loginValue, setLoginValue] = useState('');
   const [passwordValue, setPasswordValue] = useState('');
-  const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { user } = useSelector((state) => state.auth);
+  /* const { user } = useSelector((state) => state.auth); */
+  const [login, { isLoading, isFetching }] = useLoginMutation();
 
   useEffect(() => {
+    const user = getUser();
     if (user?._id) {
       navigate('/');
     }
-    /*    setTimeout(() => {
-      dispatch(reset());
-    }, 3000); */
-  }, [user]);
+  }, [isFetching, isLoading]);
   return (
     <Box
       component={motion.div}
@@ -122,9 +122,9 @@ const Login = () => {
           alignItems={'center'}
         >
           <Button
-            /*  disabled={!loginValue || !passwordValue} */
+            disabled={!loginValue || !passwordValue || isLoading}
             onClick={() => {
-              dispatch(login({ password: passwordValue, email: loginValue }));
+              login({ password: passwordValue, email: loginValue });
             }}
             variant="contained"
             sx={{

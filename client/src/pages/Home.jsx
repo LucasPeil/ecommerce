@@ -59,7 +59,9 @@ const Home = () => {
             EM DESTAQUE
           </h3>
         </Stack>
-        {!isFetching && <DestaqueSlider products={products} />}
+        {!isFetching && (
+          <DestaqueSlider products={products} isFetching={isFetching} />
+        )}
       </Stack>
 
       <Box sx={{ minHeight: '90vh', minWidth: '100%', position: 'relative' }}>

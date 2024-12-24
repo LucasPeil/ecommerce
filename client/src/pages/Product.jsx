@@ -22,23 +22,33 @@ import SliderImagem from '../components/SliderImagem';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct } from '../slices/products';
-import { useGetProductQuery } from '../slices/apiSlice';
-const Product = () => {
+import {
+  useGetProductQuery,
+  useUpdateUserCartMutation,
+  useGetUserCartQuery,
+} from '../slices/apiSlice';
+const Product = ({ user }) => {
   const { id } = useParams();
+
   const [qtySelected, setQtySelected] = useState(1);
   /*   const { singleProduct, getProduct: getProductState } = useSelector(
     (state) => state.products
   ); */
-  const dispatch = useDispatch();
+  useEffect(() => {}, []);
+
+  const {
+    data: userCart,
+    isLoaing: isLoadingCart,
+    isFetching: isFetchingCart,
+  } = useGetUserCartQuery({ id: user?._id }, { skip: !user });
+
   let carouselRef = useRef();
   const [photosToDisplay, setPhotosToDisplay] = useState([]);
   const [showCarousel, setShowCarousel] = useState(true);
-  /*   useEffect(() => {
-    dispatch(getProduct(id));
-  }, [id]); */
 
   const { data: singleProduct, isFetching, isSuccess } = useGetProductQuery(id);
-  console.log(singleProduct);
+  const [updateUserCart, { isLoaing }] = useUpdateUserCartMutation();
+
   return (
     <>
       {isFetching ? (
@@ -173,7 +183,13 @@ const Product = () => {
                     {!false ? (
                       <Button
                         variant="contained"
-                        onClick={() => dispatch(addProductsToCart(id))}
+                        onClick={() =>
+                          updateUserCart({
+                            id: user._id,
+                            productId: id,
+                            action: 'add',
+                          })
+                        }
                         startIcon={<LocalGroceryStoreOutlinedIcon />}
                         sx={{
                           borderRadius: 10,
@@ -191,7 +207,9 @@ const Product = () => {
                     ) : (
                       <Button
                         variant="contained"
-                        onClick={() => dispatch(removeProductsFromCart(id))}
+                        onClick={() =>
+                          updateUserCart({ id, cart: id, action: 'remove' })
+                        }
                         startIcon={<RemoveShoppingCartOutlinedIcon />}
                         sx={{
                           borderRadius: 10,
@@ -211,8 +229,9 @@ const Product = () => {
 
                   <Typography
                     sx={{
-                      border: '1px solid blue',
+                      /*  border: '1px solid blue', */
                       height: '100%',
+                      mt: 3,
                       overflow: 'auto',
                     }}
                   >

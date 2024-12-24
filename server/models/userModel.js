@@ -27,7 +27,8 @@ const userSchema = new mongoose.Schema({
     default: [],
   },
   cart: {
-    type: [String],
+    type: [mongoose.Schema.Types.ObjectId],
+    ref: 'Produto',
     required: false,
     default: [],
   },

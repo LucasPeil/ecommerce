@@ -1,7 +1,9 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { graphqlBaseQuery } from './graphqlBaseQuery';
 import { gql } from 'graphql-request';
+import { logout } from './user';
 
+export const getUser = () => JSON.parse(localStorage.getItem('user'));
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: graphqlBaseQuery({
@@ -25,7 +27,7 @@ export const apiSlice = createApi({
               ) {
                 edges {
                   node {
-                    id
+                    _id
                     name
                     images
                     description
@@ -55,16 +57,15 @@ export const apiSlice = createApi({
     }),
     getProduct: builder.query({
       query: (id) => {
-        if (id)
-          return {
-            url: '/products',
-            body: gql`
-            query {
-              getProduct(id: "${id}") {
+        return {
+          url: '/products',
+          body: gql`
+            query getProduct($id: String!) {
+              getProduct(id: $id) {
                 status
                 message
                 data {
-                  id
+                  _id
                   name
                   images
                   category
@@ -76,22 +77,24 @@ export const apiSlice = createApi({
               }
             }
           `,
-            variables: {
-              id,
-            },
-          };
+          variables: {
+            id,
+          },
+        };
       },
       transformResponse: (response) => response.getProduct.data,
     }),
     createProduct: builder.mutation({
-      mutation: (product) => ({
-        body: gql`
-          query {
-            createProduct(product: ${product}) {
+      query: (product) => {
+        return {
+          url: '/products',
+          body: gql`
+          query  createProduct($product: ProductInput) { {
+            createProduct(product: $product) {
               status
               message
               data {
-                id
+                _id
                 images
                 category 
                 description
@@ -102,13 +105,179 @@ export const apiSlice = createApi({
             }
           }
         `,
-      }),
+          variables: {
+            product,
+          },
+        };
+      },
       transformResponse: (response) => response.createProduct,
+    }),
+    // USER QUERIES
+    createUser: builder.mutation({
+      query: (user) => {
+        return {
+          url: '/users',
+          body: gql`
+            mutation createUser($user: UserInput) {
+              createUser(user: $user) {
+                status
+                message
+                data {
+                  _id
+                  username
+                  email
+                  orders {
+                    products {
+                      name
+                      images
+                    }
+                    total
+                  }
+                  cart {
+                    name
+                    images
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            user,
+          },
+          requestHeaders: {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        };
+      },
+      transformResponse: (response) => response.createUser,
+    }),
+    login: builder.mutation({
+      query: (user) => {
+        return {
+          url: '/users',
+          body: gql`
+            mutation login($user: UserInput) {
+              login(user: $user) {
+                status
+                message
+                data {
+                  _id
+                  username
+                  email
+                }
+              }
+            }
+          `,
+          variables: {
+            user,
+          },
+          requestHeaders: {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        };
+      },
+      transformResponse: (response) => {
+        console.log(response);
+        localStorage.setItem('user', JSON.stringify(response?.login?.data));
+      },
+    }),
+
+    getUserCart: builder.query({
+      query: ({ id }) => {
+        return {
+          url: '/users',
+          body: gql`
+            query getUserCart($id: String) {
+              getUserCart(id: $id) {
+                status
+                message
+                data {
+                  _id
+                  username
+                  email
+                  cart {
+                    name
+                    images
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            id,
+          },
+          requestHeaders: {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        };
+      },
+      transformResponse: (response) => response.getUserCart?.data,
+    }),
+
+    updateUserCart: builder.mutation({
+      query: ({ id, productId, action }) => {
+        return {
+          url: '/users',
+          body: gql`
+            mutation updateUserCart(
+              $id: String
+              $productId: String
+              $action: String
+            ) {
+              updateUserCart(productId: $productId, id: $id, action: $action) {
+                status
+                message
+                data {
+                  _id
+                  username
+                  email
+                  orders {
+                    products {
+                      name
+                      images
+                    }
+                    total
+                  }
+                  cart {
+                    name
+                    images
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            id,
+            productId,
+            action,
+          },
+          requestHeaders: {
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          },
+        };
+      },
+      transformResponse: (response) => response?.updateUserCart?.data,
     }),
   }),
 });
 
-export const { useGetAllProductsQuery, useGetProductQuery } = apiSlice;
+export const {
+  useGetAllProductsQuery,
+  useGetProductQuery,
+  useCreateProductMutation,
+  useCreateUserMutation,
+  useLoginMutation,
+  useGetUserCartQuery,
+  useUpdateUserCartMutation,
+} = apiSlice;
 
 /* body: gql`
             query {

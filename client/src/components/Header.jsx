@@ -7,7 +7,7 @@ import {
   useMediaQuery,
   IconButton,
 } from '@mui/material';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Twirl as Hamburger } from 'hamburger-react';
 import LocalGroceryStoreOutlinedIcon from '@mui/icons-material/LocalGroceryStoreOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
@@ -18,16 +18,33 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { logout } from '../slices/user';
 import SearchBackdrop from './SearchBackdrop';
+import {
+  getUser,
+  useGetUserCartQuery,
+  useUpdateUserCartMutation,
+} from '../slices/apiSlice';
 
-const Header = () => {
+const Header = ({ id }) => {
   const [isOpen, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
   const [openSearchBackdrop, setOpenSearchBackdrop] = useState(false);
-  const { user, register } = useSelector((state) => state.auth);
+
   const theme = useTheme();
   const dispatch = useDispatch();
   const downMd = useMediaQuery(theme.breakpoints.down('md'));
-
+  const {
+    data: userDbInfo,
+    isFetchingCart,
+    isSuccessCart,
+    refetch,
+  } = useGetUserCartQuery(
+    { id: id },
+    {
+      skip: !id,
+    }
+  );
+  // TEM QUE IMPLEMENTAR O REFETCH NO GETUSERCARTQUERY NA HORA DE ADICIONAR UM NOVO PRODUTO AO CARRINHO
+  console.log(userDbInfo);
   return (
     <Stack
       direction={'row'}
@@ -86,10 +103,11 @@ const Header = () => {
             Criar Produto
           </Typography>
         </Button>
-        {user?._id ? (
+        {id ? (
           <Button
             onClick={() => {
               dispatch(logout());
+              setUser(null);
             }}
           >
             <Typography color="black" variant="button">
@@ -105,7 +123,7 @@ const Header = () => {
         )}
 
         <IconButton sx={{ color: 'black', px: 0 }}>
-          <Badge badgeContent={4} color={'darkColor'}>
+          <Badge badgeContent={userDbInfo?.cart.length} color={'darkColor'}>
             <LocalGroceryStoreOutlinedIcon sx={{ fontSize: '1.8rem' }} />
           </Badge>
         </IconButton>

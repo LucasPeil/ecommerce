@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const { UserResultType, UserInput } = require('../User/type');
 const User = require('../models/userModel');
+const { errorTypes } = require('../errorHandler/constants');
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: '7d' });
@@ -61,6 +62,7 @@ const UserMutation = new graphql.GraphQLObjectType({
               _id: user._id,
               email: user.email,
               username: user.username,
+
               token: generateToken(user._id),
             },
           };
@@ -73,14 +75,14 @@ const UserMutation = new graphql.GraphQLObjectType({
     updateUser: {
       type: UserResultType, // Tipo de saída (Output Type) para o retorno
       // `args` describes the arguments that the `user` query accepts
-      args: { user: { type: UserInput } }, // Tipo de entrada (Input Type) para os argumentos
+      args: { user: { type: UserInput }, id: { type: graphql.GraphQLString } }, // Tipo de entrada (Input Type) para os argumentos
       resolve: async (_, { id, user }) => {
         try {
-          const updatedUser = await User.findByIdAndUpdate(id, product, {
+          const updatedUser = await User.findByIdAndUpdate(id, user, {
             new: true,
           });
           if (!updatedUser) {
-            return { status: 404, message: 'Usuário não encontrado' };
+            throw new Error('Usuário nao encontrado');
           }
           return {
             status: 200,
@@ -88,7 +90,7 @@ const UserMutation = new graphql.GraphQLObjectType({
             data: updatedUser,
           };
         } catch (error) {
-          return { status: 500, message: 'Erro ao atualizar usuário' };
+          throw new Error(errorTypes.SERVER_ERROR);
         }
       },
     },
@@ -108,21 +110,29 @@ const UserMutation = new graphql.GraphQLObjectType({
     updateUserCart: {
       type: UserResultType, // Tipo de saída (Output Type) para o retorno
       // `args` describes the arguments that the `user` query accepts
-      args: { user: { type: UserInput } }, // Tipo de entrada (Input Type) para os argumentos
-      resolve: async (_, { id, productId }) => {
+      args: {
+        id: { type: graphql.GraphQLString },
+        productId: { type: graphql.GraphQLString },
+        action: { type: graphql.GraphQLString },
+      }, // Tipo de entrada (Input Type) para os argumentos
+      resolve: async (_, { id, productId, action }) => {
         try {
           const user = await User.findById(id);
-
-          if (!updatedUser) {
-            return { status: 404, message: 'Usuário não encontrado' };
+          console.log(user);
+          if (!user) {
+            throw new Error('Usuário nao encontrado');
           }
+          action === 'add'
+            ? user.cart.push(productId)
+            : user.cart.pop(productId);
+          await user.save();
           return {
             status: 200,
             message: 'Usuário atualizado com sucesso!',
-            data: updatedUser,
+            data: user,
           };
         } catch (error) {
-          return { status: 500, message: 'Erro ao atualizar usuário' };
+          throw new Error(errorTypes.SERVER_ERROR.message);
         }
       },
     },

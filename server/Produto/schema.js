@@ -1,6 +1,6 @@
 const productSchema = buildSchema(`
     type Product{
-      id: ID
+      _id: ID
       images: String
       description: String
       price: Float

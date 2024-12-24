@@ -7,7 +7,6 @@ const app = express();
 const path = require('path');
 const dotenv = require('dotenv').config();
 const Produto = require('./models/produtoModel');
-
 const connectDB = require('./config/db');
 const { ProductQueryType } = require('./Produto/query');
 const { ProductMutation } = require('./Produto/mutation');
@@ -18,6 +17,7 @@ const { protect } = require('./middleware/authMiddleware');
 const { uploadImages } = require('./Produto/fileUpload');
 const PORT = process.env.PORT || 4000;
 const { v4: uuidv4 } = require('uuid');
+
 connectDB();
 // Query para pegar todos os produtos
 /* app.use(graphqlUploadExpress()); */
@@ -75,6 +75,9 @@ app.all(
   '/api/products',
   createHandler({
     schema: productSchema,
+    formatError: (err) => {
+      return err;
+    },
     context: async (req) => ({
       filesObj: req?.files,
     }),
@@ -84,6 +87,9 @@ app.all(
   '/api/users',
   createHandler({
     schema: userSchema,
+    formatError: (err) => {
+      return err;
+    },
     context: async (req) => ({}),
   })
 );
