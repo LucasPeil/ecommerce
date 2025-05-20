@@ -19,8 +19,7 @@ const uploadImages = async function (path, options, public_id) {
     .catch((error) => {
       console.log(error);
     });
-  /*   console.log(uploadResult); */
-  // Optimize delivery by resizing and applying auto-format and auto-quality
+
   const optimizeUrl = cloudinary.url(`ecommerce/${public_id}`, {
     fetch_format: 'auto',
     quality: 'auto',

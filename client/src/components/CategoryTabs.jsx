@@ -14,7 +14,12 @@ const CategoryTabs = () => {
     isFetching,
     error,
     refetch,
-  } = useGetAllProductsQuery({ first: 6, after: null, searchText: value });
+  } = useGetAllProductsQuery({
+    first: 6,
+    after: null,
+    filter: [{ field: '', value: '' }],
+    searchText: value,
+  });
   const handleChange = (event, newValue) => {
     setValue(newValue);
     refetch();

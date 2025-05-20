@@ -1,28 +1,30 @@
 import { createApi } from '@reduxjs/toolkit/query/react';
 import { graphqlBaseQuery } from './graphqlBaseQuery';
 import { gql } from 'graphql-request';
-import { logout } from './user';
 
-export const getUser = () => JSON.parse(localStorage.getItem('user'));
+export const getUser = () => JSON.parse(localStorage.getItem('user#19dg23'));
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: graphqlBaseQuery({
     baseUrl: 'http://localhost:5173/api',
   }),
+  tagTypes: ['DeleteProduct'],
   endpoints: (builder) => ({
     getAllProducts: builder.query({
-      query: ({ first, after, searchText }) => {
+      query: ({ first, after, filter, searchText }) => {
         return {
           url: '/products',
           body: gql`
             query getAllProducts(
               $first: Int
               $after: String
+              $filter: FilterType
               $searchText: String
             ) {
               getAllProducts(
                 first: $first
                 after: $after
+                filter: $filter
                 searchText: $searchText
               ) {
                 edges {
@@ -49,11 +51,14 @@ export const apiSlice = createApi({
           variables: {
             first,
             after,
-            searchText, // Pode ser `null`, e o GraphQL lidará corretamente
+            filter,
+            searchText,
           },
         };
       },
-      transformResponse: (response) => response.getAllProducts,
+      transformResponse: (response) => {
+        return response.getAllProducts;
+      },
     }),
     getProduct: builder.query({
       query: (id) => {
@@ -86,25 +91,27 @@ export const apiSlice = createApi({
     }),
     createProduct: builder.mutation({
       query: (product) => {
+        console.log(product);
         return {
           url: '/products',
           body: gql`
-          query  createProduct($product: ProductInput) { {
-            createProduct(product: $product) {
-              status
-              message
-              data {
-                _id
-                images
-                category 
-                description
-                price
-                available
-                quantity
-              }  
+            mutation createProduct($product: ProductInput!) {
+              createProduct(product: $product) {
+                status
+                message
+                data {
+                  _id
+                  name
+                  images
+                  category
+                  description
+                  price
+                  available
+                  quantity
+                }
+              }
             }
-          }
-        `,
+          `,
           variables: {
             product,
           },
@@ -112,13 +119,50 @@ export const apiSlice = createApi({
       },
       transformResponse: (response) => response.createProduct,
     }),
+    getRooms: builder.query({
+      query: () => {
+        return {
+          url: '/products',
+          body: gql`
+            query getRooms {
+              getRooms {
+                status
+                message
+                data
+              }
+            }
+          `,
+        };
+      },
+      transformResponse: (response) => response.getRooms,
+    }),
+    getPricesRange: builder.query({
+      query: () => {
+        return {
+          url: '/products',
+          body: gql`
+            query getPricesRange {
+              getPricesRange {
+                status
+                message
+                data {
+                  price
+                  qty
+                }
+              }
+            }
+          `,
+        };
+      },
+      transformResponse: (response) => response.getPricesRange,
+    }),
     // USER QUERIES
     createUser: builder.mutation({
       query: (user) => {
         return {
           url: '/users',
           body: gql`
-            mutation createUser($user: UserInput) {
+            mutation createUser($user: UserInput!) {
               createUser(user: $user) {
                 status
                 message
@@ -158,7 +202,7 @@ export const apiSlice = createApi({
         return {
           url: '/users',
           body: gql`
-            mutation login($user: UserInput) {
+            mutation login($user: UserInput!) {
               login(user: $user) {
                 status
                 message
@@ -181,8 +225,11 @@ export const apiSlice = createApi({
         };
       },
       transformResponse: (response) => {
-        console.log(response);
-        localStorage.setItem('user', JSON.stringify(response?.login?.data));
+        localStorage.setItem(
+          'user#19dg23',
+          JSON.stringify(response?.login?.data)
+        );
+        return response.login;
       },
     }),
 
@@ -191,7 +238,7 @@ export const apiSlice = createApi({
         return {
           url: '/users',
           body: gql`
-            query getUserCart($id: String) {
+            query getUserCart($id: String!) {
               getUserCart(id: $id) {
                 status
                 message
@@ -200,8 +247,14 @@ export const apiSlice = createApi({
                   username
                   email
                   cart {
+                    _id
                     name
                     images
+                    description
+                    price
+                    qtySelected
+                    quantity
+                    available
                   }
                 }
               }
@@ -217,20 +270,27 @@ export const apiSlice = createApi({
           },
         };
       },
+      providesTags: ['DeleteProduct'],
       transformResponse: (response) => response.getUserCart?.data,
     }),
 
     updateUserCart: builder.mutation({
-      query: ({ id, productId, action }) => {
+      query: ({ id, productId, action, qty }) => {
         return {
           url: '/users',
           body: gql`
             mutation updateUserCart(
-              $id: String
-              $productId: String
-              $action: String
+              $id: String!
+              $productId: String!
+              $action: String!
+              $qty: Int
             ) {
-              updateUserCart(productId: $productId, id: $id, action: $action) {
+              updateUserCart(
+                productId: $productId
+                id: $id
+                action: $action
+                qty: $qty
+              ) {
                 status
                 message
                 data {
@@ -256,6 +316,7 @@ export const apiSlice = createApi({
             id,
             productId,
             action,
+            qty,
           },
           requestHeaders: {
             headers: {
@@ -264,6 +325,7 @@ export const apiSlice = createApi({
           },
         };
       },
+      invalidatesTags: ['DeleteProduct'],
       transformResponse: (response) => response?.updateUserCart?.data,
     }),
   }),
@@ -277,16 +339,6 @@ export const {
   useLoginMutation,
   useGetUserCartQuery,
   useUpdateUserCartMutation,
+  useGetRoomsQuery,
+  useGetPricesRangeQuery,
 } = apiSlice;
-
-/* body: gql`
-            query {
-              posts {
-                data {
-                  id
-                  title
-                }
-              }
-            }
-          `,
-        }; */

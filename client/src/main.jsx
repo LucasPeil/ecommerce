@@ -8,7 +8,7 @@ import { store } from './store';
 import { createTheme } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
 const theme = createTheme({
@@ -37,7 +37,7 @@ const theme = createTheme({
     error: {
       main: '#f44336',
     },
-    divider: '#24A849',
+    divider: '#000000',
     background: {
       default: '#f2f2f2',
     },
@@ -55,7 +55,7 @@ createRoot(document.getElementById('root')).render(
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <CssBaseline />
-          <Router basename={import.meta.env.BASE_URL}>
+          <BrowserRouter basename={import.meta.env.BASE_URL}>
             <Routes>
               <Route exact path="/login" element={<Login />} />
 
@@ -63,7 +63,7 @@ createRoot(document.getElementById('root')).render(
 
               <Route exact path="*" element={<App />} />
             </Routes>
-          </Router>
+          </BrowserRouter>
         </ThemeProvider>
       </StyledEngineProvider>
     </Provider>

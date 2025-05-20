@@ -18,7 +18,7 @@ export const store = configureStore({
 /* axios.interceptors.response.use(
   (response) => response,
   (error) => {
-    console.log(error);
+   
     if (error.response.status === 401) {
       // Em caso de status 401 (Não autorizado)
       // Desloga o usuário e navega para caminho root

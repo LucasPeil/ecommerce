@@ -12,18 +12,20 @@ import Footer from '../components/Footer';
 import { responsive } from '../utils/carouselResponsiveness';
 import CategoryTabs from '../components/CategoryTabs';
 import { useGetAllProductsQuery } from '../slices/apiSlice';
+import { useNavigate } from 'react-router-dom';
 const Home = () => {
-  /*   const handleTabChange = (event, newValue) => {
-    setValue(newValue);
-    
-  };
-  const [tabValue, setTabValue] = useState('Sala'); */
+  const navigate = useNavigate();
   const {
     data: products = [],
 
     isFetching,
-  } = useGetAllProductsQuery({ first: 3, after: null, searchText: null });
-  console.log(products);
+  } = useGetAllProductsQuery({
+    first: 3,
+    after: null,
+    filter: [{ field: '', value: '' }],
+    searchText: null,
+  });
+
   return (
     <>
       <Carousel

@@ -31,7 +31,18 @@ const UserQueryType = new graphql.GraphQLObjectType({
       resolve: async (_, { id }) => {
         try {
           if (id) {
-            const user = await User.findOne({ _id: id }).populate('cart');
+            const user = await User.findOne({ _id: id }).populate('cart._id');
+
+            const cart = user.cart.map((item) => ({
+              _id: item._id._id,
+              name: item._id.name,
+              images: item._id.images,
+              description: item._id.description,
+              price: item._id.price,
+              qtySelected: item.qty,
+              quantity: item._id.quantity,
+              available: item._id.available,
+            }));
 
             if (!user) {
               throw new Error('Usuário nao encontrado');
@@ -39,7 +50,7 @@ const UserQueryType = new graphql.GraphQLObjectType({
             return {
               status: 200,
               message: 'Informações do carrinho recuperadas com sucesso!',
-              data: user,
+              data: { ...user._doc, ...{ cart: cart } },
             };
           }
         } catch (error) {

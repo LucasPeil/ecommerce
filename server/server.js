@@ -52,8 +52,6 @@ app.post('/api/uploadFile', async (req, res) => {
 
   for (const key of Object.keys(req.files)) {
     try {
-      /*  let url = '';
-      console.log(req.files[key].tempFilePath);  */
       const url = await uploadImages(req.files[key].tempFilePath, {}, uuidv4());
 
       urls.push(url);
@@ -78,6 +76,7 @@ app.all(
     formatError: (err) => {
       return err;
     },
+
     context: async (req) => ({
       filesObj: req?.files,
     }),
@@ -90,7 +89,7 @@ app.all(
     formatError: (err) => {
       return err;
     },
-    context: async (req) => ({}),
+    context: async (req) => {},
   })
 );
 

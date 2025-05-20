@@ -5,7 +5,6 @@ export const graphqlBaseQuery =
   async ({ url, body, variables = null, requestHeaders = {} }) => {
     try {
       const fullUrl = baseUrl + url;
-      console.log(variables);
       const result = await request({
         url: fullUrl,
         document: body,

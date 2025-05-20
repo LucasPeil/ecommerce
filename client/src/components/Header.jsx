@@ -18,33 +18,25 @@ import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
 import { logout } from '../slices/user';
 import SearchBackdrop from './SearchBackdrop';
-import {
-  getUser,
-  useGetUserCartQuery,
-  useUpdateUserCartMutation,
-} from '../slices/apiSlice';
 
-const Header = ({ id }) => {
+import CartDialog from './CartDialog';
+import { useGetUserCartQuery } from '../slices/apiSlice';
+
+const Header = ({ id, userDbInfo, user, setUser }) => {
   const [isOpen, setOpen] = useState(false);
   const [openDialog, setOpenDialog] = useState(false);
+  const [openCartDialog, setOpenCartDialog] = useState(false);
   const [openSearchBackdrop, setOpenSearchBackdrop] = useState(false);
-
+  const { refetch } = useGetUserCartQuery(
+    { id: user?._id },
+    {
+      skip: !user?._id,
+    }
+  );
   const theme = useTheme();
   const dispatch = useDispatch();
   const downMd = useMediaQuery(theme.breakpoints.down('md'));
-  const {
-    data: userDbInfo,
-    isFetchingCart,
-    isSuccessCart,
-    refetch,
-  } = useGetUserCartQuery(
-    { id: id },
-    {
-      skip: !id,
-    }
-  );
-  // TEM QUE IMPLEMENTAR O REFETCH NO GETUSERCARTQUERY NA HORA DE ADICIONAR UM NOVO PRODUTO AO CARRINHO! VER O POPULATE TAMBÉM, PARECE ESTAR RETORNANDO NULL!
-  console.log(userDbInfo);
+
   return (
     <Stack
       direction={'row'}
@@ -62,6 +54,10 @@ const Header = ({ id }) => {
         height: '80px',
       }}
     >
+      <CartDialog
+        open={openCartDialog}
+        handleClose={() => setOpenCartDialog(false)}
+      />
       <SearchBackdrop
         open={openSearchBackdrop}
         setOpen={setOpenSearchBackdrop}
@@ -122,8 +118,17 @@ const Header = ({ id }) => {
           </NavLink>
         )}
 
-        <IconButton sx={{ color: 'black', px: 0 }}>
-          <Badge badgeContent={userDbInfo?.cart.length} color={'darkColor'}>
+        <IconButton
+          sx={{ color: 'black', px: 0 }}
+          onClick={() => {
+            refetch();
+            setOpenCartDialog(true);
+          }}
+        >
+          <Badge
+            badgeContent={user ? userDbInfo?.cart.length : 0}
+            color={'darkColor'}
+          >
             <LocalGroceryStoreOutlinedIcon sx={{ fontSize: '1.8rem' }} />
           </Badge>
         </IconButton>

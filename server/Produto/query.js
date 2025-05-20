@@ -3,9 +3,13 @@ const {
   ProductResultType,
   ProductType,
   ProductConnectionType,
+  GeneralReturnType,
+  PriceRangeType,
+  FilterType,
 } = require('../Produto/type');
 const Produto = require('../models/produtoModel');
 const { errorTypes } = require('../errorHandler/constants');
+const { filterFunction } = require('../utils/filterFunction');
 
 const ProductQueryType = new graphql.GraphQLObjectType({
   name: 'Query',
@@ -18,9 +22,7 @@ const ProductQueryType = new graphql.GraphQLObjectType({
       },
 
       resolve: async (_, { id }, context) => {
-        console.log('id: ' + id);
         try {
-          console.log(context);
           const product = await Produto.findById(id);
           if (!product) {
             return { status: 404, message: 'Produto não encontrado' };
@@ -38,31 +40,27 @@ const ProductQueryType = new graphql.GraphQLObjectType({
       args: {
         first: { type: graphql.GraphQLInt },
         after: { type: graphql.GraphQLString },
+        filter: { type: FilterType },
         searchText: { type: graphql.GraphQLString },
       },
       resolve: async (
         _,
-        { first = 5, after, searchText, checkbox },
-        context
+        { first = 5, after, filter, searchText, checkbox }
       ) => {
         try {
+          filterFunction(filter);
           // Decodificar o cursor 'after' para obter o ID inicial
           let startId = null;
           if (after) {
             startId = Buffer.from(after, 'base64').toString('utf-8');
           }
           // Construir o filtro para buscar produtos após o cursor
-          const filter = {};
+
           let query = startId ? { _id: { $gt: startId } } : {};
           if (searchText) {
             query.category = { $regex: searchText, $options: 'i' };
           }
-
-          // Buscar os produtos no banco de dados
-          /*  const products = await Produto.find(query)
-            .sort({ _id: 1 }) // Ordenar por ID em ordem crescente
-            .limit(first + 1); // Buscar um a mais para verificar `hasNextPage` */
-
+          console.log(query);
           const products = await Produto.aggregate([
             { $match: query },
 
@@ -97,6 +95,68 @@ const ProductQueryType = new graphql.GraphQLObjectType({
           };
         } catch (error) {
           throw new Error(errorTypes.SERVER_ERROR.message);
+        }
+      },
+    },
+
+    getRooms: {
+      type: GeneralReturnType,
+      args: {},
+      resolve: async () => {
+        try {
+          const rooms = await Produto.distinct('category');
+
+          return { status: 200, message: 'Sucesso!', data: rooms };
+        } catch (error) {
+          return { status: 500, message: 'Erro ao buscar cômodos' };
+        }
+      },
+    },
+    getPricesRange: {
+      type: PriceRangeType,
+      args: {},
+      resolve: async () => {
+        try {
+          const priceDistribution = await Produto.aggregate([
+            {
+              $bucket: {
+                groupBy: '$price',
+                boundaries: [1, 30, 100, 500, 800, 10000],
+                default: '10000+',
+                output: {
+                  count: { $sum: 1 },
+                  /*  produtos: { $push: '$_id' }, */
+                },
+              },
+            },
+          ]);
+
+          let pricesRange = [];
+          for (let i = 0; i < priceDistribution.length; i += 2) {
+            if (i == priceDistribution.length - 1) {
+              // se for o último elemento
+              pricesRange.push({
+                price: `${priceDistribution[i]._id}`,
+                qty: priceDistribution[i].count,
+              });
+            } else {
+              pricesRange.push({
+                price: `${priceDistribution[i]._id} - ${
+                  priceDistribution[i + 1]._id
+                }`,
+                qty:
+                  priceDistribution[i].count + priceDistribution[i + 1].count,
+              });
+            }
+          }
+
+          return {
+            status: 200,
+            message: 'Sucesso!',
+            data: pricesRange,
+          };
+        } catch (error) {
+          return { status: 500, message: 'Erro ao buscar preços' };
         }
       },
     },

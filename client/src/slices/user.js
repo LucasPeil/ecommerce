@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import authServices from '../services/user';
 
 // Get user from localStorage
-const user = JSON.parse(localStorage.getItem('user'));
+const user = JSON.parse(localStorage.getItem('user#19dg23'));
 
 const initialState = {
   user: user ? user : null,
@@ -128,6 +128,11 @@ export const authSlice = createSlice({
   name: 'auth',
   initialState,
   reducers: {
+    resetRegister: (state) => {
+      state.register.isLoading = false;
+      state.register.isSuccess = false;
+      state.register.isError = false;
+    },
     reset: (state) => {
       state.isLoading = false;
       state.isSuccess = false;
@@ -233,5 +238,5 @@ export const authSlice = createSlice({
   },
 });
 
-export const { reset, resetForgotPassword } = authSlice.actions;
+export const { reset, resetForgotPassword, resetRegister } = authSlice.actions;
 export default authSlice.reducer;

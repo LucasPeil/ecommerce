@@ -15,6 +15,7 @@ const productSchema = mongoose.Schema(
     images: { type: [String] },
     description: { type: String },
     price: { type: Number, required: true },
+    //  price: { type: mongoose.Types.Decimal128, required: true },
     available: { type: Boolean, default: true },
     quantity: { type: Number, required: true },
     comments: { type: [commentschema], required: false },

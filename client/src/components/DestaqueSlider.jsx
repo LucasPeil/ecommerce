@@ -1,16 +1,14 @@
-import React, { useEffect } from 'react';
+import { Box, Skeleton } from '@mui/material';
+import React from 'react';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
-import { Box, Skeleton, Stack } from '@mui/material';
-import DestaqueProductCard from './DestaqueProductCard';
 import { responsiveDestaque } from '../utils/carouselResponsiveness';
-import { useDispatch, useSelector } from 'react-redux';
-import { getAllProducts } from '../slices/products';
-import { useGetAllProductsQuery } from '../slices/apiSlice';
+import DestaqueProductCard from './DestaqueProductCard';
 const DestaqueSlider = ({ products, isFetching = false }) => {
   return (
     <Carousel
       swipeable={false}
+      O
       focusOnSelect={false}
       draggable={false}
       showDots={false}
@@ -28,6 +26,7 @@ const DestaqueSlider = ({ products, isFetching = false }) => {
       {isFetching
         ? [...Array(4).keys()].map((item, idx) => (
             <Box
+              item={idx}
               sx={{
                 display: 'flex',
                 justifyContent: 'center',

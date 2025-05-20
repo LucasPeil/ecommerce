@@ -114,17 +114,45 @@ const UserMutation = new graphql.GraphQLObjectType({
         id: { type: graphql.GraphQLString },
         productId: { type: graphql.GraphQLString },
         action: { type: graphql.GraphQLString },
+        qty: { type: graphql.GraphQLInt },
       }, // Tipo de entrada (Input Type) para os argumentos
-      resolve: async (_, { id, productId, action }) => {
+      resolve: async (_, { id, productId, action, qty }) => {
         try {
           const user = await User.findById(id);
-          console.log(user);
+
           if (!user) {
             throw new Error('Usuário nao encontrado');
           }
-          action === 'add'
-            ? user.cart.push(productId)
-            : user.cart.pop(productId);
+          switch (action) {
+            case 'add':
+              user.cart.push({ _id: productId, qty });
+              break;
+            case 'remove':
+              const item = user.cart.pop({ _id: productId });
+              console.log(item);
+              break;
+            case 'addOne':
+              let itemIdxToAdd = item.cart.findIndex(
+                (item) => item._id == productId
+              );
+              user.cart[itemIdxToAdd].qty += 1;
+
+              break;
+            case 'removeOne':
+              let itemIdxToRemove = item.cart.findIndex(
+                (item) => item._id == productId
+              );
+
+              if (user.cart[itemIdxToRemove].qty === 1) {
+                user.cart.pop({ _id: productId });
+              } else {
+                user.cart[itemIdxToRemove].qty -= 1;
+              }
+              break;
+            default:
+              break;
+          }
+
           await user.save();
           return {
             status: 200,

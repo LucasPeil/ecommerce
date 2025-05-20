@@ -22,32 +22,29 @@ import SliderImagem from '../components/SliderImagem';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct } from '../slices/products';
-import {
-  useGetProductQuery,
-  useUpdateUserCartMutation,
-  useGetUserCartQuery,
-} from '../slices/apiSlice';
-const Product = ({ user }) => {
+import { useGetProductQuery } from '../slices/apiSlice';
+import { useNavigate } from 'react-router-dom';
+const Product = ({
+  user,
+  updateUserCart,
+  refetchGetUserCart,
+  isFetchingCart,
+  isSuccessUpdateCart,
+  userDbInfo,
+}) => {
   const { id } = useParams();
 
   const [qtySelected, setQtySelected] = useState(1);
-  /*   const { singleProduct, getProduct: getProductState } = useSelector(
-    (state) => state.products
-  ); */
-  useEffect(() => {}, []);
-
-  const {
-    data: userCart,
-    isLoaing: isLoadingCart,
-    isFetching: isFetchingCart,
-  } = useGetUserCartQuery({ id: user?._id }, { skip: !user });
-
+  const navigate = useNavigate();
   let carouselRef = useRef();
   const [photosToDisplay, setPhotosToDisplay] = useState([]);
   const [showCarousel, setShowCarousel] = useState(true);
 
   const { data: singleProduct, isFetching, isSuccess } = useGetProductQuery(id);
-  const [updateUserCart, { isLoaing }] = useUpdateUserCartMutation();
+  /*   const [updateUserCart, { isLoaing }] = useUpdateUserCartMutation(); */
+  useEffect(() => {
+    if (isSuccessUpdateCart) refetchGetUserCart();
+  }, [isSuccessUpdateCart]);
 
   return (
     <>
@@ -180,35 +177,17 @@ const Product = ({ user }) => {
                         <AddIcon />
                       </IconButton>
                     </Paper>
-                    {!false ? (
+                    {userDbInfo?.cart.some((item) => item._id == id) ? (
                       <Button
                         variant="contained"
                         onClick={() =>
-                          updateUserCart({
-                            id: user._id,
-                            productId: id,
-                            action: 'add',
-                          })
-                        }
-                        startIcon={<LocalGroceryStoreOutlinedIcon />}
-                        sx={{
-                          borderRadius: 10,
-                          backgroundColor: 'black',
-                          fontWeight: 'bold',
-                          transition: '0.3s ease',
-                          '&:hover': {
-                            backgroundColor: 'white',
-                            color: 'black',
-                          },
-                        }}
-                      >
-                        ADICIONAR AO CARRINHO
-                      </Button>
-                    ) : (
-                      <Button
-                        variant="contained"
-                        onClick={() =>
-                          updateUserCart({ id, cart: id, action: 'remove' })
+                          user._id
+                            ? updateUserCart({
+                                id: user._id,
+                                productId: id,
+                                action: 'remove',
+                              })
+                            : navigate(import.meta.env.BASE_URL + '/login')
                         }
                         startIcon={<RemoveShoppingCartOutlinedIcon />}
                         sx={{
@@ -223,6 +202,39 @@ const Product = ({ user }) => {
                         }}
                       >
                         REMOVER DO CARRINHO
+                      </Button>
+                    ) : (
+                      <Button
+                        disabled={isFetchingCart}
+                        variant="contained"
+                        onClick={() => {
+                          let navigateTo =
+                            process.env.NODE_ENV === 'production'
+                              ? import.meta.env.BASE_URL + '/login'
+                              : '/login';
+                          user?._id
+                            ? updateUserCart({
+                                id: user._id,
+                                productId: id,
+                                qty: qtySelected,
+                                action: 'add',
+                              })
+                            : navigate(navigateTo);
+                        }}
+                        startIcon={<LocalGroceryStoreOutlinedIcon />}
+                        sx={{
+                          borderRadius: 10,
+                          backgroundColor: 'black',
+                          fontWeight: 'bold',
+                          transition: '0.3s ease',
+                          '&:hover': {
+                            backgroundColor: 'white',
+                            color: 'black',
+                          },
+                        }}
+                      >
+                        {/* AINDA NÃO ESTÁ TOTALMENTE PRONTA. AS VEZES NÃO SINCRONIZA/ATUALIZA O NUMERO DE PRODUTOS NO CARRINHO. O POPULATE PARECE ESTÁ RELACIONADO, POIS AS VEZES VEM COM OS DADOS CERTOS, AS VEZES VEM NULL */}
+                        ADICIONAR AO CARRINHO
                       </Button>
                     )}
                   </Stack>

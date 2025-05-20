@@ -41,7 +41,6 @@ const SearchBackdrop = ({ open, setOpen }) => {
           onBlur={({ target }) => target.focus()}
           onKeyDown={(e) => {
             if (e.key == 'Enter') {
-              console.log('aquiii');
               setOpen(false);
             }
           }}

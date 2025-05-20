@@ -18,7 +18,7 @@ import { motion } from 'framer-motion';
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { createUser, reset } from '../slices/user';
+import { createUser, reset, resetRegister } from '../slices/user';
 const Register = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
@@ -35,7 +35,7 @@ const Register = () => {
     if (register.isSuccess) {
       navigate('/');
     }
-    dispatch(reset());
+    dispatch(resetRegister());
   }, [user]);
   return (
     <Box

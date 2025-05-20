@@ -31,11 +31,36 @@ import NextStep from './NextStep';
 import NoPhoto from './NoPhoto';
 import ReviewProductInfos from './ReviewProductInfos';
 import { useDispatch } from 'react-redux';
-import { createProduct } from '../../slices/products';
+import axios from 'axios';
+import { useCreateProductMutation } from '../../slices/apiSlice';
 /* import { useDispatch } from 'react-redux'; */
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Zoom ref={ref} {...props} />;
 });
+const UPLOAD_IMAGES_API_URL =
+  process.env.NODE_ENV === 'production'
+    ? import.meta.env.BASE_URL + '/api/uploadFile'
+    : '/api/uploadFile';
+
+const uploadImages = async (imgs) => {
+  console.log(imgs);
+  const config = {
+    headers: {
+      'Content-Type': 'multipart/form-data',
+      Accept: 'multipart/form-data',
+      /*   Authorization: `Bearer: ${token}`, */
+    },
+  };
+
+  const formData = new FormData();
+  console.log(imgs);
+  for (let i = 0; i < imgs.length; i++) {
+    formData.append(`file_${i}`, imgs[i]);
+  }
+
+  const response = await axios.post(UPLOAD_IMAGES_API_URL, formData, config);
+  return response.data;
+};
 const CriarProduto = ({ open, handleClose, data }) => {
   const [files, setFiles] = useState([]);
   const [photosToDisplay, setPhotosToDisplay] = useState([]);
@@ -61,7 +86,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
     }
   };
   let carouselRef = useRef();
-
+  const [createProduct, { isSuccess, isFetching }] = useCreateProductMutation();
   const ValidationSchema = Yup.object().shape({
     name: Yup.string().required('Nome é obrigatório'),
     description: Yup.string().required('Descrição é obrigatório'),
@@ -81,7 +106,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
   const formik = useFormik({
     enableReinitialize: true,
     initialValues: {
-      id: data?.id || '',
+      _id: data?.id || '',
       name: data?.name || '',
       description: data?.description || '',
       images: data?.images || [],
@@ -91,10 +116,13 @@ const CriarProduto = ({ open, handleClose, data }) => {
       category: data?.category || '',
     },
     validationSchema: ValidationSchema,
-    onSubmit: (values) => {
+    onSubmit: async (values) => {
       values.images = files;
       console.log(values);
-      dispatch(createProduct(values));
+      const urls = await uploadImages(values.images);
+      console.log(urls);
+      const product = { ...values, ...{ images: urls } };
+      createProduct(product);
       /*  closeDialog();
       formik.resetForm(); */
     },

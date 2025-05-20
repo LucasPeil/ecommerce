@@ -16,6 +16,7 @@ const ProductMutation = new graphql.GraphQLObjectType({
       args: { product: { type: ProductInput } }, // Tipo de entrada (Input Type) para os argumentos
       resolve: async (_, { product }) => {
         try {
+          delete product._id;
           const newProduct = new Produto(product);
           await newProduct.save();
           /*  if (req.files) {

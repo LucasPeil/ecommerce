@@ -1,7 +1,9 @@
 import React from 'react';
 import { Box, Typography, Button } from '@mui/material';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const Slide = ({ bgImage, bgPosition }) => {
+  const navigate = useNavigate();
   return (
     <Box
       sx={{
@@ -54,7 +56,7 @@ const Slide = ({ bgImage, bgPosition }) => {
 
       <Button
         variant="contained"
-        onClick={async () => {}}
+        onClick={async () => navigate('/Catalog')}
         sx={{
           color: 'black',
           border: '1px solid black',

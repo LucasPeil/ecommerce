@@ -89,6 +89,24 @@ export const createProduct = createAsyncThunk(
     }
   }
 );
+export const updatedProduct = createAsyncThunk(
+  'createProduct/post',
+  async (product, thunkAPI) => {
+    //const token = thunkAPI.getState().auth.user.token;
+    const token = 'jf9qwikl3';
+    try {
+      return await productsService.updatedProduct(product, token);
+    } catch (error) {
+      const message =
+        (error.response &&
+          error.response.data &&
+          error.response.data.message) ||
+        error.message ||
+        error.toString();
+      return thunkAPI.rejectWithValue(message);
+    }
+  }
+);
 
 export const productsSlice = createSlice({
   name: 'productsSlice',
