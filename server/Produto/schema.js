@@ -16,8 +16,6 @@ const productSchema = buildSchema(`
 
     type PageInfo {
         hasNextPage: Boolean!   
-        hasPreviousPage: Boolean! 
-        startCursor: String      
         endCursor: String        
     }
 
@@ -28,7 +26,7 @@ const productSchema = buildSchema(`
 
        type Query {
       getProduct(id: String!): ProductResult
-      getAllProducts(first: Int, after: String,filter: FilterType, searchText: String): ProductConnection
+      getAllProducts(first: Int, after: String, filter: FilterType, searchText: String): ProductConnection
       }
 
   

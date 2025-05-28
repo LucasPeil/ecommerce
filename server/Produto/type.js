@@ -18,9 +18,9 @@ const ProductType = new graphql.GraphQLObjectType({
 const FilterType = new graphql.GraphQLInputObjectType({
   name: 'FilterType',
   fields: {
-    prices: { type: new graphql.GraphQLList(graphql.GraphQLString) },
-    rooms: { type: new graphql.GraphQLList(graphql.GraphQLString) },
-    disponibility: { type: new graphql.GraphQLList(graphql.GraphQLString) },
+    price: { type: new graphql.GraphQLList(graphql.GraphQLString) },
+    category: { type: new graphql.GraphQLList(graphql.GraphQLString) },
+    available: { type: new graphql.GraphQLList(graphql.GraphQLString) },
   },
 });
 const PriceMixedScalar = new GraphQLScalarType({
@@ -94,8 +94,6 @@ const ProductConnectionType = new graphql.GraphQLObjectType({
         name: 'PageInfo',
         fields: {
           hasNextPage: { type: graphql.GraphQLBoolean },
-          hasPreviousPage: { type: graphql.GraphQLBoolean },
-          startCursor: { type: graphql.GraphQLString },
           endCursor: { type: graphql.GraphQLString },
         },
       }),

@@ -12,9 +12,15 @@ import {
   FormLabel,
   Divider,
 } from '@mui/material';
-import React, { useEffect, useState, useMemo, useCallback } from 'react';
+import React, {
+  useEffect,
+  useState,
+  useMemo,
+  useCallback,
+  useRef,
+} from 'react';
 import {
-  useGetAllProductsQuery,
+  useLazyGetAllProductsQuery,
   useGetPricesRangeQuery,
   useGetRoomsQuery,
 } from '../slices/apiSlice';
@@ -23,44 +29,46 @@ import ProductSimpleCard from '../components/ProductSimpleCard';
 
 const groupPerStack = (products, itemsPerStack = 4) => {
   const groupedProducts = [];
-  for (let i = 0; i < products?.edges?.length; i += itemsPerStack) {
-    groupedProducts.push(products?.edges?.slice(i, i + itemsPerStack));
+
+  for (let i = 0; i < products?.length; i += itemsPerStack) {
+    groupedProducts.push(products?.slice(i, i + itemsPerStack));
   }
   return groupedProducts;
 };
 
 const Catalog = () => {
   const [checkboxes, setCheckboxes] = useState({
-    prices: {},
-    rooms: {},
+    price: {},
+    category: {},
   });
-
+  const [hasNextPage, setHasNextPage] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
+  const [productsState, setProductsState] = useState([]);
+  const [first, setFirst] = useState(5);
+  const [after, setAfter] = useState(null);
   const [filters, setFilters] = useState({
-    prices: [],
-    rooms: [],
-    disponibility: [],
+    price: [],
+    category: [],
+    available: [],
   });
 
-  const {
-    data: products = [],
-    isFetching,
-    refetch,
-  } = useGetAllProductsQuery({
-    first: 25,
-    after: null,
-    filter: filters,
-    searchText: null,
-  });
-  useEffect(() => {
-    refetch();
-  }, [filters]);
-
+  const [getProducts, { data: products, isFetching }] =
+    useLazyGetAllProductsQuery();
   const { data: rooms } = useGetRoomsQuery({});
   const { data: prices } = useGetPricesRangeQuery({});
-  const [page, setPage] = useState('');
+  useEffect(() => {
+    setProductsState([]);
+    setAfter(null);
+    setHasNextPage(true);
 
-  const productsStacked = useMemo(() => groupPerStack(products, 4), [products]);
+    getProducts({ first: 5, after: null, filter: filters, searchText: null });
+  }, [filters]);
 
+  const loadMoreRef = useRef();
+  /*   useEffect(() => {
+    refetch();
+  }, [filters, after );
+ */
   // Inicializamos os estados dos checkboxes quando os dados são carregados
   useEffect(() => {
     if (prices?.data) {
@@ -71,7 +79,7 @@ const Catalog = () => {
 
       setCheckboxes((prev) => ({
         ...prev,
-        prices: pricesObj,
+        price: pricesObj,
       }));
     }
   }, [prices]);
@@ -85,10 +93,42 @@ const Catalog = () => {
 
       setCheckboxes((prev) => ({
         ...prev,
-        rooms: roomsObj,
+        category: roomsObj,
       }));
     }
   }, [rooms]);
+  useEffect(() => {
+    if (products?.edges?.length > 0) {
+      setProductsState((prev) => [...prev, ...products.edges]);
+      setHasNextPage(products?.pageInfo?.hasNextPage);
+      const nextCursor = products?.pageInfo?.endCursor;
+      setAfter(nextCursor);
+    }
+    setLoadingMore(false);
+  }, [products]);
+
+  useEffect(() => {
+    console.log(hasNextPage);
+    if (!hasNextPage || loadingMore) return;
+
+    const observer = new IntersectionObserver(([entry]) => {
+      // console.log('Esta intersectando: ', entry.isIntersecting);
+
+      if (entry.isIntersecting) {
+        setLoadingMore(true);
+        getProducts({ first: 5, after, filter: filters, searchText: null });
+        /* setLoadingMore(entry.isIntersecting);
+        if (!nextCursor) return; */
+      }
+    });
+
+    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
+
+    return () => {
+      if (loadMoreRef.current) observer.unobserve(loadMoreRef.current);
+      setLoadingMore(false);
+    };
+  }, [hasNextPage, loadingMore, products]);
 
   // Função para lidar com a mudança de um checkbox
   const handleCheckboxChange = useCallback((category, value) => {
@@ -128,6 +168,10 @@ const Catalog = () => {
       }
     });
   }, []);
+  const productsStacked = useMemo(
+    () => groupPerStack(productsState, 4),
+    [productsState]
+  );
 
   return (
     <Grid2
@@ -141,7 +185,10 @@ const Catalog = () => {
         flexGrow: 1,
       }}
     >
-      <Grid2 size={3} sx={{ pl: 2 }}>
+      <Grid2
+        size={3}
+        sx={{ pl: 2, border: '1px solid red', minHeight: '100vh' }}
+      >
         <Paper sx={{ minHeight: '100%', p: 3 }}>
           <Typography color="text.secondary">
             Encontre o que você procura com mais facilidade!
@@ -165,9 +212,9 @@ const Catalog = () => {
                   key={priceRange.price}
                   control={
                     <Checkbox
-                      checked={!!checkboxes.prices[priceRange.price]}
+                      checked={!!checkboxes.price[priceRange.price]}
                       onChange={() =>
-                        handleCheckboxChange('prices', priceRange.price)
+                        handleCheckboxChange('price', priceRange.price)
                       }
                       name={priceRange.price}
                     />
@@ -209,8 +256,8 @@ const Catalog = () => {
                   key={room}
                   control={
                     <Checkbox
-                      checked={!!checkboxes.rooms[room]}
-                      onChange={() => handleCheckboxChange('rooms', room)}
+                      checked={!!checkboxes.category[room]}
+                      onChange={() => handleCheckboxChange('category', room)}
                       name={room}
                     />
                   }
@@ -245,9 +292,18 @@ const Catalog = () => {
       </Grid2>
 
       {/* Paginação */}
-      <Stack spacing={2}>
-        <Pagination count={10} />
-      </Stack>
+      {hasNextPage && (
+        <Box
+          sx={{
+            border: '1px solid red',
+            height: '10px',
+            marginTop: 10,
+          }}
+          ref={loadMoreRef}
+        >
+          <Typography>Carregando</Typography>
+        </Box>
+      )}
     </Grid2>
   );
 };

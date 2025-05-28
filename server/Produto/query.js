@@ -10,7 +10,7 @@ const {
 const Produto = require('../models/produtoModel');
 const { errorTypes } = require('../errorHandler/constants');
 const { filterFunction } = require('../utils/filterFunction');
-
+const mongoose = require('mongoose');
 const ProductQueryType = new graphql.GraphQLObjectType({
   name: 'Query',
   fields: {
@@ -43,54 +43,42 @@ const ProductQueryType = new graphql.GraphQLObjectType({
         filter: { type: FilterType },
         searchText: { type: graphql.GraphQLString },
       },
-      resolve: async (
-        _,
-        { first = 5, after, filter, searchText, checkbox }
-      ) => {
+      resolve: async (_, { first, after, filter, searchText }) => {
         try {
-          filterFunction(filter);
+          const filterResult = filterFunction(filter);
           // Decodificar o cursor 'after' para obter o ID inicial
           let startId = null;
+          const limit = first || 5;
           if (after) {
             startId = Buffer.from(after, 'base64').toString('utf-8');
           }
+          console.log(startId);
           // Construir o filtro para buscar produtos após o cursor
+          let query = startId && {
+            _id: { $gt: new mongoose.Types.ObjectId(startId) },
+          };
 
-          let query = startId ? { _id: { $gt: startId } } : {};
-          if (searchText) {
-            query.category = { $regex: searchText, $options: 'i' };
-          }
-          console.log(query);
-          const products = await Produto.aggregate([
-            { $match: query },
+          let products = await Produto.aggregate([
+            { $match: { ...query, ...filterResult } },
 
             { $sort: { _id: 1 } },
-            { $limit: first + 1 },
+            { $limit: limit },
           ]);
 
           // Construir os edges
-          const edges = products.slice(0, first).map((product) => ({
+          const edges = products.slice(0, limit).map((product) => ({
             node: product,
             cursor: Buffer.from(product._id.toString()).toString('base64'), // Codificar o ID em base64
           }));
 
-          // Determinar os cursors de início e fim
-          const startCursor = edges.length > 0 ? edges[0].cursor : null;
-          const endCursor =
-            edges.length > 0 ? edges[edges.length - 1].cursor : null;
-
-          // Determinar se há mais páginas
-          const hasNextPage = products.length > first;
-          const hasPreviousPage = !!after; // Sempre haverá uma página anterior se o cursor `after` foi usado
-
           // Retornar os dados no formato esperado
+          console.log(products?.length);
           return {
             edges,
             pageInfo: {
-              hasNextPage,
-              hasPreviousPage,
-              startCursor,
-              endCursor,
+              hasNextPage: products.length >= limit,
+              endCursor:
+                edges.length > 0 ? edges[edges.length - 1].cursor : null,
             },
           };
         } catch (error) {

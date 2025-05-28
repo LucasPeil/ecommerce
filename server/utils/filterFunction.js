@@ -1,31 +1,34 @@
 const filterFunction = (filter, textSearch = false) => {
-  const keys = Object.keys(filter);
+  const keys = Object.keys(filter).filter((item) => filter[item].length > 0);
+
   const operator = textSearch ? '$and' : '$or';
   let filterQuery = {};
-  let priceQuery = [];
-  if (filter.prices?.length > 0) {
-    let parsedIntArray = stringArrayToInt(filter.prices);
+  let priceQuery = {};
+  if (filter.price?.length > 0) {
+    let parsedIntArray = stringArrayToInt(filter.price);
     for (let i = 0; i < parsedIntArray.length; i += 2) {
-      if (i == parsedIntArray.length - 1) {
-        // se for o último, não há com o que ser menor, pois é o ultimo valor
-        priceQuery.push({ $gte: parsedIntArray[i] });
+      if (parsedIntArray[i] == Math.max(parsedIntArray)) {
+        // se for o maior, não há com o que ser menor, pois é o ultimo valor
+        priceQuery = { $gte: parsedIntArray[i] };
       } else {
-        priceQuery.push({
-          $gte: parsedIntArray[i],
-          $lte: parsedIntArray[i + 1],
-        });
+        priceQuery = {
+          $gte: Math.min(...parsedIntArray),
+          $lte: Math.max(...parsedIntArray),
+        };
       }
     }
   }
-  console.log(priceQuery);
+
   for (let key of keys) {
-    if (key === 'prices') {
+    if (key === 'price') {
+      filterQuery[key] = priceQuery;
     } else {
       filterQuery[key] = { $in: filter[key] };
     }
   }
   const filterResult = { [operator]: [filterQuery] };
-  //console.log(filterResult);
+
+  return filterResult;
 };
 
 const stringArrayToInt = (array) => {

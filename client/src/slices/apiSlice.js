@@ -41,8 +41,6 @@ export const apiSlice = createApi({
                 }
                 pageInfo {
                   hasNextPage
-                  hasPreviousPage
-                  startCursor
                   endCursor
                 }
               }
@@ -333,6 +331,7 @@ export const apiSlice = createApi({
 
 export const {
   useGetAllProductsQuery,
+  useLazyGetAllProductsQuery,
   useGetProductQuery,
   useCreateProductMutation,
   useCreateUserMutation,

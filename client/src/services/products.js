@@ -82,8 +82,6 @@ const getAllProducts = async (options, token) => {
             }
             pageInfo {
                 hasNextPage,
-                hasPreviousPage,
-                startCursor,
                 endCursor,
             },
           }
