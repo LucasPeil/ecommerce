@@ -15,11 +15,12 @@ const CategoryTabs = () => {
     error,
     refetch,
   } = useGetAllProductsQuery({
-    first: 6,
+    first: 5,
     after: null,
-    filter: [{ field: '', value: '' }],
+    filter: [],
     searchText: value,
   });
+
   const handleChange = (event, newValue) => {
     setValue(newValue);
     refetch();

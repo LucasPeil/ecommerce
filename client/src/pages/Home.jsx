@@ -5,6 +5,7 @@ import Slide from '../components/Slide';
 import capa1 from '../assets/capa-1.jpg';
 import capa2 from '../assets/capa-2.jpg';
 import capa3 from '../assets/capa-3.jpg';
+import { useState } from 'react';
 import quartoCapa from '../assets/quarto-capa.jpg';
 import { Stack, Box, Button } from '@mui/material';
 import DestaqueSlider from '../components/DestaqueSlider';
@@ -14,16 +15,22 @@ import CategoryTabs from '../components/CategoryTabs';
 import { useGetAllProductsQuery } from '../slices/apiSlice';
 import { useNavigate } from 'react-router-dom';
 const Home = () => {
-  const navigate = useNavigate();
+  const [filters, setFilters] = useState({
+    price: [],
+    category: [],
+    available: [],
+  });
+  const [searchText, setSearchText] = useState('Sala');
+
   const {
     data: products = [],
 
     isFetching,
   } = useGetAllProductsQuery({
-    first: 3,
+    first: 5,
     after: null,
-    filter: [{ field: '', value: '' }],
-    searchText: null,
+    filter: filters,
+    searchText: searchText,
   });
 
   return (
@@ -61,9 +68,9 @@ const Home = () => {
             EM DESTAQUE
           </h3>
         </Stack>
-        {!isFetching && (
+        {/* {!isFetching && (
           <DestaqueSlider products={products} isFetching={isFetching} />
-        )}
+        )} */}
       </Stack>
 
       <Box sx={{ minHeight: '90vh', minWidth: '100%', position: 'relative' }}>

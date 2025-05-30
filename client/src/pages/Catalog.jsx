@@ -11,6 +11,7 @@ import {
   FormControl,
   FormLabel,
   Divider,
+  CircularProgress,
 } from '@mui/material';
 import React, {
   useEffect,
@@ -176,7 +177,7 @@ const Catalog = () => {
   return (
     <Grid2
       container
-      spacing={12}
+      spacing={6}
       direction={'row'}
       justifyContent={'center'}
       sx={{
@@ -185,10 +186,7 @@ const Catalog = () => {
         flexGrow: 1,
       }}
     >
-      <Grid2
-        size={3}
-        sx={{ pl: 2, border: '1px solid red', minHeight: '100vh' }}
-      >
+      <Grid2 size={3} sx={{ pl: 2, minHeight: '100vh' }}>
         <Paper sx={{ minHeight: '100%', p: 3 }}>
           <Typography color="text.secondary">
             Encontre o que você procura com mais facilidade!
@@ -292,16 +290,16 @@ const Catalog = () => {
       </Grid2>
 
       {/* Paginação */}
-      {hasNextPage && (
+      {true && (
         <Box
           sx={{
-            border: '1px solid red',
-            height: '10px',
-            marginTop: 10,
+            marginTop: 1,
           }}
           ref={loadMoreRef}
         >
-          <Typography>Carregando</Typography>
+          <Typography>
+            <CircularProgress sx={{ color: 'black' }} />
+          </Typography>
         </Box>
       )}
     </Grid2>

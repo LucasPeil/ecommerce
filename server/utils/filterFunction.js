@@ -1,8 +1,15 @@
-const filterFunction = (filter, textSearch = false) => {
+const stringArrayToInt = (array) => {
+  const parsedIntArray = [];
+  if (array?.length > 0) {
+    for (let i = 0; i < array.length; i++) {
+      parsedIntArray.push(...array[i].split(' - ').map((num) => parseInt(num)));
+    }
+  }
+  return parsedIntArray;
+};
+const filterFunction = (filter, searchText = '') => {
   const keys = Object.keys(filter).filter((item) => filter[item].length > 0);
-
-  const operator = textSearch ? '$and' : '$or';
-  let filterQuery = {};
+  let checkboxFilterQuery = {};
   let priceQuery = {};
   if (filter.price?.length > 0) {
     let parsedIntArray = stringArrayToInt(filter.price);
@@ -18,29 +25,41 @@ const filterFunction = (filter, textSearch = false) => {
       }
     }
   }
-
   for (let key of keys) {
     if (key === 'price') {
-      filterQuery[key] = priceQuery;
+      checkboxFilterQuery[key] = { ...priceQuery };
     } else {
-      filterQuery[key] = { $in: filter[key] };
+      checkboxFilterQuery[key] = { $in: filter[key] };
     }
   }
-  const filterResult = { [operator]: [filterQuery] };
-
-  return filterResult;
-};
-
-const stringArrayToInt = (array) => {
-  const parsedIntArray = [];
-  if (array?.length > 0) {
-    for (let i = 0; i < array.length; i++) {
-      parsedIntArray.push(...array[i].split(' - ').map((num) => parseInt(num)));
-    }
+  // Campo de texto - gera condições para name, description, category
+  let searchConditions = [];
+  if (searchText) {
+    const fields = ['category', 'description', 'name'];
+    searchConditions = fields.map((field) => ({
+      [field]: { $regex: searchText, $options: 'i' },
+    }));
   }
-  return parsedIntArray;
+
+  // Combinações finais
+  const finalQuery = {};
+
+  if (
+    searchConditions.length > 0 &&
+    Object.keys(checkboxFilterQuery).length > 0
+  ) {
+    finalQuery['$and'] = [checkboxFilterQuery, { $or: searchConditions }];
+  } else if (searchConditions.length > 0) {
+    finalQuery['$or'] = searchConditions;
+  } else {
+    Object.assign(finalQuery, checkboxFilterQuery);
+  }
+
+  return finalQuery;
 };
 
 module.exports = { filterFunction };
-
-/* {$or:[{category:{$in:["Quarto", "Cozinha"]}}], $and:[{price:{$gte:100}}]} */
+//Texto sempre vai ser o $
+//Checkbox sempre vai ser o $and
+// externo que vai ser um externo que sera and quando tiver texto e or quando nao viter
+/* {$or:[{ category: "Sala"}, {description:"Sala"}, {name: "Sala"}, {$or:[{name:/Produto1/}]} ]} */

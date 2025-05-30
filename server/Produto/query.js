@@ -45,14 +45,15 @@ const ProductQueryType = new graphql.GraphQLObjectType({
       },
       resolve: async (_, { first, after, filter, searchText }) => {
         try {
-          const filterResult = filterFunction(filter);
+          const filterResult = filterFunction(filter, searchText);
+
           // Decodificar o cursor 'after' para obter o ID inicial
           let startId = null;
           const limit = first || 5;
           if (after) {
             startId = Buffer.from(after, 'base64').toString('utf-8');
           }
-          console.log(startId);
+
           // Construir o filtro para buscar produtos após o cursor
           let query = startId && {
             _id: { $gt: new mongoose.Types.ObjectId(startId) },
@@ -60,7 +61,6 @@ const ProductQueryType = new graphql.GraphQLObjectType({
 
           let products = await Produto.aggregate([
             { $match: { ...query, ...filterResult } },
-
             { $sort: { _id: 1 } },
             { $limit: limit },
           ]);
@@ -72,7 +72,7 @@ const ProductQueryType = new graphql.GraphQLObjectType({
           }));
 
           // Retornar os dados no formato esperado
-          console.log(products?.length);
+
           return {
             edges,
             pageInfo: {
