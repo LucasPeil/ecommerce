@@ -12,27 +12,8 @@ import DestaqueSlider from '../components/DestaqueSlider';
 import Footer from '../components/Footer';
 import { responsive } from '../utils/carouselResponsiveness';
 import CategoryTabs from '../components/CategoryTabs';
-import { useGetAllProductsQuery } from '../slices/apiSlice';
-import { useNavigate } from 'react-router-dom';
+
 const Home = () => {
-  const [filters, setFilters] = useState({
-    price: [],
-    category: [],
-    available: [],
-  });
-  const [searchText, setSearchText] = useState('Sala');
-
-  const {
-    data: products = [],
-
-    isFetching,
-  } = useGetAllProductsQuery({
-    first: 5,
-    after: null,
-    filter: filters,
-    searchText: searchText,
-  });
-
   return (
     <>
       <Carousel
@@ -68,9 +49,8 @@ const Home = () => {
             EM DESTAQUE
           </h3>
         </Stack>
-        {/* {!isFetching && (
-          <DestaqueSlider products={products} isFetching={isFetching} />
-        )} */}
+
+        <DestaqueSlider />
       </Stack>
 
       <Box sx={{ minHeight: '90vh', minWidth: '100%', position: 'relative' }}>

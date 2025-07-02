@@ -64,7 +64,7 @@ const ProductQueryType = new graphql.GraphQLObjectType({
             { $sort: { _id: 1 } },
             { $limit: limit },
           ]);
-
+          console.log(products);
           // Construir os edges
           const edges = products.slice(0, limit).map((product) => ({
             node: product,

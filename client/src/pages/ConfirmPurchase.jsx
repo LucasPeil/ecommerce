@@ -41,7 +41,7 @@ const ConfirmPurchase = () => {
   useEffect(() => {
     setCart(data?.cart);
   }, [isFetchingCart, getCartSuccess]);
-  console.log('cart', cart);
+
   const [
     updateUserCart,
     { isSuccess: updateCartIsSuccess, isFetching: updateCartIsFetching },

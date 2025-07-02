@@ -1,23 +1,25 @@
-import { Box, Typography } from '@mui/material';
+import { Box, Button, Typography } from '@mui/material';
 import InsertPhotoOutlinedIcon from '@mui/icons-material/InsertPhotoOutlined';
 
 import React from 'react';
 
-const NoPhoto = () => {
+const NoPhoto = ({ handleFile }) => {
   return (
     <Box
+      disableRipple
       sx={{
-        height: 'calc(55vh - 4rem)',
         display: 'flex',
+        width: '100%',
+        height: '100%',
         justifyContent: 'center',
-        mt: 2,
+        '&:hover': { backgroundColor: 'transparent' },
       }}
     >
       <Box
         sx={{
           backgroundColor: '#DCDCDC',
-          width: '85%',
-          height: '80%',
+          width: '100%',
+          height: '100%',
           border: '4px dashed #5D5D5D',
           borderRadius: '1rem',
           display: 'flex',
@@ -33,8 +35,9 @@ const NoPhoto = () => {
             gap: 2,
           }}
         >
-          <InsertPhotoOutlinedIcon fontSize="large" />
-          <Typography variant="body1" color="text.secondary">
+          <InsertPhotoOutlinedIcon sx={{ fontSize: '2.5rem' }} />
+
+          <Typography variant="h5" color="text.secondary">
             Nehuma foto adicionada
           </Typography>
         </Box>

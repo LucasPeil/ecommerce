@@ -24,9 +24,7 @@ const SliderImagem = ({
         <IconButton
           disableRipple
           sx={{ position: 'absolute', top: 0, right: 0 }}
-          onClick={() => {
-            closeFunction();
-          }}
+          onClick={closeFunction}
         >
           <CloseIcon sx={{ color: 'black' }} />
         </IconButton>

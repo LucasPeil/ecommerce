@@ -13,6 +13,7 @@ import {
 } from './slices/apiSlice';
 import Catalog from './pages/Catalog';
 import ConfirmPurchase from './pages/ConfirmPurchase';
+import CriarProduto from './pages/CriarProduto';
 
 function App() {
   const [user, setUser] = useState(null);
@@ -41,10 +42,10 @@ function App() {
         setUser={setUser}
         user={user}
       />
-
       <Routes>
         <Route exact path="/" element={<Home />} />
         <Route exact path="/Catalog" element={<Catalog />} />
+        <Route exact path="/criar-produto" element={<CriarProduto />} />
         <Route exact path="/confirmar-pedido" element={<ConfirmPurchase />} />
         <Route
           exact

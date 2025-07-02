@@ -1,7 +1,7 @@
 import { Grid2, Box, Typography, Button, Stack } from '@mui/material';
 import React from 'react';
 import Carousel from 'react-multi-carousel';
-import { responsive } from '../../utils/carouselResponsiveness';
+import { responsive } from '../utils/carouselResponsiveness';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 const ReviewProductInfos = ({

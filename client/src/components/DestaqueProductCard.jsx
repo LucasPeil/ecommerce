@@ -1,13 +1,13 @@
 import React from 'react';
-import { Box, Stack, Typography } from '@mui/material';
-import quadro1 from '../assets/quadro-1.jpg';
+import { Box, Skeleton, Stack, Typography } from '@mui/material';
 import { ButtonBase } from '@mui/material';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import useImageIsLoading from '../hooks/useImageIsLoading';
 const DestaqueProductCard = ({ product }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-
+  const imageIsLoading = useImageIsLoading({ image: product?.images[0] });
   return (
     <ButtonBase
       disableRipple
@@ -27,36 +27,47 @@ const DestaqueProductCard = ({ product }) => {
           },
         }}
       >
-        <Box sx={{ overflow: 'hidden' }}>
-          <Box
-            sx={{
-              backgroundImage: `url(${product?.images[0]})`,
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-              backgroundOrigin: 'border-box',
-              minHeight: '20rem',
-              minWidth: '100%',
-              transition: '0.5s ease',
+        {!imageIsLoading ? (
+          <Box>
+            <Skeleton variant="rectangular" width="100%" height={300} />
+            <Skeleton variant="text" width="60%" sx={{ mt: 2 }} />
+            <Skeleton variant="text" width="40%" />
+            <Skeleton variant="text" width="80%" />
+          </Box>
+        ) : (
+          <>
+            <Box sx={{ overflow: 'hidden' }}>
+              <Box
+                sx={{
+                  backgroundImage: `url(${product?.images[0]})`,
+                  backgroundSize: 'cover',
+                  backgroundPosition: 'center',
+                  backgroundOrigin: 'border-box',
+                  minHeight: '20rem',
+                  minWidth: '100%',
+                  transition: '0.5s ease',
 
-              '&:hover': {
-                transform: 'scale(1.2)',
-              },
-            }}
-          />
-        </Box>
-        <Stack sx={{ mt: 1, p: 1, borderBottom: '1px solid #CDCDCD' }}>
-          <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
-            {product.name}
-          </Typography>
-          <Typography
-            variant="caption"
-            color="text.secondary"
-            gutterBottom
-            sx={{}}
-          >
-            {`R$ ${product.price}`}
-          </Typography>
-        </Stack>
+                  '&:hover': {
+                    transform: 'scale(1.2)',
+                  },
+                }}
+              />
+            </Box>
+            <Stack sx={{ mt: 1, p: 1, borderBottom: '1px solid #CDCDCD' }}>
+              <Typography variant="h6" gutterBottom sx={{ fontWeight: 'bold' }}>
+                {product.name}
+              </Typography>
+              <Typography
+                variant="caption"
+                color="text.secondary"
+                gutterBottom
+                sx={{}}
+              >
+                {`R$ ${product.price}`}
+              </Typography>
+            </Stack>
+          </>
+        )}
       </Box>
     </ButtonBase>
   );

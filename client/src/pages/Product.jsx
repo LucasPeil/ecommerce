@@ -17,7 +17,7 @@ import RemoveShoppingCartOutlinedIcon from '@mui/icons-material/RemoveShoppingCa
 import Grid from '@mui/material/Grid2';
 import { responsive } from '../utils/carouselResponsiveness';
 import Carousel from 'react-multi-carousel';
-import CustomDot from '../components/ProdutoModal/CustomDot';
+import CustomDot from '../components/CustomDot';
 import SliderImagem from '../components/SliderImagem';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
@@ -37,7 +37,6 @@ const Product = ({
   const [qtySelected, setQtySelected] = useState(1);
   const navigate = useNavigate();
   let carouselRef = useRef();
-  const [photosToDisplay, setPhotosToDisplay] = useState([]);
   const [showCarousel, setShowCarousel] = useState(true);
 
   const { data: singleProduct, isFetching, isSuccess } = useGetProductQuery(id);

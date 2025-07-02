@@ -4,6 +4,7 @@ import productsService from '../services/products';
 const initialState = {
   products: [],
   singleProduct: [],
+  textFilter: '',
   getAllProducts: {
     isSuccess: false,
     isLoading: false,
@@ -144,6 +145,12 @@ export const productsSlice = createSlice({
       state.deleteProduct.isSuccess = false;
       state.deleteProduct.isError = false;
     },
+    setTextFilter: (state, action) => {
+      state.textFilter = action.payload;
+    },
+    resetTextFiler: (state) => {
+      state.textFilter = '';
+    },
   },
 
   extraReducers: (builder) => {
@@ -208,7 +215,13 @@ export const productsSlice = createSlice({
   },
 });
 
-export const { resetCreate, resetDelete, resetUpdate, resetProducts } =
-  productsSlice.actions;
+export const {
+  resetCreate,
+  resetDelete,
+  resetUpdate,
+  resetProducts,
+  setTextFilter,
+  resetTextFiler,
+} = productsSlice.actions;
 
 export default productsSlice.reducer;

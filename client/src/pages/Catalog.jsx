@@ -1,32 +1,28 @@
+import SearchIcon from '@mui/icons-material/Search';
+import CloseIcon from '@mui/icons-material/Close';
 import {
-  Grid2,
-  Paper,
   Box,
-  Pagination,
-  Stack,
-  Typography,
   Checkbox,
+  CircularProgress,
+  Divider,
+  FormControl,
   FormControlLabel,
   FormGroup,
-  FormControl,
   FormLabel,
-  Divider,
-  CircularProgress,
+  Grid2,
+  IconButton,
+  InputBase,
+  Paper,
+  Stack,
+  Typography,
 } from '@mui/material';
-import React, {
-  useEffect,
-  useState,
-  useMemo,
-  useCallback,
-  useRef,
-} from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import ProductSimpleCard from '../components/ProductSimpleCard';
 import {
-  useLazyGetAllProductsQuery,
   useGetPricesRangeQuery,
   useGetRoomsQuery,
+  useLazyGetAllProductsQuery,
 } from '../slices/apiSlice';
-import DestaqueProductCard from '../components/DestaqueProductCard';
-import ProductSimpleCard from '../components/ProductSimpleCard';
 
 const groupPerStack = (products, itemsPerStack = 4) => {
   const groupedProducts = [];
@@ -36,7 +32,6 @@ const groupPerStack = (products, itemsPerStack = 4) => {
   }
   return groupedProducts;
 };
-
 const Catalog = () => {
   const [checkboxes, setCheckboxes] = useState({
     price: {},
@@ -47,6 +42,8 @@ const Catalog = () => {
   const [productsState, setProductsState] = useState([]);
   const [first, setFirst] = useState(5);
   const [after, setAfter] = useState(null);
+  const [text, setText] = useState('');
+  const [textFilter, setTextFilter] = useState('');
   const [filters, setFilters] = useState({
     price: [],
     category: [],
@@ -55,6 +52,7 @@ const Catalog = () => {
 
   const [getProducts, { data: products, isFetching }] =
     useLazyGetAllProductsQuery();
+
   const { data: rooms } = useGetRoomsQuery({});
   const { data: prices } = useGetPricesRangeQuery({});
   useEffect(() => {
@@ -62,15 +60,16 @@ const Catalog = () => {
     setAfter(null);
     setHasNextPage(true);
 
-    getProducts({ first: 5, after: null, filter: filters, searchText: null });
-  }, [filters]);
+    getProducts({
+      first: 5,
+      after: null,
+      filter: filters,
+      searchText: textFilter,
+    });
+  }, [filters, textFilter]);
 
   const loadMoreRef = useRef();
-  /*   useEffect(() => {
-    refetch();
-  }, [filters, after );
- */
-  // Inicializamos os estados dos checkboxes quando os dados são carregados
+
   useEffect(() => {
     if (prices?.data) {
       const pricesObj = {};
@@ -99,9 +98,9 @@ const Catalog = () => {
     }
   }, [rooms]);
   useEffect(() => {
+    setHasNextPage(products?.pageInfo?.hasNextPage);
     if (products?.edges?.length > 0) {
       setProductsState((prev) => [...prev, ...products.edges]);
-      setHasNextPage(products?.pageInfo?.hasNextPage);
       const nextCursor = products?.pageInfo?.endCursor;
       setAfter(nextCursor);
     }
@@ -109,7 +108,6 @@ const Catalog = () => {
   }, [products]);
 
   useEffect(() => {
-    console.log(hasNextPage);
     if (!hasNextPage || loadingMore) return;
 
     const observer = new IntersectionObserver(([entry]) => {
@@ -117,7 +115,12 @@ const Catalog = () => {
 
       if (entry.isIntersecting) {
         setLoadingMore(true);
-        getProducts({ first: 5, after, filter: filters, searchText: null });
+        getProducts({
+          first: 5,
+          after,
+          filter: filters,
+          searchText: textFilter,
+        });
         /* setLoadingMore(entry.isIntersecting);
         if (!nextCursor) return; */
       }
@@ -175,134 +178,189 @@ const Catalog = () => {
   );
 
   return (
-    <Grid2
-      container
-      spacing={6}
-      direction={'row'}
-      justifyContent={'center'}
-      sx={{
-        transform: 'translateY(100px)',
-        pb: 5,
-        flexGrow: 1,
-      }}
-    >
-      <Grid2 size={3} sx={{ pl: 2, minHeight: '100vh' }}>
-        <Paper sx={{ minHeight: '100%', p: 3 }}>
-          <Typography color="text.secondary">
-            Encontre o que você procura com mais facilidade!
-          </Typography>
+    <Box>
+      <Stack
+        direction="row"
+        justifyContent={'center'}
+        sx={{ transform: 'translateY(100px)', mb: 3 }}
+      >
+        <Paper
+          elevation={3}
+          sx={{
+            display: 'flex',
+            alignItems: 'center',
+            width: '50%',
 
-          {/* Filtro de Preços */}
-          <FormControl
-            sx={{ mt: 2, minWidth: '100%' }}
-            component="fieldset"
-            variant="standard"
-          >
-            <FormLabel
-              sx={{ color: 'black', fontWeight: 'bold', pb: '0.4rem' }}
-            >
-              Faixa de preço
-            </FormLabel>
-            <Divider />
-            <FormGroup>
-              {prices?.data?.map((priceRange) => (
-                <FormControlLabel
-                  key={priceRange.price}
-                  control={
-                    <Checkbox
-                      checked={!!checkboxes.price[priceRange.price]}
-                      onChange={() =>
-                        handleCheckboxChange('price', priceRange.price)
-                      }
-                      name={priceRange.price}
-                    />
-                  }
-                  label={
-                    <Stack direction="row" alignItems={'center'} gap={1}>
-                      <Typography variant="body1">
-                        {priceRange.price}
-                      </Typography>
-                      <Typography
-                        color="text.secondary"
-                        component={'span'}
-                        variant="caption"
-                      >
-                        {`(${priceRange.qty})`}
-                      </Typography>
-                    </Stack>
-                  }
-                />
-              ))}
-            </FormGroup>
-          </FormControl>
+            borderRadius: '0.3rem',
+            backgroundColor: 'white',
+          }}
+        >
+          <InputBase
+            sx={{ ml: 2, flex: 1 }}
+            placeholder="Search here"
+            inputProps={{ 'aria-label': 'search here' }}
+            value={text}
+            onChange={(e) => setText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter') setTextFilter(text);
+            }}
+          />
 
-          {/* Filtro de Cômodos */}
-          <FormControl
-            sx={{ mt: 2, minWidth: '100%' }}
-            component="fieldset"
-            variant="standard"
+          <IconButton
+            type="button"
+            sx={{
+              p: '0.7rem',
+              backgroundColor: '#333333',
+              borderRadius: '0 0.3rem 0.3rem 0',
+
+              '&:hover': {
+                color: 'white',
+                backgroundColor: '#000',
+              },
+              color: 'white',
+            }}
+            onClick={() => {
+              if (textFilter) {
+                setTextFilter('');
+                setText('');
+              } else {
+                setTextFilter(text);
+              }
+            }}
+            aria-label={textFilter ? 'close' : 'search'}
           >
-            <FormLabel
-              sx={{ color: 'black', fontWeight: 'bold', pb: '0.4rem' }}
-            >
-              Cômodos
-            </FormLabel>
-            <Divider />
-            <FormGroup>
-              {rooms?.data?.map((room) => (
-                <FormControlLabel
-                  key={room}
-                  control={
-                    <Checkbox
-                      checked={!!checkboxes.category[room]}
-                      onChange={() => handleCheckboxChange('category', room)}
-                      name={room}
-                    />
-                  }
-                  label={<Typography variant="body1">{room}</Typography>}
-                />
-              ))}
-            </FormGroup>
-          </FormControl>
+            {textFilter ? <CloseIcon /> : <SearchIcon />}
+          </IconButton>
         </Paper>
-      </Grid2>
-
-      {/* Exibição de Produtos */}
+      </Stack>
       <Grid2
-        size={9}
+        container
+        spacing={6}
         direction={'row'}
         justifyContent={'center'}
         sx={{
-          display: 'flex',
-          flexDirection: 'column',
-          flexWrap: 'wrap',
-          justifyContent: 'center',
-          gap: 8,
+          transform: 'translateY(100px)',
+          pb: 5,
+          flexGrow: 1,
         }}
       >
-        {productsStacked?.map((products, idx) => (
-          <Box key={idx} sx={{ display: 'flex', gap: 8 }}>
-            {products.map((product, idx) => (
-              <ProductSimpleCard key={idx} product={product?.node} />
-            ))}
-          </Box>
-        ))}
-      </Grid2>
+        <Grid2 size={3} sx={{ pl: 2, minHeight: '100vh' }}>
+          <Paper sx={{ minHeight: '100%', p: 3 }}>
+            <Typography color="text.secondary">
+              Encontre o que você procura com mais facilidade!
+            </Typography>
 
-      {/* Paginação */}
-      {true && (
-        <Box
+            {/* Filtro de Preços */}
+            <FormControl
+              sx={{ mt: 2, minWidth: '100%' }}
+              component="fieldset"
+              variant="standard"
+            >
+              <FormLabel
+                sx={{ color: 'black', fontWeight: 'bold', pb: '0.4rem' }}
+              >
+                Faixa de preço
+              </FormLabel>
+              <Divider />
+              <FormGroup>
+                {prices?.data?.map((priceRange) => (
+                  <FormControlLabel
+                    key={priceRange.price}
+                    control={
+                      <Checkbox
+                        checked={!!checkboxes.price[priceRange.price]}
+                        onChange={() =>
+                          handleCheckboxChange('price', priceRange.price)
+                        }
+                        name={priceRange.price}
+                      />
+                    }
+                    label={
+                      <Stack direction="row" alignItems={'center'} gap={1}>
+                        <Typography variant="body1">
+                          {priceRange.price}
+                        </Typography>
+                        <Typography
+                          color="text.secondary"
+                          component={'span'}
+                          variant="caption"
+                        >
+                          {`(${priceRange.qty})`}
+                        </Typography>
+                      </Stack>
+                    }
+                  />
+                ))}
+              </FormGroup>
+            </FormControl>
+
+            {/* Filtro de Cômodos */}
+            <FormControl
+              sx={{ mt: 2, minWidth: '100%' }}
+              component="fieldset"
+              variant="standard"
+            >
+              <FormLabel
+                sx={{ color: 'black', fontWeight: 'bold', pb: '0.4rem' }}
+              >
+                Cômodos
+              </FormLabel>
+              <Divider />
+              <FormGroup>
+                {rooms?.data?.map((room) => (
+                  <FormControlLabel
+                    key={room}
+                    control={
+                      <Checkbox
+                        checked={!!checkboxes.category[room]}
+                        onChange={() => handleCheckboxChange('category', room)}
+                        name={room}
+                      />
+                    }
+                    label={<Typography variant="body1">{room}</Typography>}
+                  />
+                ))}
+              </FormGroup>
+            </FormControl>
+          </Paper>
+        </Grid2>
+
+        {/* Exibição de Produtos */}
+        <Grid2
+          size={9}
+          direction={'row'}
           sx={{
-            marginTop: 1,
+            display: 'flex',
+            flexDirection: 'column',
+            flexWrap: 'wrap',
+            justifyContent: 'start',
+            gap: 8,
           }}
-          ref={loadMoreRef}
         >
-          <Typography>
-            <CircularProgress sx={{ color: 'black' }} />
-          </Typography>
-        </Box>
-      )}
-    </Grid2>
+          {productsStacked?.map((products, idx) => (
+            <Box key={idx} sx={{ display: 'flex', gap: 8 }}>
+              {products.map((product, idx) => (
+                <ProductSimpleCard key={idx} product={product?.node} />
+              ))}
+            </Box>
+          ))}
+        </Grid2>
+
+        {/* Paginação */}
+        {hasNextPage && (
+          <Box
+            sx={{
+              marginTop: 1,
+            }}
+            ref={loadMoreRef}
+          >
+            <Typography>
+              <CircularProgress sx={{ color: 'black' }} />
+            </Typography>
+          </Box>
+        )}
+      </Grid2>
+    </Box>
   );
 };
 

@@ -7,12 +7,24 @@ import {
   Typography,
 } from '@mui/material';
 import CloseIcon from '@mui/icons-material/Close';
+import { resetTextFiler, setTextFilter } from '../slices/products';
+import { useDispatch, useSelector } from 'react-redux';
+import { useLazyGetAllProductsQuery } from '../slices/apiSlice';
+import { useNavigate } from 'react-router-dom';
 const SearchBackdrop = ({ open, setOpen }) => {
   const textInput = useRef(null);
-  const [autoFocus, setAutoFocus] = useState(true);
+  const [text, setText] = useState('');
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const [getProducts, { data: products, isFetching }] =
+    useLazyGetAllProductsQuery();
   useEffect(() => {
     textInput.current.focus();
+    return () => {
+      if (!open) dispatch(resetTextFiler());
+    };
   }, [open]);
+  console.log(products);
   return (
     <Backdrop
       sx={{ zIndex: 10, backgroundColor: 'rgba(0, 0, 0, 0.8)' }}
@@ -34,14 +46,24 @@ const SearchBackdrop = ({ open, setOpen }) => {
       >
         <input
           ref={textInput}
+          value={text}
+          onChange={(e) => setText(e.target.value)}
           className="search-input"
           type="search"
-          placeholder="Pesquisar"
+          placeholder="Qual produto você procura?"
           autoFocus={true}
           onBlur={({ target }) => target.focus()}
           onKeyDown={(e) => {
             if (e.key == 'Enter') {
               setOpen(false);
+
+              getProducts({
+                first: 5,
+                after: null,
+                filter: [],
+                searchText: text,
+              });
+              setText('');
             }
           }}
         />
@@ -54,7 +76,6 @@ const SearchBackdrop = ({ open, setOpen }) => {
             py: 2,
           }}
         >
-          {' '}
           Aperte enter para pesquisar
         </Typography>
       </Stack>

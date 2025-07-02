@@ -12,7 +12,9 @@
   "author": "Lucas Peil",
   "license": "ISC",
   "dependencies": {
+    "body-parser": "^2.2.0",
     "concurrently": "^8.2.2",
-    "hamburger-react": "^2.5.1"
+    "hamburger-react": "^2.5.1",
+    "node-cron": "^4.1.0"
   }
 }

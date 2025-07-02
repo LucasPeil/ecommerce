@@ -1,10 +1,12 @@
 import { configureStore } from '@reduxjs/toolkit';
 import productsReducer from './slices/products';
+import uploadImageReducer from './slices/loadingSaveImage';
 import authReducer from './slices/user';
 import axios from 'axios';
 import { apiSlice } from './slices/apiSlice';
 export const store = configureStore({
   reducer: {
+    uploadImage: uploadImageReducer,
     products: productsReducer,
     auth: authReducer,
     [apiSlice.reducerPath]: apiSlice.reducer,

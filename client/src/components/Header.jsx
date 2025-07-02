@@ -12,7 +12,6 @@ import { Twirl as Hamburger } from 'hamburger-react';
 import LocalGroceryStoreOutlinedIcon from '@mui/icons-material/LocalGroceryStoreOutlined';
 import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
 import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
-import CriarProduto from './ProdutoModal/CriarProduto';
 import { useTheme } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
@@ -62,10 +61,7 @@ const Header = ({ id, userDbInfo, user, setUser }) => {
         open={openSearchBackdrop}
         setOpen={setOpenSearchBackdrop}
       />
-      <CriarProduto
-        open={openDialog}
-        handleClose={() => setOpenDialog(false)}
-      />
+
       {downMd && <Hamburger toggled={isOpen} toggle={setOpen} />}
       <h1
         className="title"
@@ -77,7 +73,6 @@ const Header = ({ id, userDbInfo, user, setUser }) => {
       >
         <Link
           style={{
-            textDecoration: 'none',
             color: '#000000',
           }}
           to="/"
@@ -94,11 +89,12 @@ const Header = ({ id, userDbInfo, user, setUser }) => {
           zIndex: 5,
         }}
       >
-        <Button onClick={() => setOpenDialog(true)}>
+        <Link to="criar-produto" n>
           <Typography color="black" variant="button">
             Criar Produto
           </Typography>
-        </Button>
+        </Link>
+
         {id ? (
           <Button
             onClick={() => {

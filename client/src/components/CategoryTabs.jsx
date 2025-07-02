@@ -2,17 +2,16 @@ import { useState } from 'react';
 import { Tabs, Tab, Box, useTheme, Skeleton } from '@mui/material';
 import DestaqueSlider from './DestaqueSlider';
 import { useGetAllProductsQuery } from '../slices/apiSlice';
+import Carrousel from './Carrousel';
 
 const CategoryTabs = () => {
   const [value, setValue] = useState('Sala');
   const theme = useTheme();
   const {
     data: products = [],
-    isLoading,
-    isSuccess,
-    isError,
+
     isFetching,
-    error,
+
     refetch,
   } = useGetAllProductsQuery({
     first: 5,
@@ -23,7 +22,8 @@ const CategoryTabs = () => {
 
   const handleChange = (event, newValue) => {
     setValue(newValue);
-    refetch();
+
+    /*    refetch(); */
   };
   return (
     <Box sx={{ width: '100%' }}>
@@ -53,7 +53,7 @@ const CategoryTabs = () => {
         <Tab value="Banheiro" label="Banheiro" disableRipple />
       </Tabs>
 
-      <DestaqueSlider products={products} isFetching={isFetching} />
+      <Carrousel data={products} loading={isFetching} />
     </Box>
   );
 };

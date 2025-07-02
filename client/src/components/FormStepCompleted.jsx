@@ -1,5 +1,4 @@
 import { Stack, Box, Typography } from '@mui/material';
-import React from 'react';
 import DoneAllOutlinedIcon from '@mui/icons-material/DoneAllOutlined';
 const FormStepCompleted = ({ showVariable, Icon }) => {
   return (

@@ -1,6 +1,6 @@
 import { Button, Box } from '@mui/material';
 import React from 'react';
-import SliderImagem from '../SliderImagem';
+import SliderImagem from './SliderImagem';
 
 const CustomDot = ({ onClick, ...rest }) => {
   const {
@@ -8,19 +8,28 @@ const CustomDot = ({ onClick, ...rest }) => {
     index,
     active,
     photosToDisplay,
+    setPhotosToDisplay,
     showCarousel,
+    carouselRef,
     showCloseButton = true,
-    closeFunction,
 
     carouselState: { currentSlide, deviceType },
   } = rest;
+  const closeFunction = (index) => {
+    const arrCopy = [...photosToDisplay];
+    arrCopy.splice(index, 1);
+    setPhotosToDisplay(arrCopy);
+    if (photosToDisplay?.length >= 1) {
+      carouselRef.current.previous();
+    }
+  };
 
   const carouselItems = photosToDisplay.map((photo) => (
     <SliderImagem
       imagem={photo}
       minHeight={'5rem'}
       minWidth={'5rem'}
-      closeFunction={closeFunction}
+      closeFunction={() => closeFunction(index)}
       showCloseButton={showCloseButton}
     />
   ));

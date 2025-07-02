@@ -11,6 +11,7 @@ import { CssBaseline } from '@mui/material';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import Login from './pages/Login.jsx';
 import Register from './pages/Register.jsx';
+
 const theme = createTheme({
   breakpoints: {
     values: {
@@ -55,6 +56,7 @@ createRoot(document.getElementById('root')).render(
       <StyledEngineProvider injectFirst>
         <ThemeProvider theme={theme}>
           <CssBaseline />
+
           <BrowserRouter basename={import.meta.env.BASE_URL}>
             <Routes>
               <Route exact path="/login" element={<Login />} />
