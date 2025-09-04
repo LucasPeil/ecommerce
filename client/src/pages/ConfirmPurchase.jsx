@@ -18,11 +18,12 @@ import {
   useGetUserCartQuery,
   useUpdateUserCartMutation,
 } from '../slices/apiSlice';
+import { useSelector } from 'react-redux';
 
 const ConfirmPurchase = () => {
   const [user, setUser] = useState(null);
   const [cart, setCart] = useState([]);
-  const [productsIds, setProductsIds] = useState([]);
+  const { token } = useSelector((state) => state.auth);
   useEffect(() => {
     setUser(getUser());
   }, []);
@@ -201,6 +202,7 @@ const ConfirmPurchase = () => {
                       onClick={() => {
                         updateUserCart({
                           id: user._id,
+                          token: token,
                           productId: product._id,
                           action: 'remove',
                         });

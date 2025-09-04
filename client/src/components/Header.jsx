@@ -15,25 +15,30 @@ import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
 import { useTheme } from '@mui/material/styles';
 import { useSelector, useDispatch } from 'react-redux';
 import { Link, NavLink } from 'react-router-dom';
-import { logout } from '../slices/user';
+// import { logout } from '../slices/user';
 import SearchBackdrop from './SearchBackdrop';
 
 import CartDialog from './CartDialog';
-import { useGetUserCartQuery } from '../slices/apiSlice';
 
-const Header = ({ id, userDbInfo, user, setUser }) => {
+import { useAuth0 } from '@auth0/auth0-react';
+
+const Header = ({ refetch, userDbInfo }) => {
+  const { getAccessTokenSilently, loginWithRedirect, isAuthenticated, logout } =
+    useAuth0();
   const [isOpen, setOpen] = useState(false);
-  const [openDialog, setOpenDialog] = useState(false);
   const [openCartDialog, setOpenCartDialog] = useState(false);
-  const [openSearchBackdrop, setOpenSearchBackdrop] = useState(false);
-  const { refetch } = useGetUserCartQuery(
-    { id: user?._id },
-    {
-      skip: !user?._id,
-    }
-  );
+  useEffect(() => {
+    const getToken = async () => {
+      const token = await getAccessTokenSilently({
+        authorizationParams: {
+          audience: 'https://ecommerce-api',
+        },
+      });
+    };
+    getToken();
+  }, []);
+
   const theme = useTheme();
-  const dispatch = useDispatch();
   const downMd = useMediaQuery(theme.breakpoints.down('md'));
 
   return (
@@ -54,12 +59,9 @@ const Header = ({ id, userDbInfo, user, setUser }) => {
       }}
     >
       <CartDialog
+        userDbInfo={userDbInfo}
         open={openCartDialog}
         handleClose={() => setOpenCartDialog(false)}
-      />
-      <SearchBackdrop
-        open={openSearchBackdrop}
-        setOpen={setOpenSearchBackdrop}
       />
 
       {downMd && <Hamburger toggled={isOpen} toggle={setOpen} />}
@@ -89,17 +91,25 @@ const Header = ({ id, userDbInfo, user, setUser }) => {
           zIndex: 5,
         }}
       >
-        <Link to="criar-produto" n>
+        <Link to="criar-produto">
           <Typography color="black" variant="button">
             Criar Produto
           </Typography>
         </Link>
+        <Link to="catalogo">
+          <Typography color="black" variant="button">
+            Catalogo
+          </Typography>
+        </Link>
 
-        {id ? (
+        {isAuthenticated ? (
           <Button
             onClick={() => {
-              dispatch(logout());
-              setUser(null);
+              logout({
+                logoutParams: {
+                  returnTo: window.location.origin + '/forniture',
+                },
+              });
             }}
           >
             <Typography color="black" variant="button">
@@ -107,11 +117,24 @@ const Header = ({ id, userDbInfo, user, setUser }) => {
             </Typography>
           </Button>
         ) : (
-          <NavLink style={{ textDecoration: 'none' }} to={'/login'}>
+          <Button
+            onClick={() => {
+              loginWithRedirect({
+                authorizationParams: {
+                  audience: 'https://ecommerce-api',
+                },
+              });
+            }}
+          >
             <Typography color="black" variant="button">
               Entrar
             </Typography>
-          </NavLink>
+          </Button>
+          //  <NavLink style={{ textDecoration: 'none' }} to={'/login'}>
+          //     <Typography color="black" variant="button">
+          //       Entrar
+          //     </Typography>
+          //   </NavLink>
         )}
 
         <IconButton
@@ -122,18 +145,11 @@ const Header = ({ id, userDbInfo, user, setUser }) => {
           }}
         >
           <Badge
-            badgeContent={user ? userDbInfo?.cart.length : 0}
+            badgeContent={isAuthenticated ? userDbInfo?.cart.length : 0}
             color={'darkColor'}
           >
             <LocalGroceryStoreOutlinedIcon sx={{ fontSize: '1.8rem' }} />
           </Badge>
-        </IconButton>
-
-        <IconButton
-          sx={{ color: 'black', px: 0 }}
-          onClick={() => setOpenSearchBackdrop(true)}
-        >
-          <SearchOutlinedIcon sx={{ fontSize: '1.8rem' }} />
         </IconButton>
       </Box>
     </Stack>

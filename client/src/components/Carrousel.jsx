@@ -25,7 +25,7 @@ const Carrousel = ({ loading, data }) => {
       {loading
         ? [...Array(4).keys()].map((item, idx) => (
             <Box
-              item={idx}
+              key={idx}
               sx={{
                 display: 'flex',
                 justifyContent: 'center',

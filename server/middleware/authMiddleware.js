@@ -1,71 +1,49 @@
-const jwt = require('jsonwebtoken');
-const asyncHandler = require('express-async-handler');
-
+const { expressjwt } = require('express-jwt');
+const jwksRsa = require('jwks-rsa');
+const axios = require('axios');
 const User = require('../models/userModel');
-
-const protect = asyncHandler(async (req) => {
-  let token;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    try {
-      token = req.headers.authorization.split(' ')[1];
-
-      // Verifica o token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Get user id from token
-      req.user = await User.findById(decoded.id).select('-password');
-
-      if (!req.user) {
-        throw new Error('Não autorizado');
-      }
-    } catch (error) {
-      console.log(error.message);
-    }
-  }
-
-  /*  if (!token) {
-    throw new Error('No token');
-  } */
+const checkJwt = expressjwt({
+  secret: jwksRsa.expressJwtSecret({
+    cache: true,
+    rateLimit: true,
+    jwksRequestsPerMinute: 5,
+    jwksUri: `${process.env.AUTH0_AUDIENCE}.well-known/jwks.json`,
+  }),
+  audience: 'https://ecommerce-api',
+  issuer: process.env.AUTH0_AUDIENCE,
+  algorithms: ['RS256'],
+  credentialsRequired: false,
 });
 
-// Trabalhar numa maneira de permitir que o recrutador tenha um user 'temporario'
-const protectRecruiter = asyncHandler(async (req, res, next) => {
-  let token;
-
-  if (
-    req.headers.authorization &&
-    req.headers.authorization.startsWith('Bearer')
-  ) {
-    try {
-      token = req.headers.authorization.split(' ')[1];
-
-      // Verifica o token
-      const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-      // Get user id from token
-      req.user = await User.findById(decoded.id).select('-password');
-
-      // Encaminha o request somente se usuário for admin
-      if (req.user.admin) {
-        next();
-      } else {
-        res.status(401);
-        throw new Error('Não autorizado');
-      }
-    } catch (error) {
-      res.status(401);
-      throw new Error('Não autorizado');
+const createUserInMongoDb = async (req, res, next) => {
+  try {
+    let user;
+    if (!req.auth) {
+      return next(); // rota pública
     }
-  }
+    const token = req.headers.authorization?.split(' ')[1];
+    const userInfo = await axios.get(process.env.AUTH0_AUDIENCE + 'userinfo', {
+      headers: { Authorization: `Bearer ${token}` },
+    });
+    if (userInfo?.data) {
+      const { sub, email, name } = userInfo?.data;
 
-  if (!token) {
-    res.status(401);
-    throw new Error('No token');
+      user = await User.findOne({ auth0Id: sub /* auth0id: sub */ });
+      console.log(user);
+      if (!user) {
+        user = await User.create({
+          auth0Id: sub,
+          username: name,
+          email,
+        });
+      }
+      req.user = user;
+      next();
+    }
+  } catch (error) {
+    console.error('Erro ao criar/verificar usuário:', error);
+    res.status(500).json({ message: 'Erro interno no servidor' });
   }
-});
+};
 
-module.exports = { protect, protectRecruiter };
+module.exports = { checkJwt, createUserInMongoDb };

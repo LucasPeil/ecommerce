@@ -26,27 +26,26 @@ import {
 import { IconButton } from '@mui/material';
 import EmptyCard from './EmptyCard';
 import { useNavigate } from 'react-router-dom';
+import { useSelector } from 'react-redux';
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
-const CartDialog = ({ open, handleClose }) => {
-  const [user, setUser] = useState(null);
+const CartDialog = ({ open, handleClose, userDbInfo }) => {
   const [cart, setCart] = useState([]);
+  const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
-  useEffect(() => {
+  /*  useEffect(() => {
     setUser(getUser());
   }, []);
-
+ */
   const {
     data,
-
     isFetching: isFetchingCart,
-
     refetch: refetchCart,
   } = useGetUserCartQuery(
-    { id: user?._id },
+    { id: userDbInfo?._id, token: token },
     {
-      skip: !user?._id,
+      skip: !userDbInfo?._id,
     }
   );
 
@@ -57,12 +56,12 @@ const CartDialog = ({ open, handleClose }) => {
 
   const removeFromCart = (productId) => {
     updateUserCart({
-      id: user._id,
+      id: userDbInfo?._id,
+      token: token,
       productId: productId,
       action: 'remove',
     });
   };
-  /*******  3b89ce4a-c704-4f43-ab33-a620b16d2e67  *******/
 
   useEffect(() => {
     setCart(data?.cart);

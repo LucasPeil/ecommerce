@@ -22,27 +22,27 @@ import SliderImagem from '../components/SliderImagem';
 import { useParams } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getProduct } from '../slices/products';
-import { useGetProductQuery } from '../slices/apiSlice';
+import {
+  useGetProductQuery,
+  useUpdateUserCartMutation,
+} from '../slices/apiSlice';
 import { useNavigate } from 'react-router-dom';
-const Product = ({
-  user,
-  updateUserCart,
-  refetchGetUserCart,
-  isFetchingCart,
-  isSuccessUpdateCart,
-  userDbInfo,
-}) => {
+const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
   const { id } = useParams();
-
+  const { token } = useSelector((state) => state.auth);
   const [qtySelected, setQtySelected] = useState(1);
   const navigate = useNavigate();
   let carouselRef = useRef();
   const [showCarousel, setShowCarousel] = useState(true);
-
+  const [updateUserCart, { isLoaing, isSuccess: isSuccessUpdateCart }] =
+    useUpdateUserCartMutation();
   const { data: singleProduct, isFetching, isSuccess } = useGetProductQuery(id);
-  /*   const [updateUserCart, { isLoaing }] = useUpdateUserCartMutation(); */
+
   useEffect(() => {
-    if (isSuccessUpdateCart) refetchGetUserCart();
+    console.log(isSuccessUpdateCart);
+    if (isSuccessUpdateCart) {
+      refetchGetUserCart();
+    }
   }, [isSuccessUpdateCart]);
 
   return (
@@ -180,9 +180,10 @@ const Product = ({
                       <Button
                         variant="contained"
                         onClick={() =>
-                          user._id
+                          userDbInfo._id
                             ? updateUserCart({
-                                id: user._id,
+                                id: userDbInfo._id,
+                                token: token,
                                 productId: id,
                                 action: 'remove',
                               })
@@ -207,18 +208,14 @@ const Product = ({
                         disabled={isFetchingCart}
                         variant="contained"
                         onClick={() => {
-                          let navigateTo =
-                            process.env.NODE_ENV === 'production'
-                              ? import.meta.env.BASE_URL + '/login'
-                              : '/login';
-                          user?._id
-                            ? updateUserCart({
-                                id: user._id,
-                                productId: id,
-                                qty: qtySelected,
-                                action: 'add',
-                              })
-                            : navigate(navigateTo);
+                          userDbInfo?._id &&
+                            updateUserCart({
+                              id: userDbInfo._id,
+                              token: token,
+                              productId: id,
+                              qty: qtySelected,
+                              action: 'add',
+                            });
                         }}
                         startIcon={<LocalGroceryStoreOutlinedIcon />}
                         sx={{

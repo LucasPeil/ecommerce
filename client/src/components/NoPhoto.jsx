@@ -6,7 +6,6 @@ import React from 'react';
 const NoPhoto = ({ handleFile }) => {
   return (
     <Box
-      disableRipple
       sx={{
         display: 'flex',
         width: '100%',

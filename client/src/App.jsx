@@ -1,63 +1,95 @@
 import { useState, useEffect } from 'react';
 
 import './App.css';
-import axios from 'axios';
 import Home from './pages/Home';
 import Header from './components/Header';
 import { Route, Routes } from 'react-router-dom';
 import Product from './pages/Product';
-import {
-  getUser,
-  useGetUserCartQuery,
-  useUpdateUserCartMutation,
-} from './slices/apiSlice';
+import { useGetUserCartQuery, useLazyGetUserQuery } from './slices/apiSlice';
 import Catalog from './pages/Catalog';
 import ConfirmPurchase from './pages/ConfirmPurchase';
 import CriarProduto from './pages/CriarProduto';
+import PrivateRoute from './components/PrivateRoute';
+import { useAuth0 } from '@auth0/auth0-react';
+import { setToken, setUser } from './slices/user';
+import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
-  const [user, setUser] = useState(null);
+  const { user, getAccessTokenSilently } = useAuth0();
+  const getToken = async () => {
+    let token = await getAccessTokenSilently({
+      authorizationParams: {
+        audience: 'https://ecommerce-api',
+      },
+    });
 
-  useEffect(() => {
-    setUser(getUser());
-  }, []);
+    return token;
+  };
+  const [getUser, { data: userDb, isFetching }] = useLazyGetUserQuery();
+  const { token } = useSelector((state) => state.auth);
+  const dispatch = useDispatch();
   const {
     data: userDbInfo,
     isFetching: isFetchingCart,
     isSuccess: isSuccessCart,
     refetch,
   } = useGetUserCartQuery(
-    { id: user?._id },
+    { id: userDb?._id, token: token },
     {
-      skip: !user?._id,
+      skip: !userDb?._id,
     }
   );
-  const [updateUserCart, { isLoaing, isSuccess: isSuccessUpdateCart }] =
-    useUpdateUserCartMutation();
+
+  useEffect(() => {
+    if (user) {
+      getToken().then((result) => {
+        dispatch(setToken(result));
+        getUser({ email: user?.email, token: result });
+
+        // You may want to do setState here as well
+      });
+      // console.log(token);
+    }
+  }, [user, getAccessTokenSilently]);
+
+  /*   useEffect(() => {
+    if (userDb) {
+      dispatch(setUser(userDb));
+    }
+  }, [userDb]); */
+
   return (
     <>
-      <Header
-        id={user ? user._id : null}
-        userDbInfo={userDbInfo}
-        setUser={setUser}
-        user={user}
-      />
+      <Header refetch={refetch} userDbInfo={userDbInfo} />
       <Routes>
         <Route exact path="/" element={<Home />} />
-        <Route exact path="/Catalog" element={<Catalog />} />
-        <Route exact path="/criar-produto" element={<CriarProduto />} />
-        <Route exact path="/confirmar-pedido" element={<ConfirmPurchase />} />
+        <Route exact path="/catalogo" element={<Catalog />} />
+        <Route
+          exact
+          path="/criar-produto"
+          element={
+            <PrivateRoute>
+              <CriarProduto />
+            </PrivateRoute>
+          }
+        />
+        <Route
+          exact
+          path="/confirmar-pedido"
+          element={
+            <PrivateRoute>
+              <ConfirmPurchase />
+            </PrivateRoute>
+          }
+        />
         <Route
           exact
           path="/produto/:id"
           element={
             <Product
-              user={user}
-              updateUserCart={updateUserCart}
+              userDbInfo={userDbInfo}
               refetchGetUserCart={refetch}
               isFetchingCart={isFetchingCart}
-              isSuccessUpdateCart={isSuccessUpdateCart}
-              userDbInfo={userDbInfo}
             />
           }
         />
@@ -67,41 +99,3 @@ function App() {
 }
 
 export default App;
-
-/* 
-<button
-          onClick={async () => { */
-/* const response = await axios.get(
-              `/teste?query=${query}&variables=${JSON.stringify({ id: id })}`,
-              {
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-              }
-            ); */
-/*  let data = JSON.stringify({
-              query: mutation,
-              variables: {
-                product: {
-                  name: 'Produto 1',
-                  image: 'image-url',
-                  description: 'Criando um produto',
-                  price: 50.0,
-                  available: true,
-                  quantity: 500,
-                },
-              },
-            });
-
-            const response = await axios.post(`/teste`, data, {
-              headers: {
-                'Content-Type': 'application/json',
-                Accept: 'application/json',
-              },
-            });
-
-          
-          }}
-        >
-          count is {count}
-        </button> */

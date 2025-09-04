@@ -9,9 +9,7 @@ import { createTheme } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
-import Login from './pages/Login.jsx';
-import Register from './pages/Register.jsx';
-
+import Auth0ProviderComponent from './components/AuthProvider.jsx';
 const theme = createTheme({
   breakpoints: {
     values: {
@@ -50,6 +48,7 @@ const theme = createTheme({
     },
   },
 });
+
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
@@ -58,13 +57,9 @@ createRoot(document.getElementById('root')).render(
           <CssBaseline />
 
           <BrowserRouter basename={import.meta.env.BASE_URL}>
-            <Routes>
-              <Route exact path="/login" element={<Login />} />
-
-              <Route exact path="/cadastrar" element={<Register />} />
-
-              <Route exact path="*" element={<App />} />
-            </Routes>
+            <Auth0ProviderComponent>
+              <App />
+            </Auth0ProviderComponent>
           </BrowserRouter>
         </ThemeProvider>
       </StyledEngineProvider>

@@ -8,7 +8,6 @@ const NextStep = ({ actionFuncToShow, actionFuncToHide }) => {
       onClick={() => {}}
     >
       <Button
-        disableRipple
         onClick={() => {
           actionFuncToShow(true);
           actionFuncToHide(false);

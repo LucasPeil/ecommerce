@@ -24,7 +24,7 @@ const SearchBackdrop = ({ open, setOpen }) => {
       if (!open) dispatch(resetTextFiler());
     };
   }, [open]);
-  console.log(products);
+
   return (
     <Backdrop
       sx={{ zIndex: 10, backgroundColor: 'rgba(0, 0, 0, 0.8)' }}

@@ -6,7 +6,7 @@ export const getUser = () => JSON.parse(localStorage.getItem('user#19dg23'));
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: graphqlBaseQuery({
-    baseUrl: 'http://localhost:5173/api',
+    baseUrl: 'http://localhost:3100/api',
   }),
   tagTypes: ['DeleteProduct'],
   endpoints: (builder) => ({
@@ -88,8 +88,7 @@ export const apiSlice = createApi({
       transformResponse: (response) => response.getProduct.data,
     }),
     createProduct: builder.mutation({
-      query: (product) => {
-        console.log(product);
+      query: ({ product, token }) => {
         return {
           url: '/products',
           body: gql`
@@ -112,6 +111,9 @@ export const apiSlice = createApi({
           `,
           variables: {
             product,
+          },
+          requestHeaders: {
+            authorization: `Bearer ${token}`,
           },
         };
       },
@@ -155,7 +157,7 @@ export const apiSlice = createApi({
       transformResponse: (response) => response.getPricesRange,
     }),
     // USER QUERIES
-    createUser: builder.mutation({
+    /*  createUser: builder.mutation({
       query: (user) => {
         return {
           url: '/users',
@@ -194,8 +196,8 @@ export const apiSlice = createApi({
         };
       },
       transformResponse: (response) => response.createUser,
-    }),
-    login: builder.mutation({
+    }), */
+    /*  login: builder.mutation({
       query: (user) => {
         return {
           url: '/users',
@@ -229,14 +231,52 @@ export const apiSlice = createApi({
         );
         return response.login;
       },
-    }),
-
-    getUserCart: builder.query({
-      query: ({ id }) => {
+    }), */
+    getUser: builder.query({
+      query: ({ email, token }) => {
         return {
           url: '/users',
           body: gql`
-            query getUserCart($id: String!) {
+            query getUser($email: String) {
+              getUser(email: $email) {
+                status
+                message
+                data {
+                  _id
+                  username
+                  email
+                  cart {
+                    _id
+                    name
+                    images
+                    description
+                    price
+                    qtySelected
+                    quantity
+                    available
+                  }
+                }
+              }
+            }
+          `,
+          variables: {
+            email,
+          },
+          requestHeaders: {
+            'Content-Type': 'application/json',
+            authorization: `Bearer ${token}`,
+          },
+        };
+      },
+      transformResponse: (response) => response.getUser?.data,
+    }),
+
+    getUserCart: builder.query({
+      query: ({ id, token }) => {
+        return {
+          url: '/users',
+          body: gql`
+            query getUserCart($id: String) {
               getUserCart(id: $id) {
                 status
                 message
@@ -262,9 +302,8 @@ export const apiSlice = createApi({
             id,
           },
           requestHeaders: {
-            headers: {
-              'Content-Type': 'application/json',
-            },
+            // 'Content-Type': 'application/json',
+            authorization: `Bearer ${token}`,
           },
         };
       },
@@ -273,7 +312,7 @@ export const apiSlice = createApi({
     }),
 
     updateUserCart: builder.mutation({
-      query: ({ id, productId, action, qty }) => {
+      query: ({ id, productId, action, qty, token }) => {
         return {
           url: '/users',
           body: gql`
@@ -319,6 +358,7 @@ export const apiSlice = createApi({
           requestHeaders: {
             headers: {
               'Content-Type': 'application/json',
+              authorization: `Bearer ${token}`,
             },
           },
         };
@@ -334,10 +374,12 @@ export const {
   useLazyGetAllProductsQuery,
   useGetProductQuery,
   useCreateProductMutation,
-  useCreateUserMutation,
-  useLoginMutation,
+  /*   useCreateUserMutation,
+  useLoginMutation, */
   useGetUserCartQuery,
   useUpdateUserCartMutation,
   useGetRoomsQuery,
   useGetPricesRangeQuery,
+  useGetUserQuery,
+  useLazyGetUserQuery,
 } = apiSlice;

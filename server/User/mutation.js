@@ -129,7 +129,7 @@ const UserMutation = new graphql.GraphQLObjectType({
               break;
             case 'remove':
               const item = user.cart.pop({ _id: productId });
-              console.log(item);
+
               break;
             case 'addOne':
               let itemIdxToAdd = item.cart.findIndex(

@@ -59,6 +59,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
   const [productcategory, setProductcategory] = useState('');
   const [saveImagesIsLoading, setSaveImagesIsLoading] = useState(false);
   const { uploadImageIsLoading } = useSelector((state) => state.uploadImage);
+  const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -107,7 +108,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
       const urls = await uploadImages(files);
       setSaveImagesIsLoading(false);
       const product = { ...values, ...{ images: urls } };
-      createProduct(product);
+      createProduct({ product, token: token });
       formik.resetForm();
       navigate('/');
     },
@@ -266,7 +267,6 @@ const CriarProduto = ({ open, handleClose, data }) => {
                     </>
                   ) : (
                     <IconButton
-                      disableRipple
                       component="label"
                       sx={{
                         color: 'black',

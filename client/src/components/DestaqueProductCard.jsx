@@ -10,7 +10,6 @@ const DestaqueProductCard = ({ product }) => {
   const imageIsLoading = useImageIsLoading({ image: product?.images[0] });
   return (
     <ButtonBase
-      disableRipple
       className="buttonBase"
       onClick={() => {
         navigate(`/produto/${product._id}`);

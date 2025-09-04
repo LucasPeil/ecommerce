@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/forniture',
   server: {
+    port: 3100,
     proxy: {
       '/api': {
         target: 'http://localhost:4000/',

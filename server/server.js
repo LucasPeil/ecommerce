@@ -1,22 +1,23 @@
 const express = require('express');
+
 const { createHandler } = require('graphql-http/lib/use/express');
 const graphql = require('graphql');
-const { buildSchema } = require('graphql');
 const bodyParser = require('body-parser');
 const app = express();
-const path = require('path');
-const dotenv = require('dotenv').config();
-const Produto = require('./models/produtoModel');
+require('dotenv').config();
 const connectDB = require('./config/db');
 const { ProductQueryType } = require('./Produto/query');
 const { ProductMutation } = require('./Produto/mutation');
 const { UserMutation } = require('./User/mutation');
 const fileUpload = require('express-fileupload');
 const { UserQueryType } = require('./User/query');
-const { protect } = require('./middleware/authMiddleware');
 const { uploadImages } = require('./Produto/fileUpload');
 const PORT = process.env.PORT || 4000;
 const { v4: uuidv4 } = require('uuid');
+const {
+  checkJwt,
+  createUserInMongoDb,
+} = require('./middleware/authMiddleware');
 
 connectDB();
 // Query para pegar todos os produtos
@@ -71,6 +72,8 @@ app.post('/api/uploadFile', async (req, res) => {
 });
 app.all(
   '/api/products',
+  checkJwt,
+  createUserInMongoDb,
   createHandler({
     schema: productSchema,
     formatError: (err) => {
@@ -78,18 +81,24 @@ app.all(
     },
 
     context: async (req) => ({
-      filesObj: req?.files,
+      /*   filesObj: req?.files, */
+      user: req.user || null,
     }),
   })
 );
+
 app.all(
   '/api/users',
+  checkJwt,
+  createUserInMongoDb,
   createHandler({
     schema: userSchema,
     formatError: (err) => {
       return err;
     },
-    context: async (req) => {},
+    context: async (req) => {
+      return { user: req.user || null };
+    },
   })
 );
 

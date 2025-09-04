@@ -10,17 +10,23 @@ const UserQueryType = new graphql.GraphQLObjectType({
       type: UserResultType,
       // `args` describes the arguments that the `user` query accepts
       args: {
-        id: { type: graphql.GraphQLString },
+        email: { type: graphql.GraphQLString },
       },
-      resolve: async (_, { id }) => {
+      resolve: async (_, { email }, context) => {
         try {
-          const user = await User.findById(id);
+          // console.log(context);
+          const user = await User.findOne({ email: email });
           if (!user) {
-            return { status: 404, message: 'Usuário não encontrado' };
+            return {
+              status: 404,
+              message: 'Usuário não encontrado',
+              data: null,
+            };
           }
+
           return { status: 200, data: user };
         } catch (error) {
-          return { status: 500, message: 'Erro ao buscar usuário' };
+          return { status: 500, message: 'Erro ao buscar usuário', data: null };
         }
       },
     },

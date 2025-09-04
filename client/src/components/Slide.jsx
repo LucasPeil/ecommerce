@@ -56,7 +56,7 @@ const Slide = ({ bgImage, bgPosition }) => {
 
       <Button
         variant="contained"
-        onClick={async () => navigate('/Catalog')}
+        onClick={async () => navigate('/catalogo')}
         sx={{
           color: 'black',
           border: '1px solid black',

@@ -3,16 +3,8 @@ import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import RemoveIcon from '@mui/icons-material/Remove';
 import { IconButton, InputBase, Paper } from '@mui/material';
 import React, { useEffect, useState } from 'react';
-import {
-  getUser,
-  useGetUserCartQuery,
-  useUpdateUserCartMutation,
-} from '../slices/apiSlice';
 
 const QuantityInputField = ({ cart, refetchCart }) => {
-  const [updateUserCart, { isSuccess: updateCartIsSuccess }] =
-    useUpdateUserCartMutation();
-
   return (
     <Paper
       elevation={2}
