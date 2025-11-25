@@ -70,6 +70,7 @@ app.post('/api/uploadFile', async (req, res) => {
     throw new Error('Erro ao salvar imagens.');
   }
 });
+
 app.all(
   '/api/products',
   checkJwt,

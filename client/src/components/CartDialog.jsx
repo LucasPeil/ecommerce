@@ -24,7 +24,7 @@ import {
   useUpdateUserCartMutation,
 } from '../slices/apiSlice';
 import { IconButton } from '@mui/material';
-import EmptyCard from './EmptyCard';
+import EmptyCart from './EmptyCart';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
 const Transition = React.forwardRef(function Transition(props, ref) {
@@ -324,7 +324,7 @@ const CartDialog = ({ open, handleClose, userDbInfo }) => {
               </Button>
             </>
           ) : (
-            <EmptyCard />
+            <EmptyCart />
           )}
         </DialogContent>
       </Dialog>

@@ -8,7 +8,7 @@ import { store } from './store';
 import { createTheme } from '@mui/material';
 import { ThemeProvider } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter } from 'react-router-dom';
 import Auth0ProviderComponent from './components/AuthProvider.jsx';
 const theme = createTheme({
   breakpoints: {

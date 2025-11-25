@@ -7,16 +7,14 @@ import {
   useMediaQuery,
   IconButton,
 } from '@mui/material';
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Twirl as Hamburger } from 'hamburger-react';
 import LocalGroceryStoreOutlinedIcon from '@mui/icons-material/LocalGroceryStoreOutlined';
-import LogoutOutlinedIcon from '@mui/icons-material/LogoutOutlined';
-import SearchOutlinedIcon from '@mui/icons-material/SearchOutlined';
+
 import { useTheme } from '@mui/material/styles';
-import { useSelector, useDispatch } from 'react-redux';
+
 import { Link, NavLink } from 'react-router-dom';
 // import { logout } from '../slices/user';
-import SearchBackdrop from './SearchBackdrop';
 
 import CartDialog from './CartDialog';
 
@@ -29,7 +27,7 @@ const Header = ({ refetch, userDbInfo }) => {
   const [openCartDialog, setOpenCartDialog] = useState(false);
   useEffect(() => {
     const getToken = async () => {
-      const token = await getAccessTokenSilently({
+      await getAccessTokenSilently({
         authorizationParams: {
           audience: 'https://ecommerce-api',
         },
@@ -130,11 +128,6 @@ const Header = ({ refetch, userDbInfo }) => {
               Entrar
             </Typography>
           </Button>
-          //  <NavLink style={{ textDecoration: 'none' }} to={'/login'}>
-          //     <Typography color="black" variant="button">
-          //       Entrar
-          //     </Typography>
-          //   </NavLink>
         )}
 
         <IconButton

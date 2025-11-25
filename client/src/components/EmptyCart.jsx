@@ -1,8 +1,7 @@
 import ShoppingCartOutlinedIcon from '@mui/icons-material/ShoppingCartOutlined';
 import { Box, Typography } from '@mui/material';
-import React from 'react';
-import cartIcon from '../assets/shopping_cart_icon_2.svg';
-const EmptyCard = () => {
+
+const EmptyCart = () => {
   return (
     <Box
       sx={{
@@ -22,4 +21,4 @@ const EmptyCard = () => {
   );
 };
 
-export default EmptyCard;
+export default EmptyCart;

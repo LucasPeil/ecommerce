@@ -1,9 +1,20 @@
-import { request, gql, ClientError } from 'graphql-request';
+import { request, ClientError } from 'graphql-request';
 
 export const graphqlBaseQuery =
   ({ baseUrl }) =>
   async ({ url, body, variables = null, requestHeaders = {} }) => {
     try {
+      if (
+        requestHeaders.authorization &&
+        requestHeaders.authorization.includes('undefined')
+      ) {
+        console.warn(
+          '⛔ Tentativa de envio de token inválido bloqueada no frontend.'
+        );
+        // Retorna um erro amigável sem bater no servidor
+        return { error: { status: 401, data: 'Token not ready yet' } };
+      }
+
       const fullUrl = baseUrl + url;
       const result = await request({
         url: fullUrl,

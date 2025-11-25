@@ -2,17 +2,21 @@ const { expressjwt } = require('express-jwt');
 const jwksRsa = require('jwks-rsa');
 const axios = require('axios');
 const User = require('../models/userModel');
+const getIssuerUrl = (domain) => {
+  return domain.endsWith('/') ? domain : `${domain}/`;
+};
 const checkJwt = expressjwt({
   secret: jwksRsa.expressJwtSecret({
     cache: true,
     rateLimit: true,
     jwksRequestsPerMinute: 5,
-    jwksUri: `${process.env.AUTH0_AUDIENCE}.well-known/jwks.json`,
+    jwksUri: `https://${process.env.AUTH0_DOMAIN}/.well-known/jwks.json`,
   }),
-  audience: 'https://ecommerce-api',
-  issuer: process.env.AUTH0_AUDIENCE,
+  audience: process.env.AUTH0_AUDIENCE,
+  issuer: getIssuerUrl(process.env.AUTH0_ISSUER_BASE_URL),
   algorithms: ['RS256'],
   credentialsRequired: false,
+  requestProperty: 'user',
 });
 
 const createUserInMongoDb = async (req, res, next) => {
@@ -29,7 +33,6 @@ const createUserInMongoDb = async (req, res, next) => {
       const { sub, email, name } = userInfo?.data;
 
       user = await User.findOne({ auth0Id: sub /* auth0id: sub */ });
-      console.log(user);
       if (!user) {
         user = await User.create({
           auth0Id: sub,
@@ -38,6 +41,7 @@ const createUserInMongoDb = async (req, res, next) => {
         });
       }
       req.user = user;
+
       next();
     }
   } catch (error) {

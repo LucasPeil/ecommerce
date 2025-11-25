@@ -129,16 +129,18 @@ const UserMutation = new graphql.GraphQLObjectType({
               break;
             case 'remove':
               const item = user.cart.pop({ _id: productId });
-
               break;
-            case 'addOne':
-              let itemIdxToAdd = item.cart.findIndex(
+            case 'update_qty':
+              let itemIdxToChange = user.cart.findIndex(
                 (item) => item._id == productId
               );
-              user.cart[itemIdxToAdd].qty += 1;
 
+              if (user.cart[itemIdxToChange].qty === 1) {
+                user.cart.pop({ _id: productId });
+              }
+              user.cart[itemIdxToChange].qty = qty;
               break;
-            case 'removeOne':
+            /*  case 'removeOne':
               let itemIdxToRemove = item.cart.findIndex(
                 (item) => item._id == productId
               );
@@ -148,7 +150,7 @@ const UserMutation = new graphql.GraphQLObjectType({
               } else {
                 user.cart[itemIdxToRemove].qty -= 1;
               }
-              break;
+              break; */
             default:
               break;
           }

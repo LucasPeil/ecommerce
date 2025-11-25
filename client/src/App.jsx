@@ -25,7 +25,7 @@ function App() {
 
     return token;
   };
-  const [getUser, { data: userDb, isFetching }] = useLazyGetUserQuery();
+  const [getUser, { data: userDb }] = useLazyGetUserQuery();
   const { token } = useSelector((state) => state.auth);
   const dispatch = useDispatch();
   const {
@@ -45,18 +45,15 @@ function App() {
       getToken().then((result) => {
         dispatch(setToken(result));
         getUser({ email: user?.email, token: result });
-
-        // You may want to do setState here as well
       });
-      // console.log(token);
     }
   }, [user, getAccessTokenSilently]);
 
-  /*   useEffect(() => {
+  useEffect(() => {
     if (userDb) {
       dispatch(setUser(userDb));
     }
-  }, [userDb]); */
+  }, [userDb]);
 
   return (
     <>

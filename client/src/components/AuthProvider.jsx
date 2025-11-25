@@ -13,8 +13,8 @@ export default function Auth0ProviderComponent({ children }) {
     <Auth0Provider
       /* domain={import.meta.env.VITE_AUTH0_DOMAIN}
                clientId={import.meta.env.VITE_AUTH0_CLIENT_ID} */
-      domain=""
-      clientId=""
+      domain="dev-l3qgrjq4agwdbcug.us.auth0.com"
+      clientId="yKwGKu8x7pZLtnfuLYA7DzdUcVwfmeE8"
       authorizationParams={{
         redirect_uri: window.location.origin + '/forniture',
       }}
