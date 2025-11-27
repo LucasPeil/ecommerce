@@ -64,7 +64,7 @@ const ConfirmPurchase = () => {
         token,
         productId: product._id,
         qty: newQuantity, // Envia a nova qtd
-        action: 'update_qty', // Supondo que seu backend tenha essa action
+        action: 'update_qty',
       });
     } catch (err) {
       console.error('Erro ao atualizar quantidade', err);
