@@ -25,14 +25,6 @@ import {
   useLazyGetAllProductsQuery,
 } from '../slices/apiSlice';
 
-const groupPerStack = (products, itemsPerStack = 4) => {
-  const groupedProducts = [];
-
-  for (let i = 0; i < products?.length; i += itemsPerStack) {
-    groupedProducts.push(products?.slice(i, i + itemsPerStack));
-  }
-  return groupedProducts;
-};
 const Catalog = () => {
   const [productsState, setProductsState] = useState([]);
   const [hasNextPage, setHasNextPage] = useState(true);
@@ -48,13 +40,12 @@ const Catalog = () => {
     category: [],
     available: [],
   });
-  const [getProducts, { data: productsData, isFetching }] =
+  const [getProducts, { data: productsData, isFetching, originalArgs }] =
     useLazyGetAllProductsQuery();
 
   const { data: rooms } = useGetRoomsQuery({});
   const { data: prices } = useGetPricesRangeQuery({});
   useEffect(() => {
-    setProductsState([]);
     setAfter(null);
     setHasNextPage(true);
 
@@ -68,37 +59,24 @@ const Catalog = () => {
 
   const loadMoreRef = useRef();
 
-  /*   useEffect(() => {
-    if (prices?.data) {
-      const pricesObj = {};
-      prices.data?.forEach((price) => {
-        pricesObj[price.price] = false;
-      });
-
-      setCheckboxes((prev) => ({
-        ...prev,
-        price: pricesObj,
-      }));
-    }
-  }, [prices]);
-
-  useEffect(() => {
-    if (rooms?.data) {
-      const roomsObj = {};
-      rooms.data?.forEach((room) => {
-        roomsObj[room] = false;
-      });
-
-      setCheckboxes((prev) => ({
-        ...prev,
-        category: roomsObj,
-      }));
-    }
-  }, [rooms]); */
-
   useEffect(() => {
     if (productsData?.edges?.length > 0) {
-      setProductsState((prev) => [...prev, ...productsData.edges]);
+      const isLoadMore = !!originalArgs?.after;
+      /* console.log('Is Load More:', isLoadMore); */
+      setProductsState((prev) => {
+        if (isLoadMore) {
+          // Dica Pro: Filtramos duplicatas caso o React StrictMode ou a rede dupliquem
+          const newIds = new Set(prev.map((p) => p.node._id));
+          const uniqueNewEdges = productsData.edges.filter(
+            (edge) => !newIds.has(edge.node._id)
+          );
+          return [...prev, ...uniqueNewEdges];
+        } else {
+          // Filtro Novo ou Busca (Replace)
+          // Substituímos tudo pelo que veio da API
+          return productsData.edges;
+        }
+      });
       setAfter(productsData.pageInfo.endCursor);
       setHasNextPage(productsData.pageInfo.hasNextPage);
     } else if (productsData?.edges?.length === 0 && !isFetching) {
@@ -144,7 +122,6 @@ const Catalog = () => {
   // 5. Handler Unificado e Otimizado
   const handleToggleFilter = useCallback((category, value) => {
     setFilters((prev) => {
-      console.log(prev);
       const currentList = prev[category];
       const isAlreadySelected = currentList.includes(value);
 
@@ -244,11 +221,8 @@ const Catalog = () => {
           <Box
             sx={{
               display: 'grid',
-              // O SEGREDO ESTÁ AQUI 👇
-              // Cria colunas automaticamente. Cada card terá no mínimo 260px (ajuste conforme seu design)
-              // e no máximo 1fr (uma fração do espaço disponível).
               gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: 4, // Espaçamento entre os cards (equivalente a spacing={3})
+              gap: 4,
               width: '100%',
             }}
           >

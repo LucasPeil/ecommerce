@@ -1,8 +1,16 @@
-const stringArrayToInt = (array) => {
+const formatPriceFilter = (array) => {
   const parsedIntArray = [];
+
   if (array?.length > 0) {
     for (let i = 0; i < array.length; i++) {
-      parsedIntArray.push(...array[i].split(' - ').map((num) => parseInt(num)));
+      const pricesRange = array[i].split(' - ');
+
+      parsedIntArray.push({
+        price: {
+          $gte: parseInt(pricesRange[0]),
+          $lte: parseInt(pricesRange[1]),
+        },
+      });
     }
   }
   return parsedIntArray;
@@ -10,27 +18,11 @@ const stringArrayToInt = (array) => {
 const filterFunction = (filter, searchText = '') => {
   const keys = Object.keys(filter).filter((item) => filter[item].length > 0);
   let checkboxFilterQuery = {};
-  let priceQuery = [];
-  console.log(filter.price);
-  if (filter.price?.length > 0) {
-    let parsedIntArray = stringArrayToInt(filter.price);
+  const priceFilter = formatPriceFilter(filter.price);
 
-    for (let i = 0; i < parsedIntArray.length; i += 2) {
-      if (parsedIntArray[i] == Math.max(parsedIntArray)) {
-        // se for o maior, não há com o que ser menor, pois é o ultimo valor
-        priceQuery = { $gte: parsedIntArray[i] };
-      } else {
-        priceQuery = {
-          $gte: Math.min(...parsedIntArray),
-          $lte: Math.max(...parsedIntArray),
-        };
-      }
-    }
-    // Fazer um OR entre os intervalos de preço selecionados
-  }
   for (let key of keys) {
     if (key === 'price') {
-      checkboxFilterQuery[key] = { ...priceQuery };
+      checkboxFilterQuery['$or'] = priceFilter;
     } else {
       checkboxFilterQuery[key] = { $in: filter[key] };
     }
@@ -57,13 +49,8 @@ const filterFunction = (filter, searchText = '') => {
   } else {
     Object.assign(finalQuery, checkboxFilterQuery);
   }
-  /*  console.log(finalQuery); // aqui o OR
-  finalQuery["price"] = {} */
+
   return finalQuery;
 };
 
 module.exports = { filterFunction };
-//Texto sempre vai ser o $
-//Checkbox sempre vai ser o $and
-// externo que vai ser um externo que sera and quando tiver texto e or quando nao viter
-/* {$or:[{ category: "Sala"}, {description:"Sala"}, {name: "Sala"}, {$or:[{name:/Produto1/}]} ]} */

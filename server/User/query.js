@@ -14,7 +14,6 @@ const UserQueryType = new graphql.GraphQLObjectType({
       },
       resolve: async (_, { email }, context) => {
         try {
-          // console.log(context);
           const user = await User.findOne({ email: email });
           if (!user) {
             return {
