@@ -10,7 +10,6 @@ const UPLOAD_IMAGES_API_URL =
     : '/api/uploadFile';
 
 const uploadImages = async (imgs) => {
-  console.log(imgs);
   const config = {
     headers: {
       'Content-Type': 'multipart/form-data',
@@ -20,7 +19,7 @@ const uploadImages = async (imgs) => {
   };
 
   const formData = new FormData();
-  console.log(imgs);
+
   for (let i = 0; i < imgs.length; i++) {
     formData.append(`file_${i}`, imgs[i]);
   }

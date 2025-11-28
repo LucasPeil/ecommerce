@@ -1,3 +1,4 @@
+/* eslint-disable react/prop-types */
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
 import {
@@ -33,24 +34,21 @@ const groupPerStack = (products, itemsPerStack = 4) => {
   return groupedProducts;
 };
 const Catalog = () => {
-  const [checkboxes, setCheckboxes] = useState({
-    price: {},
-    category: {},
-  });
+  const [productsState, setProductsState] = useState([]);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
-  const [productsState, setProductsState] = useState([]);
-  const [first, setFirst] = useState(5);
   const [after, setAfter] = useState(null);
+
+  // Busca
   const [text, setText] = useState('');
-  const [textFilter, setTextFilter] = useState('');
+  const [textFilter, setTextFilter] = useState(''); // O que realmente dispara a busca
+
   const [filters, setFilters] = useState({
     price: [],
     category: [],
     available: [],
   });
-
-  const [getProducts, { data: products, isFetching }] =
+  const [getProducts, { data: productsData, isFetching }] =
     useLazyGetAllProductsQuery();
 
   const { data: rooms } = useGetRoomsQuery({});
@@ -66,11 +64,11 @@ const Catalog = () => {
       filter: filters,
       searchText: textFilter,
     });
-  }, [filters, textFilter]);
+  }, [filters, textFilter, getProducts]);
 
   const loadMoreRef = useRef();
 
-  useEffect(() => {
+  /*   useEffect(() => {
     if (prices?.data) {
       const pricesObj = {};
       prices.data?.forEach((price) => {
@@ -96,272 +94,259 @@ const Catalog = () => {
         category: roomsObj,
       }));
     }
-  }, [rooms]);
+  }, [rooms]); */
+
   useEffect(() => {
-    setHasNextPage(products?.pageInfo?.hasNextPage);
-    if (products?.edges?.length > 0) {
-      setProductsState((prev) => [...prev, ...products.edges]);
-      const nextCursor = products?.pageInfo?.endCursor;
-      setAfter(nextCursor);
+    if (productsData?.edges?.length > 0) {
+      setProductsState((prev) => [...prev, ...productsData.edges]);
+      setAfter(productsData.pageInfo.endCursor);
+      setHasNextPage(productsData.pageInfo.hasNextPage);
+    } else if (productsData?.edges?.length === 0 && !isFetching) {
+      // Se a busca retornou vazio
+      setHasNextPage(false);
     }
     setLoadingMore(false);
-  }, [products]);
+  }, [productsData, isFetching]);
 
   useEffect(() => {
-    if (!hasNextPage || loadingMore) return;
+    if (!hasNextPage || loadingMore || isFetching) return;
 
-    const observer = new IntersectionObserver(([entry]) => {
-      // console.log('Esta intersectando: ', entry.isIntersecting);
-
-      if (entry.isIntersecting) {
-        setLoadingMore(true);
-        getProducts({
-          first: 5,
-          after,
-          filter: filters,
-          searchText: textFilter,
-        });
-        /* setLoadingMore(entry.isIntersecting);
-        if (!nextCursor) return; */
-      }
-    });
-
-    if (loadMoreRef.current) observer.observe(loadMoreRef.current);
-
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setLoadingMore(true);
+          getProducts({
+            first: 5,
+            after,
+            filter: filters,
+            searchText: textFilter,
+          });
+        }
+      },
+      { threshold: 0.5 }
+    );
+    const currentRef = loadMoreRef.current;
+    if (currentRef) observer.observe(currentRef);
     return () => {
-      if (loadMoreRef.current) observer.unobserve(loadMoreRef.current);
+      if (currentRef) observer.unobserve(currentRef);
       setLoadingMore(false);
     };
-  }, [hasNextPage, loadingMore, products]);
+  }, [
+    hasNextPage,
+    loadingMore,
+    isFetching,
+    after,
+    filters,
+    textFilter,
+    getProducts,
+  ]);
 
-  // Função para lidar com a mudança de um checkbox
-  const handleCheckboxChange = useCallback((category, value) => {
-    // Atualizamos o estado dos checkboxes de forma imutável
-    setCheckboxes((prev) => {
-      const newState = {
-        ...prev,
-        [category]: {
-          ...prev[category],
-          [value]: !prev[category][value],
-        },
-      };
-
-      // Atualizamos os filtros com base no novo estado dos checkboxes
-      updateFilters(category, value, newState[category][value]);
-
-      return newState;
-    });
-  }, []);
-
-  // Função para atualizar os filtros com base na ação do checkbox
-  const updateFilters = useCallback((category, value, isChecked) => {
+  // 5. Handler Unificado e Otimizado
+  const handleToggleFilter = useCallback((category, value) => {
     setFilters((prev) => {
-      // Se o checkbox foi marcado, adicionamos o valor ao filtro
-      if (isChecked) {
+      console.log(prev);
+      const currentList = prev[category];
+      const isAlreadySelected = currentList.includes(value);
+
+      if (isAlreadySelected) {
+        // Remove
         return {
           ...prev,
-          [category]: [...prev[category], value],
+          [category]: currentList.filter((item) => item !== value),
         };
-      }
-      // Se o checkbox foi desmarcado, removemos o valor do filtro
-      else {
-        return {
-          ...prev,
-          [category]: prev[category].filter((item) => item !== value),
-        };
+      } else {
+        // Adiciona
+        return { ...prev, [category]: [...currentList, value] };
       }
     });
   }, []);
-  const productsStacked = useMemo(
-    () => groupPerStack(productsState, 4),
-    [productsState]
-  );
+
+  // Helper para verificar se está marcado (substitui o estado 'checkboxes')
+  /* const isChecked = (category, value) => filters[category].includes(value); */
+
+  const isChecked = (category, value) => filters[category].includes(value);
+
+  const handleSearch = () => {
+    if (textFilter) {
+      setTextFilter('');
+      setText('');
+    } else {
+      setTextFilter(text);
+    }
+  };
 
   return (
-    <Box>
-      <Stack
-        direction="row"
-        justifyContent={'center'}
-        sx={{ transform: 'translateY(100px)', mb: 3 }}
-      >
+    <Box sx={{ pt: '100px', pb: 5 }}>
+      {/* Use padding ao invés de transform para layout */}
+      {/* Search Bar */}
+      <Stack direction="row" justifyContent="center" sx={{ mb: 6 }}>
         <Paper
           elevation={3}
           sx={{
             display: 'flex',
             alignItems: 'center',
-            width: '50%',
-
-            borderRadius: '0.3rem',
-            backgroundColor: 'white',
+            width: { xs: '90%', md: '50%' },
+            p: '2px 4px',
           }}
         >
           <InputBase
-            sx={{ ml: 2, flex: 1 }}
+            sx={{ ml: 1, flex: 1 }}
             placeholder="Search here"
-            inputProps={{ 'aria-label': 'search here' }}
             value={text}
             onChange={(e) => setText(e.target.value)}
-            onKeyDown={(e) => {
-              if (e.key === 'Enter') setTextFilter(text);
-            }}
+            onKeyDown={(e) => e.key === 'Enter' && setTextFilter(text)}
           />
-
-          <IconButton
-            type="button"
-            sx={{
-              p: '0.7rem',
-              backgroundColor: '#333333',
-              borderRadius: '0 0.3rem 0.3rem 0',
-
-              '&:hover': {
-                color: 'white',
-                backgroundColor: '#000',
-              },
-              color: 'white',
-            }}
-            onClick={() => {
-              if (textFilter) {
-                setTextFilter('');
-                setText('');
-              } else {
-                setTextFilter(text);
-              }
-            }}
-            aria-label={textFilter ? 'close' : 'search'}
-          >
+          <IconButton onClick={handleSearch} sx={{ p: '10px' }}>
             {textFilter ? <CloseIcon /> : <SearchIcon />}
           </IconButton>
         </Paper>
       </Stack>
-      <Grid2
-        container
-        spacing={6}
-        direction={'row'}
-        justifyContent={'center'}
-        sx={{
-          transform: 'translateY(100px)',
-          pb: 5,
-          flexGrow: 1,
-        }}
-      >
-        <Grid2 size={3} sx={{ pl: 2, minHeight: '100vh' }}>
-          <Paper sx={{ minHeight: '100%', p: 3 }}>
-            <Typography color="text.secondary">
-              Encontre o que você procura com mais facilidade!
+      <Grid2 container spacing={4} sx={{ px: { xs: 2, md: 6 } }}>
+        {/* Sidebar Filtros */}
+        <Grid2 size={{ xs: 12, md: 3 }} sx={{ minHeight: { md: '100vh' } }}>
+          <Paper sx={{ p: 3, position: 'sticky', top: '110px' }}>
+            <Typography variant="h6" gutterBottom>
+              Filtros
             </Typography>
-
-            {/* Filtro de Preços */}
-            <FormControl
-              sx={{ mt: 2, minWidth: '100%' }}
-              component="fieldset"
-              variant="standard"
-            >
-              <FormLabel
-                sx={{ color: 'black', fontWeight: 'bold', pb: '0.4rem' }}
-              >
-                Faixa de preço
-              </FormLabel>
-              <Divider />
-              <FormGroup>
-                {prices?.data?.map((priceRange) => (
-                  <FormControlLabel
-                    key={priceRange.price}
-                    control={
-                      <Checkbox
-                        checked={!!checkboxes.price[priceRange.price]}
-                        onChange={() =>
-                          handleCheckboxChange('price', priceRange.price)
-                        }
-                        name={priceRange.price}
-                      />
-                    }
-                    label={
-                      <Stack direction="row" alignItems={'center'} gap={1}>
-                        <Typography variant="body1">
-                          {priceRange.price}
-                        </Typography>
-                        <Typography
-                          color="text.secondary"
-                          component={'span'}
-                          variant="caption"
-                        >
-                          {`(${priceRange.qty})`}
-                        </Typography>
-                      </Stack>
-                    }
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
-
-            {/* Filtro de Cômodos */}
-            <FormControl
-              sx={{ mt: 2, minWidth: '100%' }}
-              component="fieldset"
-              variant="standard"
-            >
-              <FormLabel
-                sx={{ color: 'black', fontWeight: 'bold', pb: '0.4rem' }}
-              >
-                Cômodos
-              </FormLabel>
-              <Divider />
-              <FormGroup>
-                {rooms?.data?.map((room) => (
-                  <FormControlLabel
-                    key={room}
-                    control={
-                      <Checkbox
-                        checked={!!checkboxes.category[room]}
-                        onChange={() => handleCheckboxChange('category', room)}
-                        name={room}
-                      />
-                    }
-                    label={<Typography variant="body1">{room}</Typography>}
-                  />
-                ))}
-              </FormGroup>
-            </FormControl>
+            <Typography variant="body2" color="text.secondary">
+              Encontre o que você procura!
+            </Typography>
+            {/* Filtro Dinâmico: Preço */}
+            <FilterGroup
+              label="Faixa de Preço"
+              items={prices?.data}
+              category="price"
+              valueKey="price"
+              labelKey="price"
+              subLabelKey="qty"
+              isChecked={isChecked}
+              onToggle={handleToggleFilter}
+            />
+            {/* Filtro Dinâmico: Cômodos */}
+            <FilterGroup
+              label="Cômodos"
+              items={rooms?.data} // Assumindo que rooms.data é um array de strings
+              category="category"
+              simpleStringArray={true}
+              isChecked={isChecked}
+              onToggle={handleToggleFilter}
+            />
           </Paper>
         </Grid2>
 
-        {/* Exibição de Produtos */}
+        {/* Lista de Produtos */}
         <Grid2
-          size={9}
-          direction={'row'}
+          size={{ xs: 12, md: 9 }}
           sx={{
-            display: 'flex',
-            flexDirection: 'column',
-            flexWrap: 'wrap',
-            justifyContent: 'start',
-            gap: 8,
+            justifyContent: 'center',
           }}
         >
-          {productsStacked?.map((products, idx) => (
-            <Box key={idx} sx={{ display: 'flex', gap: 8 }}>
-              {products.map((product, idx) => (
-                <ProductSimpleCard key={idx} product={product?.node} />
-              ))}
-            </Box>
-          ))}
-        </Grid2>
-
-        {/* Paginação */}
-        {hasNextPage && (
           <Box
             sx={{
-              marginTop: 1,
+              display: 'grid',
+              // O SEGREDO ESTÁ AQUI 👇
+              // Cria colunas automaticamente. Cada card terá no mínimo 260px (ajuste conforme seu design)
+              // e no máximo 1fr (uma fração do espaço disponível).
+              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+              gap: 4, // Espaçamento entre os cards (equivalente a spacing={3})
+              width: '100%',
             }}
-            ref={loadMoreRef}
           >
-            <Typography>
-              <CircularProgress sx={{ color: 'black' }} />
-            </Typography>
+            {productsState.map((edge) => (
+              // Remova o Grid2 wrapper do card, use o componente direto ou um Box simples
+              <Box
+                key={edge.node.id}
+                sx={{ display: 'flex', justifyContent: 'center' }}
+              >
+                <ProductSimpleCard product={edge.node} />
+              </Box>
+            ))}
           </Box>
-        )}
+
+          {/* Loader / Sentinel */}
+          {(hasNextPage || isFetching) && (
+            <Box
+              ref={loadMoreRef}
+              sx={{
+                display: 'flex',
+                justifyContent: 'center',
+                mt: 4,
+                width: '100%',
+              }}
+            >
+              <CircularProgress />
+            </Box>
+          )}
+
+          {!hasNextPage && productsState.length > 0 && (
+            <Typography
+              align="center"
+              sx={{ mt: 4, width: '100%' }}
+              color="text.secondary"
+            >
+              Você chegou ao fim da lista.
+            </Typography>
+          )}
+        </Grid2>
       </Grid2>
     </Box>
   );
 };
+
+// Pequeno subcomponente para limpar a repetição da UI de filtros
+const FilterGroup = ({
+  label,
+  items,
+  category,
+  valueKey,
+  labelKey,
+  subLabelKey,
+  isChecked,
+  onToggle,
+  simpleStringArray,
+}) => (
+  <FormControl
+    component="fieldset"
+    variant="standard"
+    sx={{ mt: 2, width: '100%' }}
+  >
+    <FormLabel component="legend" sx={{ fontWeight: 'bold' }}>
+      {label}
+    </FormLabel>
+    <Divider sx={{ my: 1 }} />
+    <FormGroup>
+      {items?.map((item) => {
+        const value = simpleStringArray ? item : item[valueKey];
+        const displayLabel = simpleStringArray ? item : item[labelKey];
+        const subLabel = subLabelKey ? `(${item[subLabelKey]})` : '';
+
+        return (
+          <FormControlLabel
+            key={value}
+            control={
+              <Checkbox
+                checked={isChecked(category, value)}
+                onChange={() => onToggle(category, value)}
+                name={String(value)}
+              />
+            }
+            label={
+              <Typography variant="body2">
+                {displayLabel}{' '}
+                <Typography
+                  component="span"
+                  variant="caption"
+                  color="text.secondary"
+                >
+                  {subLabel}
+                </Typography>
+              </Typography>
+            }
+          />
+        );
+      })}
+    </FormGroup>
+  </FormControl>
+);
 
 export default Catalog;

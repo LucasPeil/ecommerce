@@ -10,9 +10,11 @@ const stringArrayToInt = (array) => {
 const filterFunction = (filter, searchText = '') => {
   const keys = Object.keys(filter).filter((item) => filter[item].length > 0);
   let checkboxFilterQuery = {};
-  let priceQuery = {};
+  let priceQuery = [];
+  console.log(filter.price);
   if (filter.price?.length > 0) {
     let parsedIntArray = stringArrayToInt(filter.price);
+
     for (let i = 0; i < parsedIntArray.length; i += 2) {
       if (parsedIntArray[i] == Math.max(parsedIntArray)) {
         // se for o maior, não há com o que ser menor, pois é o ultimo valor
@@ -24,6 +26,7 @@ const filterFunction = (filter, searchText = '') => {
         };
       }
     }
+    // Fazer um OR entre os intervalos de preço selecionados
   }
   for (let key of keys) {
     if (key === 'price') {
@@ -54,7 +57,8 @@ const filterFunction = (filter, searchText = '') => {
   } else {
     Object.assign(finalQuery, checkboxFilterQuery);
   }
-
+  /*  console.log(finalQuery); // aqui o OR
+  finalQuery["price"] = {} */
   return finalQuery;
 };
 

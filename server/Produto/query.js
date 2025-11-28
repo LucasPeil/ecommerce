@@ -58,7 +58,13 @@ const ProductQueryType = new graphql.GraphQLObjectType({
           let query = startId && {
             _id: { $gt: new mongoose.Types.ObjectId(startId) },
           };
-
+          const teste = {
+            $or: [
+              { $gte: 1, $lte: 30 },
+              { $gte: 30, $lte: 10000 },
+            ],
+          };
+          console.log({ ...query, ...filterResult });
           let products = await Produto.aggregate([
             { $match: { ...query, ...filterResult } },
             { $sort: { _id: 1 } },

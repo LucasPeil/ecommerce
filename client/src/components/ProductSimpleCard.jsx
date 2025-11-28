@@ -5,7 +5,7 @@ import useImageIsLoading from '../hooks/useImageIsLoading';
 const ProductSimpleCard = ({ product }) => {
   const imageIsLoading = useImageIsLoading({ image: product?.images[0] });
   return (
-    <Box sx={{ width: '20%' }}>
+    <Box sx={{ width: 280 }}>
       {!imageIsLoading ? (
         <Box>
           <Skeleton variant="rectangular" width="100%" height={300} />
