@@ -71,14 +71,14 @@ const Header = ({ refetch, userDbInfo }) => {
           textAlign: 'center',
         }}
       >
-        <Link
+        <NavLink
           style={{
             color: '#000000',
           }}
           to="/"
         >
           FORNITURE
-        </Link>
+        </NavLink>
       </h1>
       <Box
         sx={{
@@ -89,16 +89,16 @@ const Header = ({ refetch, userDbInfo }) => {
           zIndex: 5,
         }}
       >
-        <Link to="criar-produto">
+        <NavLink to="criar-produto">
           <Typography color="black" variant="button">
             Criar Produto
           </Typography>
-        </Link>
-        <Link to="catalogo">
+        </NavLink>
+        <NavLink to="catalogo">
           <Typography color="black" variant="button">
             Catalogo
           </Typography>
-        </Link>
+        </NavLink>
 
         {isAuthenticated ? (
           <Button

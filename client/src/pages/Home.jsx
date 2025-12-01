@@ -12,8 +12,10 @@ import DestaqueSlider from '../components/DestaqueSlider';
 import Footer from '../components/Footer';
 import { responsive } from '../utils/carouselResponsiveness';
 import CategoryTabs from '../components/CategoryTabs';
+import { useNavigate } from 'react-router-dom';
 
 const Home = () => {
+  const navigate = useNavigate();
   return (
     <>
       <Carousel
@@ -96,6 +98,7 @@ const Home = () => {
           <Stack flexDirection={'row'} justifyContent={'center'} sx={{}}>
             <Button
               variant="contained"
+              onClick={() => navigate('/catalogo/quarto')}
               sx={{
                 color: 'black',
                 backgroundColor: 'white',

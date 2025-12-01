@@ -1,9 +1,10 @@
 /* eslint-disable react/prop-types */
-import { Add, Remove, Delete } from '@mui/icons-material';
-import { Box, IconButton, Paper, Typography, Button } from '@mui/material';
+import { Delete } from '@mui/icons-material';
+import { Box, Typography, Button } from '@mui/material';
 import { formatCurrency } from '../utils/formatCurrency';
+import ProductQtyChange from './ProductQtyChange';
 
-const CartItem = ({ product, onUpdateQuantity, onRemove }) => {
+const CartItem = ({ product, onRemove }) => {
   return (
     <Box display="flex" py={2} borderBottom="1px solid #e0e0e0">
       {/* Imagem Otimizada */}
@@ -33,35 +34,7 @@ const CartItem = ({ product, onUpdateQuantity, onRemove }) => {
         </Typography>
 
         <Box mt={1} display="flex" alignItems="center" gap={2}>
-          <Paper
-            elevation={0} // Design mais limpo, borda sutil
-            variant="outlined"
-            sx={{
-              display: 'flex',
-              alignItems: 'center',
-              borderRadius: 5, // Arredondado moderno
-            }}
-          >
-            <IconButton
-              size="small"
-              onClick={() => onUpdateQuantity(product, -1)}
-              disabled={product.qtySelected <= 1}
-            >
-              <Remove fontSize="small" />
-            </IconButton>
-
-            <Typography sx={{ mx: 2, fontWeight: 'bold' }}>
-              {product.qtySelected}
-            </Typography>
-
-            <IconButton
-              size="small"
-              onClick={() => onUpdateQuantity(product, 1)}
-            >
-              <Add fontSize="small" />
-            </IconButton>
-          </Paper>
-
+          <ProductQtyChange product={product} />
           <Button
             startIcon={<Delete fontSize="small" />}
             onClick={() => onRemove(product._id)}

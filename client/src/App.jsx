@@ -60,7 +60,8 @@ function App() {
       <Header refetch={refetch} userDbInfo={userDbInfo} />
       <Routes>
         <Route exact path="/" element={<Home />} />
-        <Route exact path="/catalogo" element={<Catalog />} />
+        <Route path="/catalogo/:area" element={<Catalog />} />
+        <Route path="/catalogo" element={<Catalog />} />
         <Route
           exact
           path="/criar-produto"

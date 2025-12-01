@@ -1,9 +1,13 @@
 /* eslint-disable react/prop-types */
 import SearchIcon from '@mui/icons-material/Search';
 import CloseIcon from '@mui/icons-material/Close';
+import AttachMoneyIcon from '@mui/icons-material/AttachMoney';
+import TextFormatIcon from '@mui/icons-material/TextFormat';
+import RestartAltIcon from '@mui/icons-material/RestartAlt';
 import {
   Box,
   Checkbox,
+  Chip,
   CircularProgress,
   Divider,
   FormControl,
@@ -11,26 +15,31 @@ import {
   FormGroup,
   FormLabel,
   Grid2,
+  Icon,
   IconButton,
   InputBase,
   Paper,
   Stack,
   Typography,
 } from '@mui/material';
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+
+import { useCallback, useEffect, useRef, useState } from 'react';
 import ProductSimpleCard from '../components/ProductSimpleCard';
 import {
   useGetPricesRangeQuery,
   useGetRoomsQuery,
   useLazyGetAllProductsQuery,
 } from '../slices/apiSlice';
+import { useParams } from 'react-router-dom';
+import ProductsNotFound from '../components/ProductsNotFound';
 
 const Catalog = () => {
   const [productsState, setProductsState] = useState([]);
+  const [orderBy, setOrderBy] = useState(null);
   const [hasNextPage, setHasNextPage] = useState(true);
   const [loadingMore, setLoadingMore] = useState(false);
   const [after, setAfter] = useState(null);
-
+  const { area } = useParams();
   // Busca
   const [text, setText] = useState('');
   const [textFilter, setTextFilter] = useState(''); // O que realmente dispara a busca
@@ -40,32 +49,37 @@ const Catalog = () => {
     category: [],
     available: [],
   });
-  const [getProducts, { data: productsData, isFetching, originalArgs }] =
-    useLazyGetAllProductsQuery();
+  const [
+    getProducts,
+    { data: productsData, isFetching, originalArgs, isError },
+  ] = useLazyGetAllProductsQuery();
 
   const { data: rooms } = useGetRoomsQuery({});
   const { data: prices } = useGetPricesRangeQuery({});
   useEffect(() => {
+    window.scrollTo({
+      top: 0,
+      left: 0,
+      behavior: 'smooth',
+    });
     setAfter(null);
     setHasNextPage(true);
-
     getProducts({
       first: 5,
       after: null,
+      sort: orderBy,
       filter: filters,
       searchText: textFilter,
     });
-  }, [filters, textFilter, getProducts]);
+  }, [filters, orderBy, textFilter, getProducts]);
 
   const loadMoreRef = useRef();
 
   useEffect(() => {
-    if (productsData?.edges?.length > 0) {
+    if (productsData?.edges) {
       const isLoadMore = !!originalArgs?.after;
-      /* console.log('Is Load More:', isLoadMore); */
       setProductsState((prev) => {
         if (isLoadMore) {
-          // Dica Pro: Filtramos duplicatas caso o React StrictMode ou a rede dupliquem
           const newIds = new Set(prev.map((p) => p.node._id));
           const uniqueNewEdges = productsData.edges.filter(
             (edge) => !newIds.has(edge.node._id)
@@ -87,8 +101,7 @@ const Catalog = () => {
   }, [productsData, isFetching]);
 
   useEffect(() => {
-    if (!hasNextPage || loadingMore || isFetching) return;
-
+    if (!hasNextPage || loadingMore || isFetching || isError) return;
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
@@ -96,6 +109,7 @@ const Catalog = () => {
           getProducts({
             first: 5,
             after,
+            sort: orderBy,
             filter: filters,
             searchText: textFilter,
           });
@@ -117,7 +131,17 @@ const Catalog = () => {
     filters,
     textFilter,
     getProducts,
+    orderBy,
   ]);
+
+  useEffect(() => {
+    if (area) {
+      setFilters((prev) => ({
+        ...prev,
+        category: [area[0].toUpperCase() + area.slice(1)],
+      }));
+    }
+  }, [area]);
 
   // 5. Handler Unificado e Otimizado
   const handleToggleFilter = useCallback((category, value) => {
@@ -168,7 +192,7 @@ const Catalog = () => {
         >
           <InputBase
             sx={{ ml: 1, flex: 1 }}
-            placeholder="Search here"
+            placeholder="O que você está procurando?"
             value={text}
             onChange={(e) => setText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && setTextFilter(text)}
@@ -180,8 +204,38 @@ const Catalog = () => {
       </Stack>
       <Grid2 container spacing={4} sx={{ px: { xs: 2, md: 6 } }}>
         {/* Sidebar Filtros */}
-        <Grid2 size={{ xs: 12, md: 3 }} sx={{ minHeight: { md: '100vh' } }}>
+        <Grid2 size={{ xs: 12, md: 3 }}>
           <Paper sx={{ p: 3, position: 'sticky', top: '110px' }}>
+            <Stack direction="row" justifyContent="start" alignItems="center">
+              <Typography variant="h6">Ordenar por</Typography>
+              <IconButton
+                onClick={() => {
+                  setOrderBy(null);
+                }}
+                size="small"
+                sx={{ ml: 1, display: orderBy ? 'inline-flex' : 'none' }}
+              >
+                <RestartAltIcon fontSize="small" />
+              </IconButton>
+            </Stack>
+            <Stack direction={'row'} spacing={1} sx={{ mt: 1, mb: 2 }}>
+              <Chip
+                onClick={() => {
+                  setOrderBy('price');
+                }}
+                icon={<AttachMoneyIcon />}
+                label="Valor"
+                color={orderBy === 'price' ? 'darkColor' : 'default'}
+              />
+              <Chip
+                onClick={() => {
+                  setOrderBy('name');
+                }}
+                icon={<TextFormatIcon />}
+                label="Nome"
+                color={orderBy === 'name' ? 'darkColor' : 'default'}
+              />
+            </Stack>
             <Typography variant="h6" gutterBottom>
               Filtros
             </Typography>
@@ -218,27 +272,31 @@ const Catalog = () => {
             justifyContent: 'center',
           }}
         >
-          <Box
-            sx={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
-              gap: 4,
-              width: '100%',
-            }}
-          >
-            {productsState.map((edge) => (
-              // Remova o Grid2 wrapper do card, use o componente direto ou um Box simples
-              <Box
-                key={edge.node.id}
-                sx={{ display: 'flex', justifyContent: 'center' }}
-              >
-                <ProductSimpleCard product={edge.node} />
-              </Box>
-            ))}
-          </Box>
+          {productsState.length === 0 && !isFetching ? (
+            <ProductsNotFound />
+          ) : (
+            <Box
+              sx={{
+                display: 'grid',
+                gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+                gap: 4,
+                width: '100%',
+              }}
+            >
+              {productsState.map((edge) => (
+                // Remova o Grid2 wrapper do card, use o componente direto ou um Box simples
+                <Box
+                  key={edge.node.id}
+                  sx={{ display: 'flex', justifyContent: 'center' }}
+                >
+                  <ProductSimpleCard product={edge.node} />
+                </Box>
+              ))}
+            </Box>
+          )}
 
-          {/* Loader / Sentinel */}
-          {(hasNextPage || isFetching) && (
+          {/* Loader */}
+          {(hasNextPage || isFetching) && !isError && (
             <Box
               ref={loadMoreRef}
               sx={{
@@ -267,7 +325,7 @@ const Catalog = () => {
   );
 };
 
-// Pequeno subcomponente para limpar a repetição da UI de filtros
+//
 const FilterGroup = ({
   label,
   items,

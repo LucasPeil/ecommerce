@@ -1,7 +1,7 @@
+/* eslint-disable react/prop-types */
 import { Box, Skeleton, Stack, Typography } from '@mui/material';
-import React, { useState, useEffect } from 'react';
 import useImageIsLoading from '../hooks/useImageIsLoading';
-
+import { Link } from 'react-router-dom';
 const ProductSimpleCard = ({ product }) => {
   const imageIsLoading = useImageIsLoading({ image: product?.images[0] });
   return (
@@ -14,7 +14,10 @@ const ProductSimpleCard = ({ product }) => {
           <Skeleton variant="text" width="80%" />
         </Box>
       ) : (
-        <>
+        <Link
+          style={{ color: 'black', textDecoration: 'none', fontWeight: 'bold' }}
+          to={`/produto/${product._id}`}
+        >
           <Box sx={{ overflow: 'hidden' }}>
             <Box
               sx={{
@@ -36,7 +39,7 @@ const ProductSimpleCard = ({ product }) => {
               {`R$ ${product.price}`}
             </Typography>
           </Stack>
-        </>
+        </Link>
       )}
     </Box>
   );

@@ -5,14 +5,11 @@ import {
   Divider,
   Grid2 as Grid,
   IconButton,
-  InputBase,
   Paper,
   Typography,
 } from '@mui/material';
-import { useEffect, useState } from 'react';
 import EmptyCart from '../components/EmptyCart';
 import {
-  getUser,
   useGetUserCartQuery,
   useUpdateUserCartMutation,
 } from '../slices/apiSlice';
@@ -23,11 +20,7 @@ import { formatCurrency } from '../utils/formatCurrency';
 
 const ConfirmPurchase = () => {
   const { token, user: userDb } = useSelector((state) => state.auth);
-  const {
-    data,
-    isFetching: isFetchingCart,
-    isSuccess: getCartSuccess,
-  } = useGetUserCartQuery(
+  const { data, isFetching: isFetchingCart } = useGetUserCartQuery(
     { id: userDb?._id, token: token },
     {
       skip: !token,
@@ -41,30 +34,26 @@ const ConfirmPurchase = () => {
 
   const handleRemoveItem = async (productId) => {
     try {
-      await updateUserCart({
+      updateUserCart({
         id: userDb._id,
         token,
         productId,
         action: 'remove',
-      }).unwrap();
+      });
     } catch (err) {
       console.error('Falha ao remover item', err);
     }
   };
-  const handleUpdateQuantity = async (product, change) => {
-    const newQuantity = product.qtySelected + change;
-    console.log(product._id);
-    if (newQuantity < 1) return;
+  const handleCleanCart = async () => {
     try {
       updateUserCart({
         id: userDb._id,
         token,
-        productId: product._id,
-        qty: newQuantity, // Envia a nova qtd
-        action: 'update_qty',
+        productId: null,
+        action: 'remove_all',
       });
     } catch (err) {
-      console.error('Erro ao atualizar quantidade', err);
+      console.error('Falha ao remover item', err);
     }
   };
   // 4. Cálculos Derivados (Memoization implícita na renderização é ok aqui)
@@ -99,14 +88,13 @@ const ConfirmPurchase = () => {
             <Typography variant="h6" fontWeight="bold">
               Seu carrinho
             </Typography>
-            <IconButton>
+            <IconButton
+              onClick={() => handleCleanCart()}
+              disabled={cartItems?.length === 0 || isUpdating}
+            >
               <DeleteIcon />
             </IconButton>
           </Box>
-
-          <Typography variant="body2" color="text.secondary" mt={1} mb={2}>
-            Desmarcar todos itens
-          </Typography>
 
           <Divider />
 
@@ -131,7 +119,6 @@ const ConfirmPurchase = () => {
                       key={product._id}
                       product={product}
                       onRemove={handleRemoveItem}
-                      onUpdateQuantity={handleUpdateQuantity}
                     />
                   ))}
                   <Box display="flex" justifyContent="flex-end" mt={2}>

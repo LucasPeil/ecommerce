@@ -11,7 +11,7 @@ export const apiSlice = createApi({
   tagTypes: ['DeleteProduct'],
   endpoints: (builder) => ({
     getAllProducts: builder.query({
-      query: ({ first, after, filter, searchText }) => {
+      query: ({ first, after, filter, sort, searchText }) => {
         return {
           url: '/products',
           body: gql`
@@ -20,12 +20,14 @@ export const apiSlice = createApi({
               $after: String
               $filter: FilterType
               $searchText: String
+              $sort: String
             ) {
               getAllProducts(
                 first: $first
                 after: $after
                 filter: $filter
                 searchText: $searchText
+                sort: $sort
               ) {
                 edges {
                   node {
@@ -51,6 +53,7 @@ export const apiSlice = createApi({
             after,
             filter,
             searchText,
+            sort,
           },
         };
       },
@@ -318,7 +321,7 @@ export const apiSlice = createApi({
           body: gql`
             mutation updateUserCart(
               $id: String!
-              $productId: String!
+              $productId: String
               $action: String!
               $qty: Int
             ) {

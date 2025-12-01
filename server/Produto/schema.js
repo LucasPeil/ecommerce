@@ -26,7 +26,7 @@ const productSchema = buildSchema(`
 
        type Query {
       getProduct(id: String!): ProductResult
-      getAllProducts(first: Int, after: String, filter: FilterType, searchText: String): ProductConnection
+      getAllProducts(first: Int, after: String, filter: FilterType, searchText: String, sort: String): ProductConnection
       }
 
   

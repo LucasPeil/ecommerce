@@ -128,17 +128,17 @@ const UserMutation = new graphql.GraphQLObjectType({
               user.cart.push({ _id: productId, qty });
               break;
             case 'remove':
-              const item = user.cart.pop({ _id: productId });
+              user.cart = user.cart.filter((item) => item._id != productId);
+              break;
+            case 'remove_all':
+              user.cart = [];
               break;
             case 'update_qty':
               let itemIdxToChange = user.cart.findIndex(
                 (item) => item._id == productId
               );
-
               user.cart[itemIdxToChange].qty = qty;
-              /*  if (user.cart[itemIdxToChange].qty === 0) {
-                user.cart.pop({ _id: productId });
-              } */
+
               break;
 
             default:

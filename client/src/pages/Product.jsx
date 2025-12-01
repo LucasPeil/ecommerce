@@ -20,8 +20,7 @@ import Carousel from 'react-multi-carousel';
 import CustomDot from '../components/CustomDot';
 import SliderImagem from '../components/SliderImagem';
 import { useParams } from 'react-router-dom';
-import { useDispatch, useSelector } from 'react-redux';
-import { getProduct } from '../slices/products';
+import { useSelector } from 'react-redux';
 import {
   useGetProductQuery,
   useUpdateUserCartMutation,
@@ -33,13 +32,12 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
   const [qtySelected, setQtySelected] = useState(1);
   const navigate = useNavigate();
   let carouselRef = useRef();
-  const [showCarousel, setShowCarousel] = useState(true);
-  const [updateUserCart, { isLoaing, isSuccess: isSuccessUpdateCart }] =
+  const [showCarousel] = useState(true);
+  const [updateUserCart, { isSuccess: isSuccessUpdateCart }] =
     useUpdateUserCartMutation();
-  const { data: singleProduct, isFetching, isSuccess } = useGetProductQuery(id);
+  const { data: singleProduct, isFetching } = useGetProductQuery(id);
 
   useEffect(() => {
-    console.log(isSuccessUpdateCart);
     if (isSuccessUpdateCart) {
       refetchGetUserCart();
     }

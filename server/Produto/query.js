@@ -42,8 +42,12 @@ const ProductQueryType = new graphql.GraphQLObjectType({
         after: { type: graphql.GraphQLString },
         filter: { type: FilterType },
         searchText: { type: graphql.GraphQLString },
+        sort: { type: graphql.GraphQLString },
       },
-      resolve: async (_, { first, after, filter, searchText }) => {
+      resolve: async (
+        _,
+        { first, after, filter, searchText, sort = '_id' }
+      ) => {
         try {
           const filterResult = filterFunction(filter, searchText);
 
@@ -63,10 +67,9 @@ const ProductQueryType = new graphql.GraphQLObjectType({
             {
               $match: { ...query, ...filterResult },
             },
-            { $sort: { _id: 1 } },
+            { $sort: { [sort]: 1 } },
             { $limit: limit },
           ]);
-
           // Construir os edges
           const edges = products.slice(0, limit).map((product) => ({
             node: product,

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import {
   Button,
   Dialog,
@@ -9,17 +9,13 @@ import {
   Typography,
   Slide,
   Stack,
-  InputBase,
-  Paper,
   Divider,
   CircularProgress,
 } from '@mui/material';
-import AddIcon from '@mui/icons-material/Add';
-import RemoveIcon from '@mui/icons-material/Remove';
+
 import CloseIcon from '@mui/icons-material/Close';
 import DeleteOutlineIcon from '@mui/icons-material/DeleteOutline';
 import {
-  getUser,
   useGetUserCartQuery,
   useUpdateUserCartMutation,
 } from '../slices/apiSlice';
@@ -27,45 +23,39 @@ import { IconButton } from '@mui/material';
 import EmptyCart from './EmptyCart';
 import { useNavigate } from 'react-router-dom';
 import { useSelector } from 'react-redux';
+import ProductQtyChange from './ProductQtyChange';
 const Transition = React.forwardRef(function Transition(props, ref) {
   return <Slide direction="left" ref={ref} {...props} />;
 });
 const CartDialog = ({ open, handleClose, userDbInfo }) => {
-  const [cart, setCart] = useState([]);
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   /*  useEffect(() => {
     setUser(getUser());
   }, []);
  */
-  const {
-    data,
-    isFetching: isFetchingCart,
-    refetch: refetchCart,
-  } = useGetUserCartQuery(
+  const { data } = useGetUserCartQuery(
     { id: userDbInfo?._id, token: token },
     {
       skip: !userDbInfo?._id,
     }
   );
 
-  const [
-    updateUserCart,
-    { isSuccess: updateCartIsSuccess, isFetching: updateCartIsFetching },
-  ] = useUpdateUserCartMutation();
+  const [updateUserCart, { isFetching: updateCartIsFetching }] =
+    useUpdateUserCartMutation();
 
-  const removeFromCart = (productId) => {
-    updateUserCart({
-      id: userDbInfo?._id,
-      token: token,
-      productId: productId,
-      action: 'remove',
-    });
+  const removeFromCart = async (productId) => {
+    try {
+      await updateUserCart({
+        id: userDbInfo?._id,
+        token: token,
+        productId: productId,
+        action: 'remove',
+      }).unwrap();
+    } catch (error) {
+      console.log('erro ao remover do carrinho', error);
+    }
   };
-
-  useEffect(() => {
-    setCart(data?.cart);
-  }, [isFetchingCart]);
 
   return (
     <>
@@ -115,7 +105,7 @@ const CartDialog = ({ open, handleClose, userDbInfo }) => {
             overflowX: 'hidden',
           }}
         >
-          {cart?.length > 0 ? (
+          {data?.cart?.length > 0 ? (
             <>
               <Stack
                 direction={'row'}
@@ -127,14 +117,14 @@ const CartDialog = ({ open, handleClose, userDbInfo }) => {
                   Subtotal:
                 </Typography>
                 <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                  {`R$ ${cart?.reduce(
+                  {`R$ ${data?.cart?.reduce(
                     (acc, currentValue) =>
                       acc + currentValue.price * currentValue.qtySelected,
                     0
                   )}`}
                 </Typography>
               </Stack>
-              {cart?.map((item, idx) => (
+              {data?.cart?.map((item, idx) => (
                 <Box
                   key={idx}
                   sx={{
@@ -177,101 +167,7 @@ const CartDialog = ({ open, handleClose, userDbInfo }) => {
                       <Typography variant="h6" sx={{}}>
                         {item?.name}
                       </Typography>
-                      <Paper
-                        elevation={2}
-                        sx={{
-                          width: '5rem',
-                          display: 'flex',
-                          justifyContent: 'space-between',
-                        }}
-                      >
-                        <IconButton
-                          sx={{ p: 0 }}
-                          onClick={
-                            () => {
-                              if (item.qtySelected == 0) {
-                                removeFromCart(item._id);
-                              } else {
-                                const cartItem = { ...item };
-                                if (cartItem.qtySelected > 0) {
-                                  const cartCopy = [...cart];
-                                  const cartItemIndex = cartCopy.findIndex(
-                                    (obj) => obj._id == cartItem._id
-                                  );
-                                  cartItem.qtySelected -= 1;
-                                  /* e.target.value */
-
-                                  cartCopy.splice(cartItemIndex, 1, cartItem);
-                                  setCart(cartCopy);
-                                }
-                              }
-                            }
-                            /* qtySelected >= 2 && setQtySelected(qtySelected - 1) */
-                          }
-                        >
-                          {item.qtySelected == 0 ? (
-                            <DeleteOutlineIcon fontSize="small" />
-                          ) : (
-                            <RemoveIcon fontSize="small" />
-                          )}
-                        </IconButton>
-
-                        <InputBase
-                          sx={{
-                            flex: 1,
-                            fontSize: '1rem',
-                            '& .MuiInputBase-input': {
-                              padding: '0',
-                            },
-                          }}
-                          value={item.qtySelected /* qtySelected */}
-                          onChange={
-                            (e) => {
-                              const cartItem = { ...item };
-                              const cartCopy = [...cart];
-                              const cartItemIndex = cartCopy.findIndex(
-                                (obj) => obj._id == cartItem._id
-                              );
-                              cartItem.qtySelected =
-                                e.target.value /* e.target.value */;
-
-                              cartCopy.splice(cartItemIndex, 1, cartItem);
-                              setCart(cartCopy);
-                            } /* setQtySelected(e.target.value) */
-                          }
-                          slotProps={{
-                            input: {
-                              style: {
-                                textAlign: 'center',
-                              },
-                              type: 'number',
-                              min: 1,
-                              disabled: true,
-                            },
-                          }}
-                        />
-                        <IconButton
-                          sx={{ p: 0 }}
-                          onClick={
-                            () => {
-                              const cartItem = { ...item };
-                              const cartCopy = [...cart];
-                              const cartItemIndex = cartCopy.findIndex(
-                                (obj) => obj._id == cartItem._id
-                              );
-                              cartItem.qtySelected += 1;
-                              /* e.target.value */
-
-                              cartCopy.splice(cartItemIndex, 1, cartItem);
-                              setCart(cartCopy);
-                            }
-                            /*  qtySelected < singleProduct?.quantity &&
-                        setQtySelected(qtySelected + 1) */
-                          }
-                        >
-                          <AddIcon fontSize="small" />
-                        </IconButton>
-                      </Paper>
+                      <ProductQtyChange product={item} />
                     </Stack>
                     <Stack
                       direction={'row'}
@@ -289,7 +185,7 @@ const CartDialog = ({ open, handleClose, userDbInfo }) => {
 
                       <Button
                         sx={{ p: 0 }}
-                        onClick={() => removeFromCart(item._id)}
+                        onClick={async () => await removeFromCart(item._id)}
                         disabled={updateCartIsFetching}
                       >
                         {updateCartIsFetching ? (
