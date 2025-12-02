@@ -44,13 +44,11 @@ const ProductQueryType = new graphql.GraphQLObjectType({
         searchText: { type: graphql.GraphQLString },
         sort: { type: graphql.GraphQLString },
       },
-      resolve: async (
-        _,
-        { first, after, filter, searchText, sort = '_id' }
-      ) => {
+      resolve: async (_, { first, after, filter, searchText, sort = null }) => {
         try {
           const filterResult = filterFunction(filter, searchText);
-
+          let sortOption = sort ? { [sort]: 1 } : { price: -1 };
+          let sortO = sort ? sort : 'price';
           // Decodificar o cursor 'after' para obter o ID inicial
           let startId = null;
           const limit = first || 5;
@@ -67,7 +65,7 @@ const ProductQueryType = new graphql.GraphQLObjectType({
             {
               $match: { ...query, ...filterResult },
             },
-            { $sort: { [sort]: 1 } },
+            { $sort: sortOption },
             { $limit: limit },
           ]);
           // Construir os edges

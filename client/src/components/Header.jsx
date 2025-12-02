@@ -13,7 +13,7 @@ import LocalGroceryStoreOutlinedIcon from '@mui/icons-material/LocalGroceryStore
 
 import { useTheme } from '@mui/material/styles';
 
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 // import { logout } from '../slices/user';
 
 import CartDialog from './CartDialog';
@@ -50,7 +50,7 @@ const Header = ({ refetch, userDbInfo }) => {
         position: 'fixed',
         top: 0,
         left: 0,
-        zIndex: 200,
+        zIndex: 1000000,
         /* px: 3, */
         boxSizing: 'border-box',
         height: '80px',
@@ -131,17 +131,22 @@ const Header = ({ refetch, userDbInfo }) => {
         )}
 
         <IconButton
-          sx={{ color: 'black', px: 0 }}
+          sx={{ color: 'black', '&:hover': { backgroundColor: 'transparent' } }}
           onClick={() => {
             refetch();
             setOpenCartDialog(true);
           }}
         >
           <Badge
-            badgeContent={isAuthenticated ? userDbInfo?.cart.length : 0}
+            badgeContent={isAuthenticated ? userDbInfo?.cart?.length : 0}
             color={'darkColor'}
+            sx={{}}
           >
-            <LocalGroceryStoreOutlinedIcon sx={{ fontSize: '1.8rem' }} />
+            <LocalGroceryStoreOutlinedIcon
+              sx={{
+                fontSize: '1.8rem',
+              }}
+            />
           </Badge>
         </IconButton>
       </Box>
