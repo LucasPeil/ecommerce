@@ -1,5 +1,4 @@
 const express = require('express');
-
 const { createHandler } = require('graphql-http/lib/use/express');
 const graphql = require('graphql');
 const bodyParser = require('body-parser');
@@ -18,10 +17,8 @@ const {
   checkJwt,
   createUserInMongoDb,
 } = require('./middleware/authMiddleware');
-
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 connectDB();
-// Query para pegar todos os produtos
-/* app.use(graphqlUploadExpress()); */
 
 const productSchema = new graphql.GraphQLSchema({
   query: ProductQueryType,
@@ -68,6 +65,36 @@ app.post('/api/uploadFile', async (req, res) => {
   } else {
     res.status(400);
     throw new Error('Erro ao salvar imagens.');
+  }
+});
+// 2. Rota para criar o PaymentIntent do Stripe
+app.post('/api/create-payment-intent', async (req, res) => {
+  try {
+    const { items, email } = req.body;
+
+    const calculateOrderAmount = (items) => {
+      //R$ 1 fixo para teste.
+      return 100;
+    };
+    const paymentIntent = await stripe.paymentIntents.create({
+      amount: calculateOrderAmount(items),
+      currency: 'brl',
+      // Habilita métodos automáticos (Cartão, Boleto, PIX, etc, configurados no Dashboard)
+      automatic_payment_methods: {
+        enabled: true,
+      },
+      metadata: {
+        email_cliente: email, // O email que capturamos no frontend
+        integration_check: 'portfolio_checkout',
+      },
+    });
+
+    res.send({
+      clientSecret: paymentIntent.client_secret,
+    });
+  } catch (error) {
+    console.error('Erro no Stripe:', error);
+    res.status(500).send({ error: error.message });
   }
 });
 

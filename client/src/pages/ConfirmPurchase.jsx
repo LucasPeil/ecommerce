@@ -2,6 +2,7 @@ import DeleteIcon from '@mui/icons-material/Delete';
 import {
   Box,
   Button,
+  Link,
   Divider,
   Grid2 as Grid,
   IconButton,
@@ -61,6 +62,7 @@ const ConfirmPurchase = () => {
     (acc, item) => acc + item.price * item.qtySelected,
     0
   );
+
   return (
     <Grid
       container
@@ -126,13 +128,6 @@ const ConfirmPurchase = () => {
                       Subtotal ({cartItems?.length} produtos):{' '}
                       <b>{formatCurrency(totalValue)}</b> &nbsp;
                     </Typography>
-                    {/*   <Typography variant="body1" sx={{ fontWeight: 'bold' }}>
-                      {`R$ ${cartItems?.reduce(
-                        (acc, currentValue) =>
-                          acc + currentValue.price * currentValue.qtySelected,
-                        0
-                      )}`}
-                    </Typography> */}
                   </Box>
                 </>
               )}
@@ -170,9 +165,12 @@ const ConfirmPurchase = () => {
                   {formatCurrency(totalValue)}
                 </Typography>
               </Box>
-              <Button
-                variant="contained"
-                disabled={cartItems?.length < 1 || isUpdating}
+              <Link
+                {...(cartItems?.length < 1 || isUpdating
+                  ? { href: undefined, 'aria-disabled': 'true', tabIndex: -1 }
+                  : { href: import.meta.env.BASE_URL + '/finalizar-compra' })}
+                /* href="/finalizar-compra" */
+                underline="none"
                 sx={{
                   backgroundColor: '#000',
                   color: '#fff',
@@ -187,7 +185,7 @@ const ConfirmPurchase = () => {
                 }}
               >
                 {isUpdating ? 'ATUALIZANDO...' : 'FINALIZAR COMPRA'}
-              </Button>
+              </Link>
             </>
           )}
         </Paper>

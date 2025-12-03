@@ -13,6 +13,7 @@ import PrivateRoute from './components/PrivateRoute';
 import { useAuth0 } from '@auth0/auth0-react';
 import { setToken, setUser } from './slices/user';
 import { useDispatch, useSelector } from 'react-redux';
+import Checkout from './components/Checkout';
 
 function App() {
   const { user, getAccessTokenSilently } = useAuth0();
@@ -62,6 +63,7 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route path="/catalogo/:area" element={<Catalog />} />
         <Route path="/catalogo" element={<Catalog />} />
+        <Route path="/finalizar-compra" element={<Checkout />} />
         <Route
           exact
           path="/criar-produto"

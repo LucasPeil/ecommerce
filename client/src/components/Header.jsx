@@ -51,7 +51,7 @@ const Header = ({ refetch, userDbInfo }) => {
         top: 0,
         left: 0,
         zIndex: 1000000,
-        /* px: 3, */
+
         boxSizing: 'border-box',
         height: '80px',
       }}
@@ -63,12 +63,12 @@ const Header = ({ refetch, userDbInfo }) => {
       />
 
       {downMd && <Hamburger toggled={isOpen} toggle={setOpen} />}
+
       <h1
         className="title"
         style={{
-          width: '100%',
-          position: 'absolute',
           textAlign: 'center',
+          margin: 'auto auto',
         }}
       >
         <NavLink
@@ -80,6 +80,7 @@ const Header = ({ refetch, userDbInfo }) => {
           FORNITURE
         </NavLink>
       </h1>
+
       <Box
         sx={{
           display: 'flex',
@@ -87,6 +88,8 @@ const Header = ({ refetch, userDbInfo }) => {
           gap: 4,
           px: 2,
           zIndex: 5,
+          position: 'absolute',
+          right: 0,
         }}
       >
         <NavLink to="criar-produto">

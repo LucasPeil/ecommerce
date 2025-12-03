@@ -1,10 +1,15 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import {
   PaymentElement,
+  LinkAuthenticationElement,
+  AddressElement,
   useStripe,
   useElements,
 } from '@stripe/react-stripe-js';
-
+// Imports do Material UI
+import { Box, Paper, Typography, Alert, Divider, Button } from '@mui/material';
+import PaymentIcon from '@mui/icons-material/Payment';
+import axios from 'axios';
 const CheckoutForm = () => {
   const stripe = useStripe();
   const elements = useElements();
@@ -14,55 +19,143 @@ const CheckoutForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
 
-    if (elements == null) {
+    if (!stripe || !elements) {
       return;
     }
+    setErrorMessage(null);
 
-    // Trigger form validation and wallet collection
+    // 1. Validação do formulário
     const { error: submitError } = await elements.submit();
     if (submitError) {
-      // Show error to your customer
       setErrorMessage(submitError.message);
       return;
     }
 
-    // Create the PaymentIntent and obtain clientSecret from your server endpoint
-    const res = await fetch('/create-intent', {
-      method: 'POST',
-    });
+    // 2. Fetch do ClientSecret (Backend)
+    // OBS: Substitua pela sua lógica real de fetch
+    try {
+      const PAYMENT_INTENT_URL =
+        process.env.NODE_ENV === 'production'
+          ? import.meta.env.BASE_URL + '/api/create-payment-intent'
+          : '/api/create-payment-intent';
 
-    const { client_secret: clientSecret } = await res.json();
+      const res = await axios.post(PAYMENT_INTENT_URL);
+      const { clientSecret } = await res.data;
 
-    const { error } = await stripe.confirmPayment({
-      //`Elements` instance that was used to create the Payment Element
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: 'https://example.com/order/123/complete',
-      },
-    });
+      // 3. Confirmar pagamento
+      const { error } = await stripe.confirmPayment({
+        elements,
+        clientSecret,
+        confirmParams: {
+          return_url: 'http://localhost:3100/forniture/',
+        },
+      });
 
-    if (error) {
-      // This point will only be reached if there is an immediate error when
-      // confirming the payment. Show error to your customer (for example, payment
-      // details incomplete)
-      setErrorMessage(error.message);
-    } else {
-      // Your customer will be redirected to your `return_url`. For some payment
-      // methods like iDEAL, your customer will be redirected to an intermediate
-      // site first to authorize the payment, then redirected to the `return_url`.
+      // Se chegar aqui, houve erro imediato (ex: cartão recusado)
+      if (error) {
+        setErrorMessage(error.message);
+      }
+    } catch (e) {
+      setErrorMessage('Erro de comunicação com o servidor.');
     }
   };
 
   return (
-    <form onSubmit={handleSubmit}>
-      <PaymentElement />
-      <button type="submit" disabled={!stripe || !elements}>
-        Pay
-      </button>
-      {/* Show error message to your customers */}
-      {errorMessage && <div>{errorMessage}</div>}
-    </form>
+    <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        mb: 4,
+
+        height: 'calc(100vh - 80px)',
+        transform: 'translateY(80px)',
+        overflowY: 'auto',
+      }}
+    >
+      <Paper
+        elevation={3}
+        sx={{
+          p: 4,
+          width: '100%',
+          maxWidth: '700px',
+          borderRadius: 2,
+          height: '800px',
+          overflowY: 'auto',
+        }}
+      >
+        <Typography
+          variant="h5"
+          component="h1"
+          gutterBottom
+          align="center"
+          sx={{ mb: 3 }}
+        >
+          Finalizar Compra
+        </Typography>
+
+        <form onSubmit={handleSubmit}>
+          {/* Seção de Contato */}
+          <Box sx={{ mb: 3 }}>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{ fontWeight: 'bold' }}
+            >
+              Informações de Contato
+            </Typography>
+            <LinkAuthenticationElement />
+          </Box>
+
+          <Divider sx={{ mb: 3 }} />
+
+          {/* Seção de Endereço */}
+          <Box sx={{ mb: 3 }}>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{ fontWeight: 'bold' }}
+            >
+              Endereço de Entrega
+            </Typography>
+            <AddressElement options={{ mode: 'shipping' }} />
+          </Box>
+
+          <Divider sx={{ mb: 3 }} />
+
+          {/* Seção de Pagamento */}
+          <Box sx={{ mb: 4 }}>
+            <Typography
+              variant="subtitle1"
+              gutterBottom
+              sx={{ fontWeight: 'bold' }}
+            >
+              Dados do Pagamento
+            </Typography>
+            <PaymentElement options={{ layout: 'tabs' }} />
+          </Box>
+
+          {/* Mensagem de Erro */}
+          {errorMessage && (
+            <Alert severity="error" sx={{ mb: 2 }}>
+              {errorMessage}
+            </Alert>
+          )}
+
+          <Button
+            type="submit"
+            variant="contained"
+            fullWidth
+            size="large"
+            startIcon={<PaymentIcon />}
+            disabled={!stripe || !elements}
+            sx={{ py: 1.5, textTransform: 'none', fontSize: '1.1rem' }}
+          >
+            Pagar Agora
+          </Button>
+        </form>
+      </Paper>
+    </Box>
   );
 };
 
