@@ -17,10 +17,9 @@ export const store = configureStore({
    */
 });
 // Intercepta as responses caso o token esteja expirado
-/* axios.interceptors.response.use(
+axios.interceptors.response.use(
   (response) => response,
   (error) => {
-   
     if (error.response.status === 401) {
       // Em caso de status 401 (Não autorizado)
       // Desloga o usuário e navega para caminho root
@@ -31,4 +30,3 @@ export const store = configureStore({
     }
   }
 );
- */

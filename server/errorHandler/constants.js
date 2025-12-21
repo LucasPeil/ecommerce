@@ -1,10 +1,4 @@
 module.exports = {
-  /*   errorNames: {
-    BAD_REQUEST: 'BAD_REQUEST',
-    UNAUTHORIZED: 'UNAUTHORIZED',
-    NOT_FOUND: 'NOT_FOUND',
-    SERVER_ERROR: 'SERVER_ERROR',
-  }, */
   errorTypes: {
     BAD_REQUEST: { message: 'Requisição inválida', statusCode: 400 },
     UNAUTHORIZED: {
