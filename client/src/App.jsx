@@ -17,6 +17,7 @@ import Checkout from './components/Checkout';
 
 function App() {
   const { user, getAccessTokenSilently } = useAuth0();
+  console.log(user)
   const getToken = async () => {
     let token = await getAccessTokenSilently({
       authorizationParams: {

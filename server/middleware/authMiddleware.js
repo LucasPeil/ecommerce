@@ -21,18 +21,22 @@ const checkJwt = expressjwt({
 
 const createUserInMongoDb = async (req, res, next) => {
   try {
-    let user;
-    if (!req.auth) {
+    let user
+     if (!req.headers.authorization) {
       return next(); // rota pública
     }
-    const token = req.headers.authorization?.split(' ')[1];
-    const userInfo = await axios.get(process.env.AUTH0_AUDIENCE + 'userinfo', {
-      headers: { Authorization: `Bearer ${token}` },
+   
+   token = req.headers.authorization?.split(' ')[1];
+  
+  //  AUTH0_ISSUER_BASE_URL
+   const userInfo = await axios.get(process.env.AUTH0_ISSUER_BASE_URL + 'userinfo', {
+     headers: { Authorization: `Bearer ${token}` },
     });
-    if (userInfo?.data) {
+   
+   if (userInfo?.data) {
       const { sub, email, name } = userInfo?.data;
 
-      user = await User.findOne({ auth0Id: sub /* auth0id: sub */ });
+      user = await User.findOne({ auth0Id: sub  });
       if (!user) {
         user = await User.create({
           auth0Id: sub,
@@ -43,9 +47,9 @@ const createUserInMongoDb = async (req, res, next) => {
       req.user = user;
 
       next();
-    }
+    } 
   } catch (error) {
-    console.error('Erro ao criar/verificar usuário:', error);
+    console.error('Erro ao criar/verificar usuário:', error.message);
     res.status(500).json({ message: 'Erro interno no servidor' });
   }
 };

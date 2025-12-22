@@ -42,7 +42,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
   // const dispatch = useDispatch();
-
+  
   const handleFile = async (e) => {
     const selectedFiles = Array.from(e.target.files);
     if (!selectedFiles.length) return;

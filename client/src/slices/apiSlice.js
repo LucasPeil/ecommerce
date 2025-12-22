@@ -93,7 +93,6 @@ export const apiSlice = createApi({
     }),
     createProduct: builder.mutation({
       query:  ({ product, token }) => {
-    
         return {
           url: '/products',
           body: gql`
