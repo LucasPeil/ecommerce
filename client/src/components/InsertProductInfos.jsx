@@ -11,26 +11,28 @@ import {
 } from '@mui/material';
 import { Field } from 'formik';
 import 'react-multi-carousel/lib/styles.css';
+
 const InsertProductInfos = ({
-  showProductInfo,
+  visible,
   formik,
-  setProductcategory,
-  setShowProductInfo,
-  setShowCarousel,
-  setShowReviewArea,
-  photosToDisplay,
   productcategory,
+  onBack,
+  onNext,
+  setProductcategory, 
 }) => {
   return (
     <Box
       sx={{
-        height: showProductInfo ? '60vh' : '0vh',
-        opacity: showProductInfo ? 1 : 0,
+        height: visible ? 'auto' : '0rem', // Use 0rem or 0px
+        opacity: visible ? 1 : 0,
         transition: '0.5s ease',
         overflow: 'hidden',
+        // display: 'flex', // Always keep it in layout flow but hidden by height
+        // contentVisibility: visible ? 'auto' : 'hidden', // Optional optim
         display: 'flex',
         flexDirection: 'column',
-        justifyContent: 'space-around',
+        gap: 2,
+        visibility: visible ? 'visible' : 'hidden',
       }}
     >
       <Stack direction="row" spacing={2}>
@@ -40,7 +42,7 @@ const InsertProductInfos = ({
           variant="outlined"
           as={TextField}
           error={Boolean(formik.touched.name && formik.errors.name)}
-          helperText={formik.errors.name && formik.errors.name}
+          helperText={formik.touched.name && formik.errors.name}
           fullWidth
           sx={{ width: { xs: '100%' } }}
         />
@@ -51,19 +53,19 @@ const InsertProductInfos = ({
           label="Fale mais sobre o produto"
           variant="outlined"
           multiline
-          minRows={13}
+          minRows={4}
           maxRows={14}
           as={TextField}
           error={Boolean(
             formik.touched.description && formik.errors.description
           )}
-          helperText={formik.errors.description && formik.errors.description}
+          helperText={formik.touched.description && formik.errors.description}
           fullWidth
           sx={{ width: { xs: '100%' } }}
         />
       </Stack>
 
-      <Stack direction="row" spacing={2}>
+      <Stack direction={{ xs: 'column', md: 'row' }} spacing={2}>
         <Field
           {...formik.getFieldProps('quantity')}
           label="Quantidade disponível"
@@ -71,9 +73,9 @@ const InsertProductInfos = ({
           variant="outlined"
           as={TextField}
           error={Boolean(formik.touched.quantity && formik.errors.quantity)}
-          helperText={formik.errors.quantity && formik.errors.quantity}
+          helperText={formik.touched.quantity && formik.errors.quantity}
           fullWidth
-          sx={{ width: { xs: '33%' } }}
+          sx={{ width: { xs: '100%', md: '33%' } }}
         />
         <Field
           {...formik.getFieldProps('price')}
@@ -85,11 +87,11 @@ const InsertProductInfos = ({
           step="0.50"
           as={TextField}
           error={Boolean(formik.touched.price && formik.errors.price)}
-          helperText={formik.errors.price && formik.errors.price}
+          helperText={formik.touched.price && formik.errors.price}
           fullWidth
-          sx={{ width: { xs: '33%' } }}
+          sx={{ width: { xs: '100%', md: '33%' } }}
         />
-        <FormControl sx={{ width: { xs: '33%' } }}>
+        <FormControl sx={{ width: { xs: '100%', md: '33%' } }} error={Boolean(formik.touched.category && formik.errors.category)}>
           <InputLabel id="category">Categoria do produto</InputLabel>
           <Select
             labelId="category"
@@ -97,7 +99,7 @@ const InsertProductInfos = ({
             value={
               formik.values.category ? formik.values.category : productcategory
             }
-            label="Condição do produto"
+            label="Categoria do produto"
             onChange={(e) => {
               setProductcategory(e.target.value);
               formik.setFieldValue('category', e.target.value);
@@ -108,41 +110,37 @@ const InsertProductInfos = ({
             <MenuItem value={'Quarto'}>Quarto</MenuItem>
             <MenuItem value={'Sala'}>Sala</MenuItem>
           </Select>
-          <FormHelperText sx={{ color: 'red' }}>
-            {Boolean(formik.touched.category && formik.errors.category) &&
-              formik.errors.category}
+          <FormHelperText>
+             {formik.touched.category && formik.errors.category}
           </FormHelperText>
         </FormControl>
       </Stack>
-      <Stack direction="row" spacing={2}>
+      <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
         <Button
-          onClick={() => {
-            setShowProductInfo(false);
-            setShowCarousel(true);
-          }}
+          onClick={onBack}
           fullWidth
           sx={{
             backgroundColor: 'black',
             color: 'white',
             fontWeight: 'bold',
+            '&:hover': { backgroundColor: '#333' }
           }}
         >
           Voltar
         </Button>
         <Button
-          disabled={Object.keys(formik.errors).length > 0}
-          onClick={() => {
-            setShowProductInfo(false);
-            setShowReviewArea(true);
-            formik.setFieldValue('images', photosToDisplay);
-          }}
+          disabled={!formik.isValid || !formik.dirty} 
+          onClick={onNext}
           fullWidth
           sx={{
             backgroundColor:
-              Object.keys(formik.errors).length > 0 ? '#aaaaaa' : 'black',
-            color: Object.keys(formik.errors).length > 0 ? 'white' : 'white',
+              !formik.isValid || !formik.dirty ? '#aaaaaa' : 'black',
+            color: 'white',
             fontWeight: 'bold',
             fontSize: '1rem',
+            '&:hover': {
+                 backgroundColor: !formik.isValid || !formik.dirty ? '#aaaaaa' : '#333'
+            }
           }}
         >
           Revisar dados

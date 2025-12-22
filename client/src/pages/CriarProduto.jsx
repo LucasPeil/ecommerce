@@ -11,7 +11,7 @@ import {
 } from '@mui/material';
 import axios from 'axios';
 import { Form, FormikProvider, useFormik } from 'formik';
-import { useRef, useState } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import Carousel from 'react-multi-carousel';
 import 'react-multi-carousel/lib/styles.css';
 import { useDispatch, useSelector } from 'react-redux';
@@ -24,7 +24,6 @@ import ReviewProductInfos from '../components/ReviewProductInfos';
 import SliderImagem from '../components/SliderImagem';
 import { useCreateProductMutation } from '../slices/apiSlice';
 import { responsive } from '../utils/carouselResponsiveness';
-/* import { useDispatch } from 'react-redux'; */
 import { useNavigate } from 'react-router-dom';
 import LoadingBackdrop from '../components/LoadingBackdrop';
 
@@ -33,54 +32,43 @@ const UPLOAD_IMAGES_API_URL =
     ? import.meta.env.BASE_URL + '/api/uploadFile'
     : '/api/uploadFile';
 
-const uploadImages = async (imgs) => {
-  const config = {
-    headers: {
-      'Content-Type': 'multipart/form-data',
-      Accept: 'multipart/form-data',
-      /*   Authorization: `Bearer: ${token}`, */
-    },
-  };
-
-  const formData = new FormData();
-  for (let i = 0; i < imgs.length; i++) {
-    formData.append(`file_${i}`, imgs[i]);
-  }
-
-  const response = await axios.post(UPLOAD_IMAGES_API_URL, formData, config);
-  return response.data;
-};
 const CriarProduto = ({ open, handleClose, data }) => {
   const [files, setFiles] = useState([]);
   const [photosToDisplay, setPhotosToDisplay] = useState([]);
-  const [showCarousel, setShowCarousel] = useState(true);
-  const [showProductInfo, setShowProductInfo] = useState(false);
-  const [showReviewArea, setShowReviewArea] = useState(false);
+  const [activeStep, setActiveStep] = useState(0); // 0: Upload, 1: Details, 2: Review
   const [productcategory, setProductcategory] = useState('');
-  const [saveImagesIsLoading, setSaveImagesIsLoading] = useState(false);
+  
   const { uploadImageIsLoading } = useSelector((state) => state.uploadImage);
   const { token } = useSelector((state) => state.auth);
   const navigate = useNavigate();
-  const dispatch = useDispatch();
+  // const dispatch = useDispatch();
 
-  const handleFile = (e) => {
-    for (let photo of e.target.files) {
-      setFiles([...files, photo]);
-      const reader = new FileReader();
-      reader.readAsDataURL(photo);
-      reader.onload = () => {
-        setPhotosToDisplay([...photosToDisplay, reader.result]);
-        // formik.setFieldValue('images', reader.result);
-      };
-      reader.onerror = (error) => {
-        console.log(error);
-      };
-      /*   setPhotosToDisplay([...photosToDisplay, photo]); */
+  const handleFile = async (e) => {
+    const selectedFiles = Array.from(e.target.files);
+    if (!selectedFiles.length) return;
+
+    // Append new files to existing ones
+    setFiles((prev) => [...prev, ...selectedFiles]);
+
+    const fileReaders = selectedFiles.map((file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.readAsDataURL(file);
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = (error) => reject(error);
+      });
+    });
+
+    try {
+      const newPhotos = await Promise.all(fileReaders);
+      setPhotosToDisplay((prev) => [...prev, ...newPhotos]);
+    } catch (error) {
+      console.error("Error reading files:", error);
     }
   };
 
   let carouselRef = useRef();
-  const [createProduct, { isSuccess, isFetching }] = useCreateProductMutation();
+  const [createProduct, { isSuccess, isLoading }] = useCreateProductMutation();
   const ValidationSchema = Yup.object().shape({
     name: Yup.string().required('Nome é obrigatório'),
     description: Yup.string().required('Descrição é obrigatório'),
@@ -104,29 +92,29 @@ const CriarProduto = ({ open, handleClose, data }) => {
     },
     validationSchema: ValidationSchema,
     onSubmit: async (values) => {
-      setSaveImagesIsLoading(true);
-      const urls = await uploadImages(files);
-      setSaveImagesIsLoading(false);
-      const product = { ...values, ...{ images: urls } };
+      const product = { ...values,};
       createProduct({ product, token: token });
-      formik.resetForm();
-      navigate('/');
+      
+     
     },
   });
-
+  useEffect(() => {
+    if (isSuccess  ) {
+       navigate('/');
+      formik.resetForm(); 
+    }
+  }, [isSuccess]);
   return (
     <>
-      <LoadingBackdrop open={saveImagesIsLoading} />
+      <LoadingBackdrop open={isLoading} />
       <Container
         maxWidth="xl"
         sx={{
-          transform: 'translateY(80px)',
+          minHeight: '100vh',
+          py: 10, // Padding top/bottom instead of fixed translate
           display: 'flex',
-          flexDirection: 'column',
           justifyContent: 'center',
           alignItems: 'center',
-
-          height: 'calc(100vh - 80px)',
         }}
       >
         <Paper
@@ -134,52 +122,38 @@ const CriarProduto = ({ open, handleClose, data }) => {
           sx={{
             backgroundColor: 'white',
             borderRadius: '1.5rem',
-            height: showProductInfo || showReviewArea ? '80vh' : '70vh',
-            margin: 'auto auto',
-            minWidth: '100%',
-
-            transition: '0.5s ease',
-            px: 4,
+            width: '100%',
+            maxWidth: '1200px', // Restrict max width on large screens
+            p: { xs: 2, md: 4 }, // Responsive padding
+            display: 'flex',
+            flexDirection: 'column',
+            gap: 2,
+            minHeight: '70vh', 
           }}
         >
-          <Box
-            sx={{
-              height: '100%',
-              px: 3,
-              transition: '0.5s ease',
-              overflow: showProductInfo || showReviewArea ? 'auto' : 'hidden',
-            }}
-          >
             <Box
               sx={{
-                height: '4rem',
+                minHeight: '4rem',
                 display: 'flex',
                 justifyContent: 'space-between',
                 alignItems: 'center',
-                boxSizing: 'border-box',
+                flexWrap: 'wrap',
+                mb: 2
               }}
             >
-              {/*  {photosToDisplay?.length > 0 && showCarousel ? (
-              <NextStep
-                actionFuncToShow={setShowProductInfo}
-                actionFuncToHide={setShowCarousel}
-              />
-            ) : ( */}
-              {!showProductInfo && !showReviewArea && (
-                <Typography variant="P" color="text.secondary">
+              {activeStep === 0 && (
+                <Typography variant="h6" color="text.secondary">
                   ADICIONE AS FOTOS DO SEU PRODUTO
                 </Typography>
               )}
-              {photosToDisplay?.length > 0 &&
-                showProductInfo &&
-                !showReviewArea && (
-                  <Typography variant="p" color="text.secondary">
+              {photosToDisplay.length > 0 && activeStep === 1 && (
+                  <Typography variant="h6" color="text.secondary">
                     Descreva o produto
                   </Typography>
                 )}
 
-              {showReviewArea && (
-                <Typography variant="p" color="text.secondary">
+              {activeStep === 2 && (
+                <Typography variant="h6" color="text.secondary">
                   Revise os dados do produto
                 </Typography>
               )}
@@ -187,23 +161,23 @@ const CriarProduto = ({ open, handleClose, data }) => {
 
             <FormikProvider value={formik}>
               <Form
-                style={{}}
+                style={{ width: '100%' }}
                 autoComplete="off"
                 noValidate
                 onSubmit={formik.handleSubmit}
               >
+                {/* Step 0: Image Upload & Carousel */}
                 <Box
                   sx={{
-                    height: showCarousel ? '60vh' : '0vh',
-                    opacity: showCarousel ? 1 : 0,
-                    transition: '0.5s ease',
+                    height: activeStep === 0 ? { xs: '50vh', md: '60vh' } : '0vh', 
+                    opacity: activeStep === 0 ? 1 : 0,
                     overflow: 'hidden',
+                    transition: '0.5s ease',
                   }}
                 >
-                  {photosToDisplay?.length > 0 ? (
-                    <>
+                  {photosToDisplay.length > 0 ? (
+                    <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <Carousel
-                        style={{ display: 'none' }}
                         ref={carouselRef}
                         customTransition="all 0.5s ease-in-out"
                         transitionDuration={500}
@@ -217,7 +191,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
                         customDot={
                           <CustomDot
                             photosToDisplay={photosToDisplay}
-                            showCarousel={showCarousel}
+                            showCarousel={true}
                             setPhotosToDisplay={setPhotosToDisplay}
                             carouselRef={carouselRef}
                           />
@@ -232,25 +206,26 @@ const CriarProduto = ({ open, handleClose, data }) => {
                           />
                         ))}
                       </Carousel>
-                      <Stack direction="row" spacing={2}>
+                      <Stack direction="row" spacing={2} sx={{ mt: 2 }}>
+                         {/* Clear Button ? Or minimal back ? */}
                         <Button
-                          onClick={() => {
-                            setShowProductInfo(false);
-                            setShowCarousel(true);
-                          }}
-                          fullWidth
-                          sx={{
-                            backgroundColor: '#686868',
-                            color: 'white',
-                            fontWeight: 'bold',
-                          }}
+                            onClick={() => {
+                                setPhotosToDisplay([]);
+                                setFiles([]);
+                            }}
+                            fullWidth
+                            sx={{
+                                backgroundColor: '#000000ff',
+                                color: 'white',
+                                fontWeight: 'bold',
+                                '&:hover': { backgroundColor: '#000000ff'}
+                            }}
                         >
-                          Voltar
+                            Limpar Fotos
                         </Button>
                         <Button
                           onClick={() => {
-                            setShowProductInfo(true);
-                            setShowCarousel(false);
+                            setActiveStep(1);
                             formik.setFieldValue('images', photosToDisplay);
                           }}
                           fullWidth
@@ -259,73 +234,74 @@ const CriarProduto = ({ open, handleClose, data }) => {
                             color: 'white',
                             fontWeight: 'bold',
                             fontSize: '1rem',
+                            '&:hover': { backgroundColor: '#333'}
                           }}
                         >
                           Próximo passo
                         </Button>
                       </Stack>
-                    </>
+                    </Box>
                   ) : (
                     <IconButton
                       component="label"
                       sx={{
                         color: 'black',
-
-                        borderRadius: 0,
+                        borderRadius: 2,
                         width: '100%',
-                        height: '90%',
-                        p: 0,
+                        height: '50vh', // Significant height for dropzone feel
+                        border: '4px dashed #979797ff',
+                        backgroundColor: '#d1d1d1ff',
+                        '&:hover': { backgroundColor: '#b1b1b1ff', border: '4px dashed #000' }
                       }}
                     >
-                      <NoPhoto />
+                      <Box sx={{ display: 'flex', flexDirection: 'column', alignItems: 'center', width: '100%', height: '100%' }}>
+                         <NoPhoto />
+                         <Typography variant="body1" sx={{ mt: 2 }}>Clique para adicionar fotos</Typography>
+                      </Box>
                       <input
                         type="file"
                         onChange={handleFile}
                         multiple
                         hidden
+                        accept="image/*"
                       />
                     </IconButton>
                   )}
                 </Box>
+
                 <FormStepCompleted
-                  showVariable={showProductInfo || showReviewArea}
+                  showVariable={activeStep > 0} 
                   Icon={CameraAltOutlinedIcon}
                 />
 
-                <>
-                  <InsertProductInfos
-                    showProductInfo={showProductInfo}
+                <InsertProductInfos
+                    visible={activeStep === 1}
                     formik={formik}
                     setProductcategory={setProductcategory}
-                    setShowProductInfo={setShowProductInfo}
-                    setShowCarousel={setShowCarousel}
-                    setShowReviewArea={setShowReviewArea}
-                    photosToDisplay={photosToDisplay}
                     productcategory={productcategory}
+                    onBack={() => setActiveStep(0)}
+                    onNext={() => {
+                        formik.setFieldValue('images', photosToDisplay); // Ensure images are set
+                        setActiveStep(2);
+                    }}
                   />
-                </>
 
-                {/* ARRUMAR AQUIIII */}
                 <FormStepCompleted
-                  showVariable={showReviewArea} // se for true ele esconde
+                  showVariable={activeStep > 1} 
                   Icon={DescriptionOutlinedIcon}
                 />
 
                 <ReviewProductInfos
                   data={formik.values}
                   onSubmit={() => formik.handleSubmit()}
-                  showReviewArea={showReviewArea}
-                  returnToDescription={() => {
-                    setShowProductInfo(true);
-                    setShowReviewArea(false);
-                  }}
+                  visible={activeStep === 2}
+                  onBack={() => setActiveStep(1)}
                 />
               </Form>
             </FormikProvider>
-          </Box>
         </Paper>
       </Container>
-    </>
+      </>
   );
 };
 

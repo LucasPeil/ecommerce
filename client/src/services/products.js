@@ -123,6 +123,7 @@ const createProduct = async (data, token) => {
      
       } `;
 
+
   const urls = await uploadImages(data.images);
 
   const product = { ...data, ...{ images: urls } };

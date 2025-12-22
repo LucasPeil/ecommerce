@@ -2,7 +2,7 @@ import { configureStore } from '@reduxjs/toolkit';
 import productsReducer from './slices/products';
 import uploadImageReducer from './slices/loadingSaveImage';
 import authReducer from './slices/user';
-import axios from 'axios';
+
 import { apiSlice } from './slices/apiSlice';
 export const store = configureStore({
   reducer: {
@@ -17,7 +17,7 @@ export const store = configureStore({
    */
 });
 // Intercepta as responses caso o token esteja expirado
-axios.interceptors.response.use(
+/* axios.interceptors.response.use(
   (response) => response,
   (error) => {
     if (error.response.status === 401) {
@@ -29,4 +29,4 @@ axios.interceptors.response.use(
       return Promise.reject(error);
     }
   }
-);
+); */

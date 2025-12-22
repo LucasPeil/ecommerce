@@ -8,7 +8,7 @@ const FormStepCompleted = ({ showVariable, Icon }) => {
       alignItems="center"
       gap={2}
       sx={{
-        height: '5vh',
+        height: showVariable ? '5vh' : '0vh',
         transition: '0.5s ease',
         transitionDelay: showVariable ? '0.5s' : 0,
         overflow: 'hidden',

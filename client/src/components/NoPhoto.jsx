@@ -5,33 +5,17 @@ import React from 'react';
 
 const NoPhoto = ({ handleFile }) => {
   return (
-    <Box
-      sx={{
-        display: 'flex',
-        width: '100%',
-        height: '100%',
-        justifyContent: 'center',
-        '&:hover': { backgroundColor: 'transparent' },
-      }}
-    >
-      <Box
-        sx={{
-          backgroundColor: '#DCDCDC',
-          width: '100%',
-          height: '100%',
-          border: '4px dashed #5D5D5D',
-          borderRadius: '1rem',
-          display: 'flex',
-          justifyContent: 'center',
-          alignItems: 'center',
-        }}
-      >
+   
         <Box
           sx={{
             display: 'flex',
             flexDirection: 'column',
             alignItems: 'center',
             gap: 2,
+            width: '100%',
+            height: '100%',
+            justifyContent: 'center',
+            
           }}
         >
           <InsertPhotoOutlinedIcon sx={{ fontSize: '2.5rem' }} />
@@ -40,8 +24,7 @@ const NoPhoto = ({ handleFile }) => {
             Nehuma foto adicionada
           </Typography>
         </Box>
-      </Box>
-    </Box>
+     
   );
 };
 

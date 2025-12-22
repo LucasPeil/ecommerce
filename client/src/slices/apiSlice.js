@@ -8,7 +8,7 @@ export const apiSlice = createApi({
   baseQuery: graphqlBaseQuery({
     baseUrl: 'http://localhost:3100/api',
   }),
-  tagTypes: ['DeleteProduct'],
+  tagTypes: ['DeleteProduct','CreateProduct'],
   endpoints: (builder) => ({
     getAllProducts: builder.query({
       query: ({ first, after, filter, sort, searchText }) => {
@@ -57,6 +57,7 @@ export const apiSlice = createApi({
           },
         };
       },
+      providesTags: ['CreateProduct'],
       transformResponse: (response) => {
         return response.getAllProducts;
       },
@@ -91,7 +92,8 @@ export const apiSlice = createApi({
       transformResponse: (response) => response.getProduct.data,
     }),
     createProduct: builder.mutation({
-      query: ({ product, token }) => {
+      query:  ({ product, token }) => {
+    
         return {
           url: '/products',
           body: gql`
@@ -115,11 +117,13 @@ export const apiSlice = createApi({
           variables: {
             product,
           },
+           
           requestHeaders: {
             authorization: `Bearer ${token}`,
           },
         };
       },
+      invalidatesTags: ['CreateProduct'],
       transformResponse: (response) => response.createProduct,
     }),
     getRooms: builder.query({

@@ -4,33 +4,37 @@ import Carousel from 'react-multi-carousel';
 import { responsive } from '../utils/carouselResponsiveness';
 import ShoppingBagOutlinedIcon from '@mui/icons-material/ShoppingBagOutlined';
 import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
+
 const ReviewProductInfos = ({
   data,
   onSubmit,
-  showReviewArea,
-  returnToDescription,
+  visible,
+  onBack,
 }) => {
+  // if (!visible) return null; // Removed to allow transition
+  
   return (
     <Grid2
       container
-      rowSpacing={1}
-      columnSpacing={{ xs: 1, sm: 2, md: 3 }}
+      spacing={2}
       sx={{
-        height: showReviewArea ? '60vh' : '0vh',
-        opacity: showReviewArea ? 1 : 0,
+        width: '100%',
+        height: visible ? 'auto' : '0px',
+        opacity: visible ? 1 : 0,
+        visibility: visible ? 'visible' : 'hidden',
+        overflow: 'hidden',
         transition: '0.5s ease',
-        overflow: 'auto',
-      }}
+        }}
     >
-      <Grid2 size={5}>
-        <Box sx={{}}>
+      <Grid2 size={{ xs: 12, md: 5 }}>
+        <Box sx={{ width: '100%' }}>
           <Carousel
             swipeable={false}
             focusOnSelect={false}
             draggable={false}
             showDots={false}
             responsive={responsive}
-            ssr={false} // means to render carousel on server-side.
+            ssr={false}
             infinite={false}
             keyBoardControl={false}
             customTransition="all 0.5s ease-in-out"
@@ -40,39 +44,39 @@ const ReviewProductInfos = ({
             dotListClass="custom-dot-list-style"
             itemClass="carousel-item-padding-40-px"
           >
-            {data?.images.map((image, idx) => (
+            {data?.images?.map((image, idx) => (
               <Box
+                key={idx}
                 sx={{
                   backgroundImage: `url(${image})`,
                   backgroundSize: 'cover',
                   backgroundPosition: 'center',
-                  backgroundOrigin: 'border-box',
-                  minHeight: '20rem',
-                  minWidth: '100%',
+                  height: '20rem',
+                  borderRadius: 2,
                 }}
               />
             ))}
           </Carousel>
         </Box>
       </Grid2>
-      <Grid2 size={7}>
-        <Typography className="title" variant="h4" textAlign={'center'}>
+      <Grid2 size={{ xs: 12, md: 7 }}>
+        <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }} textAlign={'center'} gutterBottom>
           {data?.name}
         </Typography>
         <Box
           sx={{
-            height: '92%',
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
+            height: '100%'
           }}
         >
           <Box
             sx={{
-              height: '25rem',
-              mt: 2,
-              px: 2,
-              overflow: 'auto',
+               maxHeight: '20rem',
+               overflowY: 'auto',
+               mb: 2,
+               p: 1
             }}
           >
             <Typography
@@ -86,7 +90,7 @@ const ReviewProductInfos = ({
           <Stack
             direction={'row'}
             justifyContent={'space-between'}
-            sx={{ px: 1 }}
+            sx={{ px: 1, my: 2 }}
           >
             <Box
               sx={{
@@ -99,7 +103,6 @@ const ReviewProductInfos = ({
               <Typography
                 sx={{ fontWeight: 'bold' }}
                 variant="body2"
-                textAlign={'justify'}
               >
                 {data?.price}
               </Typography>
@@ -115,7 +118,6 @@ const ReviewProductInfos = ({
               <Typography
                 sx={{ fontWeight: 'bold' }}
                 variant="body2"
-                textAlign={'justify'}
               >
                 {`${data?.quantity} disponíveis`}
               </Typography>
@@ -126,34 +128,30 @@ const ReviewProductInfos = ({
 
       <Grid2
         container
-        direction={'row'}
-        justifyContent={'center'}
-        alignItems={'center'}
-        columnSpacing={2}
         size={12}
+        spacing={2}
+        justifyContent="center"
       >
         <Button
-          onClick={() => {
-            returnToDescription();
-          }}
+          onClick={onBack}
           sx={{
             backgroundColor: '#686868',
             color: 'white',
             fontWeight: 'bold',
-            minWidth: '49%',
+            flex: 1,
+            '&:hover': { backgroundColor: '#555' }
           }}
         >
           Voltar
         </Button>
         <Button
-          onClick={() => {
-            onSubmit();
-          }}
+          onClick={onSubmit}
           sx={{
             backgroundColor: 'black',
             color: 'white',
             fontWeight: 'bold',
-            minWidth: '49%',
+            flex: 1,
+            '&:hover': { backgroundColor: '#333' }
           }}
         >
           Cadastrar

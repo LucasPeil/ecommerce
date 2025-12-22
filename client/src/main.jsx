@@ -57,9 +57,12 @@ createRoot(document.getElementById('root')).render(
           <CssBaseline />
 
           <BrowserRouter basename={import.meta.env.BASE_URL}>
+          
+      
             <Auth0ProviderComponent>
               <App />
             </Auth0ProviderComponent>
+            
           </BrowserRouter>
         </ThemeProvider>
       </StyledEngineProvider>
