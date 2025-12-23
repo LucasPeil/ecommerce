@@ -9,7 +9,7 @@
     "server": "npm start --prefix server",
     "both": "concurrently \"npm run client\" \"npm run server\"",
     "postinstall": "cd client && npm install",
-  "build": "cd client && npm run build"
+    "build": "cd client && npm run build"
   },
   "author": "Lucas Peil",
   "license": "ISC",

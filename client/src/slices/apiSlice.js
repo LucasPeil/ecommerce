@@ -6,7 +6,10 @@ export const getUser = () => JSON.parse(localStorage.getItem('user#19dg23'));
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: graphqlBaseQuery({
-    baseUrl: 'https://ecommerce-opal-psi-29.vercel.app/api',
+    baseUrl: typeof window !== 'undefined' 
+  ? `${window.location.origin}/api` 
+  : 'https://ecommerce-opal-psi-29.vercel.app/api',
+    /* baseUrl: 'https://ecommerce-opal-psi-29.vercel.app/api', */
   }),
   tagTypes: ['DeleteProduct','CreateProduct'],
   endpoints: (builder) => ({

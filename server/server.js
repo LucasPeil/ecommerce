@@ -12,6 +12,7 @@ const fileUpload = require('express-fileupload');
 const { UserQueryType } = require('./User/query');
 const { uploadImages } = require('./Produto/fileUpload');
 const PORT = process.env.PORT || 4000;
+const cors = require('cors');
 const { v4: uuidv4 } = require('uuid');
 const {
   checkJwt,
@@ -28,6 +29,15 @@ const userSchema = new graphql.GraphQLSchema({
   query: UserQueryType,
   mutation: UserMutation,
 });
+
+app.use(cors({
+    origin: [
+        'https://ecommerce-opal-psi-29.vercel.app', // Produção
+        'http://localhost:3100', // Frontend
+        'http://localhost:5173'  // Porta padrão do Vite
+    ],
+    credentials: true
+}));
 app.use(bodyParser.json({ limit: '50mb' }));
 app.use(
   bodyParser.urlencoded({

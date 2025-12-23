@@ -10,7 +10,7 @@ export default defineConfig({
     outDir: '../public',
     emptyOutDir: true,
   }, */
-  server: {
+/*   server: {
     port: 3100,
     proxy: {
       '/api': {
@@ -18,5 +18,5 @@ export default defineConfig({
         changeOrigin: true,
       },
     },
-  },
+  }, */
 });
