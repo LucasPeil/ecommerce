@@ -16,6 +16,7 @@ const CategoryTabs = () => {
   } = useGetAllProductsQuery({
     first: 5,
     after: null,
+    filter: [{}],
     searchText: value,
   });
 

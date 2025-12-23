@@ -10,6 +10,7 @@ const DestaqueSlider = ({}) => {
   } = useGetAllProductsQuery({
     first: 5,
     after: null,
+    filter: [{}],
     searchText: '',
   });
   return <Carrousel data={products} loading={isFetching} />;
