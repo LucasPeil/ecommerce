@@ -126,9 +126,9 @@ const Home = () => {
           </Box>
         </Box>
       </Grid2>
-      {/* <Grid2 size={12}>
+       <Grid2 size={12}>
         <CategoryTabs />
-      </Grid2> */}
+      </Grid2> 
 
       <ReviewSection />
  

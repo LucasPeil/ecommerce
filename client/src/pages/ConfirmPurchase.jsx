@@ -168,7 +168,7 @@ const ConfirmPurchase = () => {
               <Link
                 {...(cartItems?.length < 1 || isUpdating
                   ? { href: undefined, 'aria-disabled': 'true', tabIndex: -1 }
-                  : { href: import.meta.env.BASE_URL + '/finalizar-compra' })}
+                  : { href:'/finalizar-compra' })}
                 /* href="/finalizar-compra" */
                 underline="none"
                 sx={{
