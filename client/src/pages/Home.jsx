@@ -58,7 +58,7 @@ const Home = () => {
 
           <DestaqueSlider />
         </Stack>
-      </Grid2>
+      </Grid2>*/}
       <Grid2 size={12}>
         <Box sx={{ position: 'relative' }}>
           <Box
@@ -131,7 +131,7 @@ const Home = () => {
       </Grid2>
 
       <ReviewSection />
- */}
+ 
       <Grid2 size={{ xs: 12, md: 12 }}>
         <Footer />
       </Grid2>
