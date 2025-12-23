@@ -21,7 +21,7 @@ export const apiSlice = createApi({
             query getAllProducts(
               $first: Int
               $after: String
-              $filter: []
+              $filter: FilterType
               $searchText: String
               $sort: String
             ) {
