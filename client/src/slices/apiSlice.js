@@ -6,7 +6,7 @@ export const getUser = () => JSON.parse(localStorage.getItem('user#19dg23'));
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: graphqlBaseQuery({
-    baseUrl: 'http://localhost:3100/api',
+    baseUrl:  import.meta.env.BASE_URL + '/api',
   }),
   tagTypes: ['DeleteProduct','CreateProduct'],
   endpoints: (builder) => ({
