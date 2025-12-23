@@ -48,7 +48,7 @@ const Home = () => {
           <Slide bgImage={capa3} bgPosition={'bottom'} />
         </Carousel>
       </Grid2>
-      <Grid2 size={12}>
+       <Grid2 size={12}>
         <Stack rowGap={'2rem'}>
           <Stack sx={{}} direction={'row'} justifyContent={'center'}>
             <h3 className="title" style={{ fontSize: '1.4rem' }}>

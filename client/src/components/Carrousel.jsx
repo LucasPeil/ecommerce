@@ -22,7 +22,7 @@ const Carrousel = ({ loading, data }) => {
       dotListClass="custom-dot-list-style"
       itemClass="carousel-item-padding-40-px"
     >
-      {loading
+      {loading || !data || !data.length
         ? [...Array(4).keys()].map((item, idx) => (
             <Box
               key={idx}
