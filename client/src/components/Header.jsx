@@ -108,7 +108,7 @@ const Header = ({ refetch, userDbInfo }) => {
             onClick={() => {
               logout({
                 logoutParams: {
-                  returnTo: window.location.origin + '/forniture',
+                  returnTo: window.location.origin,
                 },
               });
             }}

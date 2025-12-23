@@ -47,7 +47,7 @@ const CheckoutForm = () => {
         elements,
         clientSecret,
         confirmParams: {
-          return_url: 'http://localhost:3100/forniture/',
+          return_url: import.meta.env.BASE_URL,
         },
       });
 
