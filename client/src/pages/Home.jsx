@@ -19,7 +19,7 @@ const Home = () => {
   const navigate = useNavigate();
   return (
     <Grid2 container spacing={5} sx={{ alignItems: 'flex-start' }}>
-      <Grid2 size={12}>
+      {/* <Grid2 size={12}>
         <Carousel
           swipeable={false}
           focusOnSelect={false}
@@ -131,7 +131,7 @@ const Home = () => {
       </Grid2>
 
       <ReviewSection />
-
+ */}
       <Grid2 size={{ xs: 12, md: 12 }}>
         <Footer />
       </Grid2>

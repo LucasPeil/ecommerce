@@ -272,7 +272,7 @@ const Catalog = () => {
             justifyContent: 'center',
           }}
         >
-          {productsState.length === 0 && !isFetching ? (
+          {productsState?.length === 0 && !isFetching ? (
             <ProductsNotFound />
           ) : (
             <Box
@@ -310,7 +310,7 @@ const Catalog = () => {
             </Box>
           )}
 
-          {!hasNextPage && productsState.length > 0 && (
+          {!hasNextPage && productsState?.length > 0 && (
             <Typography
               align="center"
               sx={{ mt: 4, width: '100%' }}
