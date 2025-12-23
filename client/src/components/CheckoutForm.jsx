@@ -10,7 +10,9 @@ import {
 import { Box, Paper, Typography, Alert, Divider, Button } from '@mui/material';
 import PaymentIcon from '@mui/icons-material/Payment';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 const CheckoutForm = () => {
+  const navigate = useNavigate();
   const stripe = useStripe();
   const elements = useElements();
 
@@ -94,7 +96,7 @@ const CheckoutForm = () => {
           Finalizar Compra
         </Typography>
 
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={ ()=> navigate('/confirmar-pedido')/* handleSubmit */}>
           {/* Seção de Contato */}
           <Box sx={{ mb: 3 }}>
             <Typography
