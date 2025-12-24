@@ -96,7 +96,7 @@ const CheckoutForm = () => {
           Finalizar Compra
         </Typography>
 
-        <form onSubmit={ ()=> navigate('/confirmar-pedido')/* handleSubmit */}>
+        <form onSubmit={ ()=> navigate('/')/* handleSubmit */}>
           {/* Seção de Contato */}
           <Box sx={{ mb: 3 }}>
             <Typography

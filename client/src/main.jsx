@@ -10,6 +10,7 @@ import { ThemeProvider } from '@emotion/react';
 import { CssBaseline } from '@mui/material';
 import { BrowserRouter } from 'react-router-dom';
 import Auth0ProviderComponent from './components/AuthProvider.jsx';
+import PendingImprovements from './components/PendingImprovements.jsx';
 const theme = createTheme({
   breakpoints: {
     values: {
@@ -61,6 +62,7 @@ createRoot(document.getElementById('root')).render(
       
             <Auth0ProviderComponent>
               <App />
+              <PendingImprovements />
             </Auth0ProviderComponent>
             
           </BrowserRouter>
