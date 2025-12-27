@@ -7,8 +7,8 @@ console.log('')
 export const apiSlice = createApi({
   reducerPath: 'api',
   baseQuery: graphqlBaseQuery({
-    baseUrl: typeof window !== 'undefined' 
-  ? `${window.location.origin}/api`  //http://localhost:4000/api
+    baseUrl: import.meta.env.VITE_ENV === 'development' 
+  ? 'http://localhost:4000/api' 
   : 'https://ecommerce-opal-psi-29.vercel.app/api',
   }),
   tagTypes: ['DeleteProduct','CreateProduct'],

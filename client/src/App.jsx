@@ -5,7 +5,11 @@ import Home from './pages/Home';
 import Header from './components/Header';
 import { Route, Routes } from 'react-router-dom';
 import Product from './pages/Product';
-import { useGetUserCartQuery, useLazyGetUserQuery } from './slices/apiSlice';
+import { 
+  useCreateProductMutation, 
+  useGetUserCartQuery, 
+  useLazyGetUserQuery,
+} from './slices/apiSlice';
 import Catalog from './pages/Catalog';
 import ConfirmPurchase from './pages/ConfirmPurchase';
 import CriarProduto from './pages/CriarProduto';
@@ -14,10 +18,10 @@ import { useAuth0 } from '@auth0/auth0-react';
 import { setToken, setUser } from './slices/user';
 import { useDispatch, useSelector } from 'react-redux';
 import Checkout from './components/Checkout';
-
+import { toast } from "react-toastify";
 function App() {
   const { user, getAccessTokenSilently } = useAuth0();
- 
+ const [tempStripeSuccess, setTempStripeSuccess] = useState(false);
   const getToken = async () => {
     let token = await getAccessTokenSilently({
       authorizationParams: {
@@ -34,6 +38,7 @@ function App() {
     data: userDbInfo,
     isFetching: isFetchingCart,
     isSuccess: isSuccessCart,
+    isError: isErrorCart,
     refetch,
   } = useGetUserCartQuery(
     { id: userDb?._id, token: token },
@@ -41,6 +46,9 @@ function App() {
       skip: !userDb?._id,
     }
   );
+  const [_, { isSuccess: isSuccessCreateProduct, isError: isErrorCreateProduct, reset } ] = useCreateProductMutation({ fixedCacheKey: 'shared-create-product' });
+
+  
 
   useEffect(() => {
     if (user) {
@@ -56,6 +64,26 @@ function App() {
       dispatch(setUser(userDb));
     }
   }, [userDb]);
+  useEffect(() => {
+    if (isSuccessCreateProduct) {
+      toast.success("Produto criado com sucesso!");
+    }
+    if (isErrorCreateProduct) {
+      toast.error("Erro ao criar produto.");
+    }
+    return () => {
+      reset();
+    };
+  }, [isSuccessCreateProduct, isErrorCreateProduct]);
+
+  useEffect(() => {
+    if (tempStripeSuccess) {
+      toast.success("Pagamento realizado com sucesso!");
+    }
+    return () => {
+      setTempStripeSuccess(false);
+    };
+  }, [tempStripeSuccess]);
 
   return (
     <>
@@ -64,7 +92,7 @@ function App() {
         <Route exact path="/" element={<Home />} />
         <Route path="/catalogo/:area" element={<Catalog />} />
         <Route path="/catalogo" element={<Catalog />} />
-        <Route path="/finalizar-compra" element={<Checkout />} />
+        <Route path="/finalizar-compra" element={<Checkout setTempStripeSuccess={setTempStripeSuccess}/>} />
         <Route
           exact
           path="/criar-produto"

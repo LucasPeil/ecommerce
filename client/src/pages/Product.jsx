@@ -34,7 +34,7 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
   let carouselRef = useRef();
   const [showCarousel] = useState(true);
   const [updateUserCart, { isSuccess: isSuccessUpdateCart }] =
-    useUpdateUserCartMutation();
+    useUpdateUserCartMutation({ fixedCacheKey: 'shared-update-cart' });
   const { data: singleProduct, isFetching } = useGetProductQuery(id);
 
   useEffect(() => {
@@ -59,7 +59,7 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
           }}
         >
           <Grid container spacing={6} sx={{ height: '100%' }}>
-            <Grid size={6} alignContent={'center'} sx={{}}>
+            <Grid size={{ xs: 12, md: 6 }} alignContent={'center'} sx={{}}>
               <Carousel
                 style={{ display: 'none' }}
                 ref={carouselRef}
@@ -94,19 +94,20 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
               </Carousel>
             </Grid>
 
-            <Grid size={6} alignContent={'center'}>
+            <Grid size={{ xs: 12, md: 6 }} alignContent={'center'}>
               <Box
                 sx={{
                   display: 'flex',
                   flexDirection: 'column',
                   gap: 1,
                   height: '80%',
+                  
                 }}
               >
                 <Typography
                   component={'h1'}
                   className="product-title"
-                  sx={{ fontSize: '2.5rem', fontWeight: 600 }}
+                  sx={{ fontSize: '2.5rem', fontWeight: 600, textAlign:{xs:'center', md:'left'} }}
                 >
                   {singleProduct?.name}
                 </Typography>
@@ -114,7 +115,7 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
                 <Typography
                   component={'p'}
                   className="product-title"
-                  sx={{ fontSize: '1.8rem', fontWeight: 500 }}
+                  sx={{ fontSize: '1.8rem', fontWeight: 500, textAlign:{xs:'center', md:'left'} }}
                 >
                   {`R$ ${singleProduct?.price}`}
                 </Typography>
@@ -130,18 +131,23 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
                     component={'span'}
                     variant="caption"
                     color="text.secondary"
+                    sx={{ textAlign:{xs:'center', md:'left'} }}
                   >
                     {`Disponível: ${singleProduct?.quantity} `}
                   </Typography>
 
-                  <Stack flexDirection={'row'} justifyContent={'space-between'}>
+                  <Stack flexDirection={{xs:'column', md:'row'}}  spacing={{xs:2, md:0}} 
+                    sx={{justifyContent:{xs:'center', md:'space-between'},
+                    alignItems:{xs:'center', md:'center'}, 
+                    
+                  }}>
                     <Paper
                       elevation={2}
                       sx={{
                         width: '7rem',
                         display: 'flex',
-
-                        justifyContent: 'space-between',
+                        
+                       
                       }}
                     >
                       <IconButton
@@ -193,6 +199,8 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
                           backgroundColor: 'black',
                           fontWeight: 'bold',
                           transition: '0.3s ease',
+                          width: {xs:'18rem', md:'auto'},
+                          fontSize: '1rem',
                           '&:hover': {
                             backgroundColor: 'white',
                             color: 'black',
@@ -221,13 +229,14 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
                           backgroundColor: 'black',
                           fontWeight: 'bold',
                           transition: '0.3s ease',
+                          width: {xs:'18rem', md:'auto'},
+                          fontSize: '1rem',
                           '&:hover': {
                             backgroundColor: 'white',
                             color: 'black',
                           },
                         }}
                       >
-                        {/* AINDA NÃO ESTÁ TOTALMENTE PRONTA. AS VEZES NÃO SINCRONIZA/ATUALIZA O NUMERO DE PRODUTOS NO CARRINHO. O POPULATE PARECE ESTÁ RELACIONADO, POIS AS VEZES VEM COM OS DADOS CERTOS, AS VEZES VEM NULL */}
                         ADICIONAR AO CARRINHO
                       </Button>
                     )}
@@ -235,8 +244,9 @@ const Product = ({ refetchGetUserCart, isFetchingCart, userDbInfo }) => {
 
                   <Typography
                     sx={{
-                      /*  border: '1px solid blue', */
+                     
                       height: '100%',
+                      py:2,
                       mt: 3,
                       overflow: 'auto',
                     }}

@@ -46,12 +46,10 @@ const PendingImprovements = () => {
 
   // List of pending improvements - update this list as needed
   const improvements = [
-    "Ajustar responsividade do Checkout",
-    "Ajustar responsividade da página de criar produto",
-    "Ajustar responsividade da página individual de cada produto",
     "Otimizar carregamento de imagens",
     "Implementar skeleton loader na página individual de cada produto",
-    "Implementar notificações de sucesso/erro (criação de produto,checkout...)"
+    "Zerar carrinho de compras ao finalizar compra",
+    
   ];
 
   return (

@@ -8,10 +8,9 @@ import AttachMoneyOutlinedIcon from '@mui/icons-material/AttachMoneyOutlined';
 const ReviewProductInfos = ({
   data,
   onSubmit,
-  visible,
   onBack,
 }) => {
-  // if (!visible) return null; // Removed to allow transition
+  
   
   return (
     <Grid2
@@ -19,11 +18,7 @@ const ReviewProductInfos = ({
       spacing={2}
       sx={{
         width: '100%',
-        height: visible ? 'auto' : '0px',
-        opacity: visible ? 1 : 0,
-        visibility: visible ? 'visible' : 'hidden',
         overflow: 'hidden',
-        transition: '0.5s ease',
         }}
     >
       <Grid2 size={{ xs: 12, md: 5 }}>
@@ -59,7 +54,7 @@ const ReviewProductInfos = ({
           </Carousel>
         </Box>
       </Grid2>
-      <Grid2 size={{ xs: 12, md: 7 }}>
+      <Grid2 size={{ xs: 12, md: 7 }} sx={{width: '100%', }}>
         <Typography variant="h4" sx={{ fontSize: { xs: '1.5rem', md: '2.125rem' } }} textAlign={'center'} gutterBottom>
           {data?.name}
         </Typography>
@@ -68,17 +63,13 @@ const ReviewProductInfos = ({
             display: 'flex',
             flexDirection: 'column',
             justifyContent: 'space-between',
-            height: '100%'
+            wordBreak: 'break-all',
+            hyphens: 'auto',
+            overflow: 'auto',
+            height:{xs:'100%', md:'20rem'},
+            
           }}
         >
-          <Box
-            sx={{
-               maxHeight: '20rem',
-               overflowY: 'auto',
-               mb: 2,
-               p: 1
-            }}
-          >
             <Typography
               color="text.secondary"
               variant="body2"
@@ -86,11 +77,12 @@ const ReviewProductInfos = ({
             >
               {data?.description}
             </Typography>
-          </Box>
+        
+        </Box>
           <Stack
             direction={'row'}
             justifyContent={'space-between'}
-            sx={{ px: 1, my: 2 }}
+            sx={{ px: 1, mt: 2, bottom:0 }}
           >
             <Box
               sx={{
@@ -123,7 +115,6 @@ const ReviewProductInfos = ({
               </Typography>
             </Box>
           </Stack>
-        </Box>
       </Grid2>
 
       <Grid2

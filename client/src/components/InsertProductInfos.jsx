@@ -13,7 +13,6 @@ import { Field } from 'formik';
 import 'react-multi-carousel/lib/styles.css';
 
 const InsertProductInfos = ({
-  visible,
   formik,
   productcategory,
   onBack,
@@ -23,16 +22,12 @@ const InsertProductInfos = ({
   return (
     <Box
       sx={{
-        height: visible ? 'auto' : '0rem', // Use 0rem or 0px
-        opacity: visible ? 1 : 0,
-        transition: '0.5s ease',
         overflow: 'hidden',
-        // display: 'flex', // Always keep it in layout flow but hidden by height
-        // contentVisibility: visible ? 'auto' : 'hidden', // Optional optim
         display: 'flex',
         flexDirection: 'column',
         gap: 2,
-        visibility: visible ? 'visible' : 'hidden',
+        py:2,
+        boxSizing:'border-box',
       }}
     >
       <Stack direction="row" spacing={2}>

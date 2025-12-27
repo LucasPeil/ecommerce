@@ -11,6 +11,8 @@ import { CssBaseline } from '@mui/material';
 import { BrowserRouter } from 'react-router-dom';
 import Auth0ProviderComponent from './components/AuthProvider.jsx';
 import PendingImprovements from './components/PendingImprovements.jsx';
+import { ToastContainer } from "react-toastify";
+import 'react-toastify/dist/ReactToastify.css';
 const theme = createTheme({
   breakpoints: {
     values: {
@@ -66,6 +68,15 @@ createRoot(document.getElementById('root')).render(
             </Auth0ProviderComponent>
             
           </BrowserRouter>
+           <ToastContainer
+            position="bottom-right"
+            autoClose={5000}
+            hideProgressBar={false}
+            newestOnTop={true}
+            closeOnClick
+            rtl={false}
+            draggable
+          />
         </ThemeProvider>
       </StyledEngineProvider>
     </Provider>

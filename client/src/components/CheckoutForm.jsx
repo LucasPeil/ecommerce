@@ -11,7 +11,7 @@ import { Box, Paper, Typography, Alert, Divider, Button } from '@mui/material';
 import PaymentIcon from '@mui/icons-material/Payment';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
-const CheckoutForm = () => {
+const CheckoutForm = ({setTempStripeSuccess}) => {
   const navigate = useNavigate();
   const stripe = useStripe();
   const elements = useElements();
@@ -71,7 +71,7 @@ const CheckoutForm = () => {
         mb: 4,
 
         height: 'calc(100vh - 80px)',
-        transform: 'translateY(80px)',
+        
         overflowY: 'auto',
       }}
     >
@@ -96,7 +96,11 @@ const CheckoutForm = () => {
           Finalizar Compra
         </Typography>
 
-        <form onSubmit={ ()=> navigate('/')/* handleSubmit */}>
+        <form onSubmit={ ()=>{ 
+          navigate('/') 
+          setTempStripeSuccess(true) 
+          /* handleSubmit */}}>
+
           {/* Seção de Contato */}
           <Box sx={{ mb: 3 }}>
             <Typography

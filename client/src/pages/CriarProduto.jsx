@@ -3,6 +3,7 @@ import DescriptionOutlinedIcon from '@mui/icons-material/DescriptionOutlined';
 import {
   Box,
   Button,
+  Collapse,
   Container,
   IconButton,
   Paper,
@@ -27,10 +28,6 @@ import { responsive } from '../utils/carouselResponsiveness';
 import { useNavigate } from 'react-router-dom';
 import LoadingBackdrop from '../components/LoadingBackdrop';
 
-const UPLOAD_IMAGES_API_URL =
-  process.env.NODE_ENV === 'production'
-    ? import.meta.env.BASE_URL + '/api/uploadFile'
-    : '/api/uploadFile';
 
 const CriarProduto = ({ open, handleClose, data }) => {
   const [files, setFiles] = useState([]);
@@ -68,7 +65,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
   };
 
   let carouselRef = useRef();
-  const [createProduct, { isSuccess, isLoading }] = useCreateProductMutation();
+  const [createProduct, { isSuccess, isLoading }] = useCreateProductMutation({ fixedCacheKey: 'shared-create-product' });
   const ValidationSchema = Yup.object().shape({
     name: Yup.string().required('Nome é obrigatório'),
     description: Yup.string().required('Descrição é obrigatório'),
@@ -108,27 +105,32 @@ const CriarProduto = ({ open, handleClose, data }) => {
     <>
       <LoadingBackdrop open={isLoading} />
       <Container
-        maxWidth="xl"
+        maxWidth="xxl"
         sx={{
-          minHeight: '100vh',
+          height: 'calc(100vh - 80px)',
           py: 10, // Padding top/bottom instead of fixed translate
           display: 'flex',
           justifyContent: 'center',
           alignItems: 'center',
+          transform: 'translateY(80px)',
+         
+          
         }}
       >
         <Paper
           elevation={3}
           sx={{
             backgroundColor: 'white',
-            borderRadius: '1.5rem',
+            borderRadius: {xs:'0', md:'1.5rem'},
             width: '100%',
             maxWidth: '1200px', // Restrict max width on large screens
             p: { xs: 2, md: 4 }, // Responsive padding
             display: 'flex',
             flexDirection: 'column',
             gap: 2,
-            minHeight: '70vh', 
+            height: 'calc(100vh - 150px)',
+             overflowY: {xs:'auto', md:'hidden'}, 
+          
           }}
         >
             <Box
@@ -138,7 +140,8 @@ const CriarProduto = ({ open, handleClose, data }) => {
                 justifyContent: 'space-between',
                 alignItems: 'center',
                 flexWrap: 'wrap',
-                mb: 2
+                mb: 2,
+                
               }}
             >
               {activeStep === 0 && (
@@ -148,13 +151,13 @@ const CriarProduto = ({ open, handleClose, data }) => {
               )}
               {photosToDisplay.length > 0 && activeStep === 1 && (
                   <Typography variant="h6" color="text.secondary">
-                    Descreva o produto
+                   DESCREVA O PRODUTO
                   </Typography>
                 )}
 
               {activeStep === 2 && (
                 <Typography variant="h6" color="text.secondary">
-                  Revise os dados do produto
+                 REVISE OS DADOS DO SEU PRODUTO
                 </Typography>
               )}
             </Box>
@@ -167,14 +170,8 @@ const CriarProduto = ({ open, handleClose, data }) => {
                 onSubmit={formik.handleSubmit}
               >
                 {/* Step 0: Image Upload & Carousel */}
-                <Box
-                  sx={{
-                    height: activeStep === 0 ? { xs: '50vh', md: '60vh' } : '0vh', 
-                    opacity: activeStep === 0 ? 1 : 0,
-                    overflow: 'hidden',
-                    transition: '0.5s ease',
-                  }}
-                >
+                <Collapse in={activeStep === 0} timeout={500}>
+                  <Box >
                   {photosToDisplay.length > 0 ? (
                     <Box sx={{ display: 'flex', flexDirection: 'column', gap: 2 }}>
                       <Carousel
@@ -248,7 +245,7 @@ const CriarProduto = ({ open, handleClose, data }) => {
                         color: 'black',
                         borderRadius: 2,
                         width: '100%',
-                        height: '50vh', // Significant height for dropzone feel
+                        height: '50vh', 
                         border: '4px dashed #979797ff',
                         backgroundColor: '#d1d1d1ff',
                         '&:hover': { backgroundColor: '#b1b1b1ff', border: '4px dashed #000' }
@@ -267,36 +264,39 @@ const CriarProduto = ({ open, handleClose, data }) => {
                       />
                     </IconButton>
                   )}
-                </Box>
+                  </Box>
+                </Collapse>
 
                 <FormStepCompleted
                   showVariable={activeStep > 0} 
                   Icon={CameraAltOutlinedIcon}
                 />
-
-                <InsertProductInfos
-                    visible={activeStep === 1}
-                    formik={formik}
-                    setProductcategory={setProductcategory}
-                    productcategory={productcategory}
-                    onBack={() => setActiveStep(0)}
-                    onNext={() => {
-                        formik.setFieldValue('images', photosToDisplay); // Ensure images are set
-                        setActiveStep(2);
-                    }}
-                  />
+                <Collapse in={activeStep === 1} timeout={500}>
+                  <InsertProductInfos
+                    
+                      formik={formik}
+                      setProductcategory={setProductcategory}
+                      productcategory={productcategory}
+                      onBack={() => setActiveStep(0)}
+                      onNext={() => {
+                          formik.setFieldValue('images', photosToDisplay); // Ensure images are set
+                          setActiveStep(2);
+                      }}
+                    />
+                  </Collapse>
 
                 <FormStepCompleted
                   showVariable={activeStep > 1} 
                   Icon={DescriptionOutlinedIcon}
                 />
-
-                <ReviewProductInfos
-                  data={formik.values}
-                  onSubmit={() => formik.handleSubmit()}
-                  visible={activeStep === 2}
-                  onBack={() => setActiveStep(1)}
-                />
+                 <Collapse in={activeStep === 2} timeout={500}> 
+                  <ReviewProductInfos
+                    data={formik.values}
+                    onSubmit={() => formik.handleSubmit()}
+                    
+                    onBack={() => setActiveStep(1)}
+                  />
+                 </Collapse> 
               </Form>
             </FormikProvider>
         </Paper>

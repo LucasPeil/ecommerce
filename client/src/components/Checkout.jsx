@@ -1,9 +1,15 @@
 import { loadStripe } from '@stripe/stripe-js';
 import { Elements } from '@stripe/react-stripe-js';
+import { Box, Alert, AlertTitle } from '@mui/material';
 import CheckoutForm from './CheckoutForm';
-const Checkout = () => {
-  console.log(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
-  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY);
+const Checkout = ({setTempStripeSuccess}) => {
+  const stripePromise = loadStripe(import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY, {
+    developerTools: {
+      assistant: {
+        enabled: false,
+      },
+    },
+  });
   const stripeAppearance = {
     theme: 'stripe',
     variables: {
@@ -34,9 +40,17 @@ const Checkout = () => {
     appearance: stripeAppearance,
   };
   return (
-    <Elements stripe={stripePromise} options={options}>
-      <CheckoutForm />
-    </Elements>
+    <Box sx={{ maxWidth: '800px', margin: '0 auto', pt: 12, px: 2 }}>
+      <Alert severity="warning" sx={{ mb: 4, borderRadius: '1rem',border:'1px solid #ccc', }}>
+        <AlertTitle>Site Fictício</AlertTitle>
+        Este é um site fictício para fins de demonstração. 
+        <strong> Nenhuma transação real será processada</strong> e nenhum produto será enviado. 
+        Este projeto foi desenvolvido apenas para composição de portfólio.
+      </Alert>
+      <Elements stripe={stripePromise} options={options}>
+        <CheckoutForm setTempStripeSuccess={setTempStripeSuccess} />
+      </Elements>
+    </Box>
   );
 };
 
